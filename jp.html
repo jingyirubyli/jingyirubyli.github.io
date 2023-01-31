@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html land="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>リ　ジンイ/個人ホームページ</title>
+
+    <link rel="stylesheet" href="style/style.css">
+
+    <script src="js/script.js" defer></script>
+
+    <link rel="icon" href="uec.ico" type="image/UEC_C-mark.png">
+
+    <style>
+                  body {
+            background: url(forest.png) repeat;
+            background-size: cover;
+            opacity: 1.4;
+        }
+		div{
+			position: relative;
+		}
+		h1{font-size: 32px;
+			color: white;
+			position:absolute;
+			top:250px;
+			left:10px;}
+	</style>
+
+  </head>
+  <body>
+
+    <div id="t-warp">
+
+      <header>
+        <img src="c-mark.png" href="https://www.uec.ac.jp/">
+    </header>
+
+
+<nav class="uk-navbar-container uk-margin" uk-navbar="mode:click">
+    <div class="uk-navbar-left">
+        <ul class="uk-navbar-nav">
+        <li><a href="jp.html">ホーム</a></li>
+
+        <li><a href="jp_myself.html">個人プロフィール</a></li>
+        <li><a href="jp_lab.html">小泉研究室</a></li>
+        <li><a href="jp_table.html">日本</a></li>
+        <li><a href="jp_links.html">詳細はこちら</a></li>
+        <li><a href="mailto:medigit.jingyili@gmail.com">联系</a></li>
+        <li onmouseover="displaySubMenu(this)" onmouseout="hideSubMenu(this)">
+            <a href="#lan">言語</a>
+            <div uk-navbar-dropdown>
+                <ul class="uk-nav uk-dropdown-nav">
+        
+                    <li class="uk-nav-divider"></li>
+                    <li><a href="ch.html">简体中文</a></li>
+                    <li class="uk-nav-divider"></li>
+                    <li><a href="index.html">English</a></li>
+                </ul>
+            </div>
+        </li>
+        <li>    
+        <div class="search" style="text-align:center"> <!-- 搜索栏是站点内导航的一个非线性的方式。 -->
+            <input type="search" name="q" placeholder="検索内容を入力する">
+            <button type="button" value>検索</button>
+        </div>
+    </li>
+    </ul>
+
+</div>
+
+</nav>
+
+    <!-- HOME -->
+    <section class="section jumbotron-section bg--position-center no-repeat bg-cover md-display-table">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="regular-content">
+              <header>
+                <h3><span class="text--semi-bold">ようこそ</span> <span class="text--light">公式_リ　ジンイ!</span></h3>
+              </header>
+<h1>
+  ようこそ!
+</h1>
+              <h2 class="">リ　ジンイ     1/1/2023</h2>
+              <a class="btn btn-default btn-theme btn-rounded-corner" href="jp_myself.html" role="button">詳細はこちら</a>
+              <video width="580" height="450" controls>
+                <source src="1230.mp4" type="video/mp4">
+              </object> 
+              </video>
+              <article>"The views and opinions expressed in this page are strictly those of the webpage author. The contents of this page have not been reviewed or approved by The University of Electro-Communications.</article>
+              <br>
+              
+              <a>**"このページに記載されている見解や意見は、あくまでもウェブページの作成者のものです。このページの内容は、電気通信大学による審査や承認を受けたものではありません。"</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- HOME END -->
+
+
+<!--<div style="background:url('image/uec_campus.JPG') no-repeat;width:100%;height:100%;
+filter:alpha(opacity=50);opacity:0.5;">
+
+    <blockquote>
+        <p style="text-align:center">Welcome to my webpage!</p>
+    </blockquote>
+</div>-->
+<!-- <div style="text-align:center;">
+    <img src="image/uec_campus.JPG" alt="" width="auto" height="auto" style="margin:0 auto;"/>
+    <div style="position:absolute;z-index:3;left:83px;top:60px;font: size 30px;;">Welcome to my webpage!</div>
+</div>-->
+<div id="container">
+
+    <footer style="text-align:center;vertical-align:center;">© 2023 リ　ジンイ<br>
+
+        <div id="linkweb"><!--时间-->
+        </div>
+        <script>setInterval("linkweb.innerHTML=new Date().toLocaleString()+'星期'+'日一二三四五六'.charAt(new Date().getDay());",1000);
+        </script>
+    <address>
+      <p font-size="8px">調布市, 東京, 日本.</p>
+    </address>
+  
+
+    </footer>
+    
+  
+</div>
+
+  </div>
+  </body>
+</html>
