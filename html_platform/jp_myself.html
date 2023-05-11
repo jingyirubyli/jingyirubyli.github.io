@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html land="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>リ　ジンイ/個人ホームページ</title>
+
+    <link rel="stylesheet" href="style/style.css">
+
+    <script src="js/script.js" defer></script>
+
+    <link rel="icon" href="uec.ico" type="image/UEC_C-mark.png">
+
+    <style>
+                  body {
+            background: url(forest.png) repeat;
+            background-size: cover;
+            opacity: 2;
+        }
+		div{
+			position: relative;
+		}
+		h1{font-size: 32px;
+			color: white;
+			position:absolute;
+			top:250px;
+			left:10px;}
+	</style>
+
+  </head>
+  <body>
+
+    <div id="t-warp">
+
+      <header>
+        <img src="c-mark.png" href="https://www.uec.ac.jp/">
+    </header>
+
+<nav class="uk-navbar-container uk-margin" uk-navbar="mode:click">
+    <div class="uk-navbar-left">
+        <ul class="uk-navbar-nav">
+        <li><a href="jp.html">ホーム</a></li>
+
+        <li><a href="jp_myself.html">個人プロフィール</a></li>
+        <li><a href="jp_lab.html">小泉研究室</a></li>
+        <li><a href="jp_table.html">日本</a></li>
+        <li><a href="jp_links.html">詳細はこちら</a></li>
+        <li><a href="mailto:medigit.jingyili@gmail.com">联系</a></li>
+        <li onmouseover="displaySubMenu(this)" onmouseout="hideSubMenu(this)">
+            <a href="#lan">言語</a>
+            <div uk-navbar-dropdown>
+                <ul class="uk-nav uk-dropdown-nav">
+        
+                    <li class="uk-nav-divider"></li>
+                    <li><a href="ch.html">简体中文</a></li>
+                    <li class="uk-nav-divider"></li>
+                    <li><a href="index.html">English</a></li>
+                </ul>
+            </div>
+        </li>
+        <li>    
+        <div class="search" style="text-align:center"> <!-- 搜索栏是站点内导航的一个非线性的方式。 -->
+            <input type="search" name="q" placeholder="検索内容を入力する">
+            <button type="button" value>検索</button>
+        </div>
+    </li>
+    </ul>
+
+</div>
+
+</nav>
+
+    <!-- ABOUT -->
+    <section style="background-image:url(forest.png)">
+    <section id="about" class="section padding-top-bottom-65">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="regular-content">
+                <header>
+                  <h3><span class="text--semi-bold">個人</span> <span class="text--light">プロフィール</span></h3>
+                </header>
+                <div class="lunbo">
+                  <img src="image/hachi.JPG" id="myp" style="width: 350px;float: left;margin-right: 50px;margin-top: 0px;margin-left: 90px">
+                  <img src="image/night.JPG" id="myp" style="width: 350px;float: left;margin-top: px">
+                  
+                </div>
+                <p style="text-indent:2em;color:black" style="text-align:justify" > 東京に来て1ヶ月半が経ちました。まず第一に、私が受講しているコースは興味深く、重要かつ有用なスキルを学ぶことができます。第二に、私が出会った人々は親切でフレンドリーです。彼らは、勉強でも日常生活でも、他の人を助ける準備ができています。私は彼らと友達になりたいと思います。さらに、東京は美しい都市です。私は、一人で、または友人と一緒に、景色を眺めたり、買い物に行ったりしたいです。将来は、大阪、北海道、京都などにも行ってみたいです。東京での体験は一生忘れません。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- ABOUT END -->
+
+
+
+      <div id="container">
+
+        <footer style="text-align:center;vertical-align:center;">© 2023 リ　ジンイ<br>
+    
+            <div id="linkweb"><!--时间-->
+            </div>
+            <script>setInterval("linkweb.innerHTML=new Date().toLocaleString()+'星期'+'日一二三四五六'.charAt(new Date().getDay());",1000);
+            </script>
+        <address>
+          <p font-size="8px">調布市, 東京, 日本.</p>
+        </address>
+      
+    
+        </footer>
+        
+      
+    </div>
+    
+
+
+    </div>
+
+
+  </body>
+</html>

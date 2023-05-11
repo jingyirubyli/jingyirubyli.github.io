@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html land="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Jingyi LI Personal WebPage</title>
+
+    <link rel="stylesheet" href="style/style.css">
+
+    <script src="js/script.js" defer></script>
+
+    <link rel="icon" href="uec.ico" type="image/UEC_C-mark.png">
+
+    <style>
+                    body {
+            background: url(forest.png) repeat;
+            background-size: cover;
+            opacity: 2;
+        }
+		div{
+			position: relative;
+		}
+		h1{font-size: 32px;
+			color: white;
+			position:absolute;
+			top:250px;
+			left:10px;}
+	</style>
+
+  </head>
+  <body>
+
+    <div id="t-warp">
+
+        <header>
+            <img src="c-mark.png" href="https://www.uec.ac.jp/">
+        </header>
+
+
+<nav class="uk-navbar-container uk-margin" uk-navbar="mode:click">
+    <div class="uk-navbar-left">
+        <ul class="uk-navbar-nav">
+        <li><a href="index.html">Home</a></li>
+
+        <li><a href="myself.html">About Me</a></li>
+        <li><a href="lab.html">KOIZUMI Lab</a></li>
+        <li><a href="table.html">Japan Life</a></li>
+        <li><a href="links.html">Learn More</a></li>
+        <li><a href="mailto:medigit.jingyili@gmail.com">Contact</a></li>
+        <li onmouseover="displaySubMenu(this)" onmouseout="hideSubMenu(this)">
+            <a href="#lan">Language</a>
+            <div uk-navbar-dropdown>
+                <ul class="uk-nav uk-dropdown-nav">
+        
+                    <li class="uk-nav-divider"></li>
+                    <li><a href="ch.html">Chinese</a></li>
+                    <li class="uk-nav-divider"></li>
+                    <li><a href="jp.html">Japanese</a></li>
+                </ul>
+            </div>
+        </li>
+        <li>    
+        <div class="search" style="text-align:center"> <!-- 搜索栏是站点内导航的一个非线性的方式。 -->
+            <input type="search" name="q" placeholder="Type in contents">
+            <button type="button" value>Search</button>
+        </div>
+    </li>
+    </ul>
+
+</div>
+
+</nav>
+<section style="background-image:url(forest.png)">
+<section id="about" class="section padding-top-bottom-65">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="regular-content">
+            <header>
+              <h3><span class="text--semi-bold">Life In</span> <span class="text--light">japan</span></h3>
+            </header>
+
+            <div class="lunbo">
+                <img src="image/fly.JPG" id="myp" style="width: 350px;float: left;margin-right: 50px;margin-top: 0px;margin-left: 90px">
+                <img src="image/green.JPG" id="myp" style="width: 350px;float: left;margin-top: px">
+                
+              </div>
+
+<table class="uk-table uk-table-hover uk-table-divider" >
+    <table border="1">
+    <thead>
+        <th>Consumer Products</th>
+        <th>Price</th>
+
+        <tr>
+         
+            <td>Meal,Inexpensive</td><td>1000,00 &yen</td>
+        </tr>
+        <tr>
+            <td>Meal for 2,Mid-range</td><td>6000.00 &yen</td>
+        </tr>
+        <tr>
+            <td>McDonalds</td><td>700.00 &yen</td>
+        </tr>
+        <tr>
+            <td>Domestic Beer</td><td>600.00 &yen</td>
+        </tr>
+        <tr>
+            <td>Imported Beer</td><td>600.00 &yen</td>
+        </tr>
+        <tr>
+            <td>Cappuccino</td><td>460.61 &yen</td>
+        </tr>
+        <tr>
+            <td>Water</td><td>114.74 &yen</td>
+        </tr>
+        <tr>
+            <td>Milk</td><td>192.93 &yen</td>
+        </tr>
+        <tr>
+            <td>Loaf of Fresh White Bread</td><td>214.17 &yen</td>
+        </tr>
+        <tr>
+            <td>Rice(white)</td><td>457.73 &yen</td>
+        </tr>
+        <tr>
+            <td>Eggs</td><td>259.42 &yen</td>
+        </tr>
+        <tr>
+            <td>Local Cheese</td><td>2043.75 &yen</td>
+        </tr>
+        <tr>
+            <td>One-way Ticket(Local Transport)</td><td>200.00 &yen</td>
+        </tr>
+        <tr>
+            <td>Monthly Pass</td><td>10,000.00 &yen</td>
+        </tr>
+        <tr>
+            <td>Fitness Club(Monthly Fee)</td><td>9919.05 &yen</td>
+        </tr>
+    </tbody>
+</table>
+
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<div id="container">
+
+    <footer style="text-align:center;vertical-align:center;">© 2023 JINGYI LI<br>
+
+        <div id="linkweb"><!--时间-->
+        </div>
+        <script>setInterval("linkweb.innerHTML=new Date().toLocaleString()+'星期'+'日一二三四五六'.charAt(new Date().getDay());",1000);
+        </script>
+
+<address>
+    <p font-size="8px">Chofu, Tokyo, Japan.</p>
+  </address>
+
+    </footer>
+    
+  
+</div>
+
+</div>
+
+
+
+  </body>
+</html>

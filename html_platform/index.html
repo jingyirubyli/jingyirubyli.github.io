@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html land="en-US">
+  <head>
+    <meta charset="utf-8">
+    <title>Jingyi LI Personal WebPage</title>
+
+    <link rel="stylesheet" href="style/style.css">
+
+    <script src="js/script.js" defer></script>
+
+    <link rel="icon" href="uec.ico" type="image/UEC_C-mark.png">
+
+    <style>
+            body {
+            background: url(forest.png) repeat;
+            background-size: cover;
+            opacity: 1.4;
+        }
+		div{
+			position: relative;
+		}
+		h1{font-size: 32px;
+			color: white;
+			position:absolute;
+			top:250px;
+			left:10px;}
+	</style>
+
+  </head>
+  <body>
+
+<div id="t-warp">
+
+<header>
+    <img src="c-mark.png" href="https://www.uec.ac.jp/">
+</header>
+
+
+<nav class="uk-navbar-container uk-margin" uk-navbar="mode:click">
+    <div class="uk-navbar-left">
+        <ul class="uk-navbar-nav">
+        <li><a href="index.html">Home</a></li>
+
+        <li><a href="myself.html">About Me</a></li>
+        <li><a href="lab.html">KOIZUMI Lab</a></li>
+        <li><a href="table.html">Japan Life</a></li>
+        <li><a href="links.html">Learn More</a></li>
+        <li><a href="mailto:medigit.jingyili@gmail.com">Contact</a></li>
+        <li onmouseover="displaySubMenu(this)" onmouseout="hideSubMenu(this)">
+            <a href="#lan">Language</a>
+            <div uk-navbar-dropdown>
+                <ul class="uk-nav uk-dropdown-nav">
+        
+                    <li class="uk-nav-divider"></li>
+                    <li><a href="ch.html">Chinese</a></li>
+                    <li class="uk-nav-divider"></li>
+                    <li><a href="jp.html">Japanese</a></li>
+                </ul>
+            </div>
+        </li>
+        <li>    
+        <div class="search" style="text-align:center"> <!-- 搜索栏是站点内导航的一个非线性的方式。 -->
+            <input type="search" name="q" placeholder="Type in contents">
+            <button type="button" value>Search</button>
+        </div>
+    </li>
+    </ul>
+
+</div>
+
+</nav>
+
+
+
+
+    <!-- HOME -->
+  <section class="section jumbotron-section bg--position-center no-repeat bg-cover md-display-table">
+
+          <div class="container">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="regular-content">
+                  <header>
+                    <h3><span class="text--semi-bold">Welcome to my</span> <span class="text--light">Webpage!</span></h3>
+                  </header>
+<h1>
+  Welcome to my webpage!
+</h1>
+                <h2 class="">Jingyi LI     1/1/2023</h2>
+                <a class="btn btn-default btn-theme btn-rounded-corner" href="myself.html" role="button">Learn More</a>
+                <video width="580" height="450" controls>
+                  <source src="1230.mp4" type="video/mp4">
+                </object> 
+                </video>
+                <article style="text-align:justify;">"The views and opinions expressed in this page are strictly those of the webpage author. The contents of this page have not been reviewed or approved by The University of Electro-Communications.</article>
+                <br>
+                
+                <a style="text-align:justify;">**"The views and opinions expressed in this page are strictly those of the webpage author. The contents of this page have not been reviewed or approved by The University of Electro-Communications."</a>
+          </div>
+        </div>
+        </div>
+      </div>
+      </section>
+      <!-- HOME END -->
+
+
+      <div id="container">
+
+        <footer style="text-align:center;vertical-align:center;">© 2023 JINGYI LI<br>
+    
+            <div id="linkweb"><!--时间-->
+            </div>
+            <script>setInterval("linkweb.innerHTML=new Date().toLocaleString()+'星期'+'日一二三四五六'.charAt(new Date().getDay());",1000);
+            </script>
+        <address>
+          <p font-size="8px">Chofu, Tokyo, Japan.</p>
+        </address>
+    
+        </footer>
+        
+      
+    </div>
+    
+    
+    </div>
+    
+    
+  </body>
+</html>
