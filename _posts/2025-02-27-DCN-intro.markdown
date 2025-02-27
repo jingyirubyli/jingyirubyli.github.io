@@ -1,25 +1,60 @@
 ---
 layout: post
-title: Time to think
-date: 2017-08-21 13:32:20 +0300
+title: DCN-Intro
+date: 2025-02-27
 description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
 img: post-5.jpg # Add image post (optional)
 tags: [Blog, Meditation]
 author: # Add name author (optional)
 ---
-You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run `jekyll serve`, which launches a web server and auto-regenerates your site when a file is updated.
+# DateCenter Network 概述
+## 1. 什么是Datacenters
+A large warehouse housing 100s of thousands of servers
+Datacenters are the workhorses of the modern Internet
+数据中心是现代互联网的主力
 
-To add new posts, simply add a file in the `_posts` directory that follows the convention `YYYY-MM-DD-name-of-post.ext` and includes the necessary front matter. Take a look at the source for this post to get an idea about how it works.
+## 2. Datacenter Network和Internet的异同
 
-Jekyll also offers powerful support for code snippets:
+- 与Internet相比，Datacenter Network规模较小(~100K vs. billions of hosts.)
+- Datacenter Network由单个实体single entity管理(Each aspect of the network can be customized!)
 
-{% highlight ruby %}
-def print_hi(name)
-  puts "Hi, #{name}"
-end
-print_hi('Tom')
-#=> prints 'Hi, Tom' to STDOUT.
-{% endhighlight %}
+`Datacenter networks present a unique opportunity to re-think the design of an entire network from grounds-up! i.e. How would you build a network if you could control the
+design of every component in the network?`
+
+## 3. 从零构建一个Datacenter Network
+### 3.1 全新的网络拓扑/协议
+- Network Topology 网络拓扑
+- Routing 路由
+- Transport 传输
+### 3.2 全新的网络架构
+- Software-defined Networks (SDNs) 软件定义网络
+- In-Network Computing 网络内计算
+- Resource Disaggregation 资源解耦
+- Multi-tenancy 多租户
+### 3.3 全新的网络硬件设备
+- Programmable Routers 可编程路由器
+- Optical Routers 光路由器
+- Programmable Switches 可编程交换机
+- RDMA NICs RDMA网卡
+
+## 4. 五层OSI(Open Syetem Interconnection)模型 Five Layer OSI Model
+
+![图片alt](/assets/img/5osi.png "Five Layer OSI Model")
+- 应用层Application (L5): 允许访问OSI环境的手段: Network service to users or applications
+  - Mechanisms: read/write data from applications, encrypt/decrypt, etc.
+
+- 运输层Transport (L4): 端到端的数据传递: (Reliable) end-to-end data delivery/communication
+  - Mechanisms: reliability, flow and congestion control, application multiplexing
+- 网络层Network (L3): 数据包从源到宿的传递和网际交互: Routing. “Best-effort” data delivery between networks
+  - Mechanisms: naming, addressing, destination discovery, routing, forwarding
+- 数据链路层Data Link (L2): 将bit组装成frame(帧)和点对点传递: Switching. “Best-effort” data delivery within a local network
+  - Mechanisms: naming, addressing, destination discovery, routing, forwarding
+- 物理层Physical (L1): 通过媒介输出比特: Bits to/from Wires, cables, etc.
+  - Mechanisms: signal processing, analog-to-digital conversions, etc.
+  Layer n interfaces only with layer n-1 and layer n+1
+
+## 5. 报头封装和解封装 Header Encapsulation & Decapsulation
+
 
 Check out the [Jekyll docs][jekyll-docs] for more info on how to get the most out of Jekyll. File all bugs/feature requests at [Jekyll’s GitHub repo][jekyll-gh]. If you have questions, you can ask them on [Jekyll Talk][jekyll-talk].
 
