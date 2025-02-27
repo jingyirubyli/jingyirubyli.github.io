@@ -1,0 +1,164 @@
+---
+layout: post
+title:  DCN Lecture2
+date:   2025-01-21
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: post-4.jpg # Add image post (optional)
+tags: [Blog, Mountains, Sport]
+author: # Add name author (optional)
+---
+
+- Network (L3): “Best-effort” data delivery between networks
+  - Mechanisms: naming, addressing, destination discovery, routing, forwarding
+- Data Link (L2): “Best-effort” data delivery within a local network
+  - Mechanisms: naming, addressing, destination discovery, routing, forwarding
+
+## Network vs. Data Link Layer
+不同点:
+- 网络层是用于连接不同本地网络的全球标准协议（IP）
+- 数据链路层允许每个局域网（LAN）内的自主性
+![图片alt](/assets/img/l2p1.png "Network vs. Data Link Layer")
+
+相同点:都使用同一套机制, `但是实现方式不同`
+- 命名和寻址 Naming and Addressing
+- 目的地发现 Destination Discovery
+- 转发 Forwarding
+- 路由 Routing
+
+`Why we need different set of solutions to solve the same set of problems?`
+从高层次上看，两者都解决了同一个问题：将数据从 A 点传送到 B 点！
+我们真的需要不同的解决方案吗？很遗憾，是的。因为它们的工作规模不同：本地数据传输(local data delivery)与全局数据传输(global data delivery)，这就是区别所在！
+
+
+## 数据链层 Data Link Layer
+Most popular (wired) protocol — Ethernet 以太网
+- Addressing: MAC Adress
+- Destination Discovery: ARP
+- Forwarding: MAC Forwarding
+- Routing: STP
+### Media Access Control (MAC) Address 媒体访问控制 (MAC) 地址
+
+#### 每个网络接口（无论是物理的还是虚拟的）都有一个“MAC 地址”
+- MAC 地址是一个48位(48 bits)的标识符，通常表示为6个十六进制数字(6 bytes)，例如 00:1A:2B:3C:4D:5E
+- ff:ff:ff:ff:ff:ff 是一个特殊的 MAC 地址，称为广播地址(Broadcast address)，用于向网络中的所有设备发送数据
+  - MAC 地址的前24位（前3个字节）称为组织唯一标识符（OUI），由 IEEE 分配给网络接口卡（NIC）的制造商
+  - MAC 地址的后24位（后3个字节）由制造商分配给特定的网络接口卡
+  - MAC 地址是固定的，不能更改，除非更换网络接口卡
+- 一个设备可以有多个接口，因此有多个 MAC 地址
+- 给定网络内每个接口的 MAC 地址必须是唯一的，由网络接口卡（NIC）的制造商分配
+  - 避免地址冲突(address clashes)
+  - 设备供应商确保其接口的 MAC 地址是全球唯一的
+- MAC 地址用于在局域网（LAN）中标识设备，以便进行通信和数据传输
+- MAC 地址可以通过 ARP（地址解析协议）来解析为 IP 地址，从而实现 IP 地址和 MAC 地址之间的映射
+
+### Address Resolution Protocol (ARP) 地址解析协议 (ARP)
+
+#### 用于获取与源主机位于同一本地网络内的目标主机的 MAC 地址
+Used to get the MAC address of a destination host
+within the same local network as the source host
+
+- 假设您知道目标主机的 IP 地址
+- 每个主机都维护一个本地表local table，其中包含 IP 地址到 MAC 地址的映射，称为 ARP table
+  - 在 MAC/Linux 上运行命令“arp -a”查看表
+  - 存储 IP 地址 —> MAC 地址之间的映射
+- 如果在表中找到条目，则完成！
+- 否则运行 ARP 以获取 MAC 地址
+
+#### ARP
+
+- ARP Request: 将 ARP 请求广播到本地网络
+![图片alt](/assets/img/l2p5.png "ARP-1")
+
+- ARP Reply: 目标主机收到请求并将其 MAC 地址发送回源主机
+![图片alt](/assets/img/l2p6.png "ARP-2")
+
+- Update local ARP table: 源主机更新其 ARP 表
+![图片alt](/assets/img/l2p7.png "ARP-3")
+
+
+## 网络层 Network Layer
+Most popular protocol — Internet Protocol 互联网协议(IP) 
+- Addressing: IP Adress
+- Destination Discovery: DNS
+- Forwarding: IP Forwarding
+- Routing: Network Routing Protocols (DV, LS, BGP)
+
+### IP Address
+
+#### IP地址组成
+- IPv4 — 32 bits — Represented as X.X.X.X where X is 8-bit decimal
+e.g., 192.168.3.29 (called “dotted decimal” format)
+- IPv6 has 128 bits... We will only focus on IPv4 in this course
+`IP Addresses are hierarchical; unlike MAC addresses that are flat`
+
+{% highlight ruby %}
+dotted decimal format  192.168.3.29
+binary format  11000000.10101000.00000011.0`0011101`
+前25位为Subnet Address Prefix子网地址前缀, 后7位为Host Identifier主机标识符
+{% endhighlight %}
+![图片alt](/assets/img/l2p2.png "IP地址")
+
+#### 子网掩码 Subnet Mask
+Subnet Mask 子网掩码用于从 IP 地址提取子网地址
+- 32-bit: 一连串全 1 后面跟着一连串全 0
+  - e.g., 255.255.240.0 (20 1s followed by 12 0s)
+- 1s in the subnet mask indicate the subnet address prefix
+- 0s in the subnet mask indicate the host identifier
+- 192.168.3.29/25
+- 192.168.3.29/255.255.255.128
+- 192.168.3.29 255.255.255.128
+
+Subnet Address 子网地址: IP 地址（按位与） 子网掩码
+- e.g., 192.168.3.29 & 255.255.240.0 = 192.168.0.0
+
+无类别域间路由 Classless Inter-Domain Routing (CIDR)是一个用于给用户分配IP地址以及在互联网上有效地路由IP数据包的对IP地址进行归类的方法。
+- A flexible representation of subnet address(Flexible number of bits allocated for subnet address)
+- 子网地址在 CIDR 中表示为 X.X.X.X/n
+  - 为子网地址分配的前 n 位都是1,称为网络位
+  - 剩余的 32-n 位是主机位
+  - 子网掩码是 n 个连续的 1 后面跟着 32-n 个 0
+  - 子网可以支持 2^(32-n) 个 IP 地址
+- E.g., Subnet address 128.32.0.0/11
+  - can support 2^21 IP addresses
+  - in the range 128.32.0.0 to 128.63.255.255
+
+![图片alt](/assets/img/l2p3.png "CIDR地址解析")
+
+#### 目标 IP 寻址类型 Types of Destination IP Addressing
+
+- 单播 Unicast
+  - 最常见的 IP 寻址类别
+  - 目标 IP 地址唯一地标识单个目标主机
+  - 单播数据包被发送到单个目标主机
+
+- 广播 Broadcast
+  - 目标 IP 地址为 all 1s: 255.255.255.255
+  - 广播数据包被发送到同一网络中的所有主机
+  - 子网的广播地址是通过将 IP 地址的主机标识符部分设置为全 1 来创建的
+    - E.g., for subnet 192.4.0.0/16, broadcast address: 192.4.255.255
+  - 发送方发送数据包，并将目标 IP 设置为广播 IP
+  - 路由器复制replicate数据包并将其路由 route 到子网中的所有主机
+
+- 多播 Multicast
+  - A generalization of broadcast
+  - 目标 IP 地址为 D 类地址
+  - 多播数据包被发送到同一组中的所有主机/目标 IP 与网络中的主机子集subset（1 个或多个）相关联
+  - 224.0.0.0 至 239.255.255.255 范围内的 IP 地址用作多播地址（D 类 IP 地址）
+    - 接收方使用 Internet 组管理协议Internet Group Management Protocol (IGMP) 加入多播组 G
+    - G 被分配多播地址 M
+    - 发送方通过将目标 IP 设置为 M 将数据包发送到 G
+    - 路由器将数据包复制replicate并将其路由route到组 G 中的所有主机(接收方)
+  - 多播地址是通过将 IP 地址的主机标识符部分设置为全 0 来创建的
+    - E.g., for multicast group 224.0.0.1, multicast address: 224.0.0.1
+
+- 任播 Anycast
+  - 一组接收者与同一个目标 IP 相关联
+  - 路由算法根据某些路由指标（例如，地理位置上最接近发送者的接收者）将消息发送到组中的单个single接收者
+  - 任播通常用于在运行相同服务的多个服务器之间平衡负载`Anycast is typically used to balance the load across multiple servers each running the same service`
+![图片alt](/assets/img/l2p4.png "目标 IP 寻址类型")
+
+
+
+[jekyll-docs]: https://jekyllrb.com/docs/home
+[jekyll-gh]:   https://github.com/jekyll/jekyll
+[jekyll-talk]: https://talk.jekyllrb.com/
