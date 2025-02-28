@@ -27,7 +27,9 @@ Prior Solutions for Enforcing Network-wide Policies
   - 例如，访问控制列表（例如，阻止具有特定源 IP 的数据包）
   - 限制：没有解决根本原因；掩盖问题而不是解决问题. 例如，如果用户更改其 IP 地址会怎样？
 
-# Ethane’s Three Principles
+# Ethane 
+
+## Three Principles
 
 - “网络应由通过高级名称声明的策略进行管理”“The network should be governed by policies declared over high-level names”
   - 使用用户名或主机名而不是动态分配的地址来表达规则
@@ -108,3 +110,62 @@ Each condition is a conjunction of predicates谓词的组合 which specify the p
 
 编译器compiler将策略编译成交换机中的转发规则
 
+### Ethane Switch
+- Ethane switches use a “Flow Table”流表 for forwarding.
+- 该策略被编译成流表的“匹配操作”规则集“Match-Action” rules
+    - 匹配数据包头packet header和元数据字段metadata fields的（子集）
+    - 采取一些操作action，例如，转发到输出端口 1、丢弃
+![图片alt](/assets/img/l7p3.png "A Flow Table")
+
+- Ethane Switch vs. Traditional Switch
+![图片alt](/assets/img/l7p4.png "Moved to the controller")
+
+### Ethane Summary
+
+- Ethane 旨在通过以下方式使网络更易于管理：
+  - 利用集中控制方案centralized
+    - 使交换机变得非常简单（仅执行转发）...
+    - 通过将控制平面逻辑control plane logic转移到中央控制器central controller, 使编程和执行全局策略变得容易
+- Ethane 与传统的分布式网络架构截然不同
+
+# OpenFlow: Communication b/w Controller & Switch
+
+Motivation: Ethane网络需要控制器与交换机通信以填充转发规则。我们需要控制器和交换机之间的通信协议。一开始，每个交换机供应商都设计了自己的协议来安装交换机转发规则, 导致网络运营商需要了解每个交换机供应商的规范,还需要针对不同供应商的不同交换机修改控制平面应用程序。OpenFlow 定义了一种可编程网络协议programmable network protocol, 该协议可以帮助管理路由器和交换机，无论底层路由器或交换机由哪家供应商制造。
+
+OpenFlow Switch至少包含三个部分：
+- Flow Table/流表：与每个条目关联的操作
+- Secure Channel/安全通道：将交换机与控制器连接起来
+- OpenFlow Protocol/OpenFlow 协议：控制器与交换机通信并填充流表条目的开放标准接口
+
+# SWAN: An Application of SDN
+
+## Inter-DC Wide Area Network (WAN)
+
+### WAN Traffic
+- 将用户数据（例如电子邮件、文档、音频/视频）复制到远程 DC 以实现可用性/持久性
+- 通过固有分布式数据源进行计算的远程存储访问
+- 跨 DC 的大规模数据同步和状态复制
+
+### WANs are very inefficient!
+- 服务间缺乏协调/Lack of co-ordination between services
+- 本地、贪婪、资源分配/Local, Greedy, Resource Allocation
+  - First order objective: Maximize throughput for each flow
+  - Second order objective: Minimize latency for each flow
+
+### SWAN: Software-driven WAN 软件驱动广域网
+
+两个关键设计元素：
+  - 协调服务的发送速率
+  - 集中资源分配
+使用中央控制器实现两个目标
+
+SWAN Workflow
+- 控制器计算每个服务的发送速率
+  - 简化为众所周知的理论问题 - 路径约束Path-constrained, 多商品流问题Multi-commodity Flow Problem
+- 控制器还计算每个流的最佳路径
+  - 例如，不相交路径以避免拥塞
+  - 相应地配置每个交换机，例如使用 OpenFlow
+  - 随着新流到达，配置会动态更新
+    - 可能需要将现有流移动到不同的路径
+    - 可能导致暂时拥塞
+![图片alt](/assets/img/l7p5.png "Congestion-free Network Updates")
