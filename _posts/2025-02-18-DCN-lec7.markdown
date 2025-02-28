@@ -106,6 +106,7 @@ Trade-off: System complexity vs. time to recover
 Policy specification language called Pol-Eth.
 Each condition is a conjunction of predicates谓词的组合 which specify the properties a flow must have for a certain action.
 例如，允许从源用户“bob”到目标主机“websrv”的 HTTP 流
+
 ![图片alt](/assets/img/l7p2.png "")
 
 编译器compiler将策略编译成交换机中的转发规则
@@ -115,6 +116,7 @@ Each condition is a conjunction of predicates谓词的组合 which specify the p
 - 该策略被编译成流表的“匹配操作”规则集“Match-Action” rules
     - 匹配数据包头packet header和元数据字段metadata fields的（子集）
     - 采取一些操作action，例如，转发到输出端口 1、丢弃
+    - 
 ![图片alt](/assets/img/l7p3.png "A Flow Table")
 
 - Ethane Switch vs. Traditional Switch
@@ -168,4 +170,5 @@ SWAN Workflow
   - 随着新流到达，配置会动态更新
     - 可能需要将现有流移动到不同的路径
     - 可能导致暂时拥塞
+  
 ![图片alt](/assets/img/l7p5.png "Congestion-free Network Updates")
