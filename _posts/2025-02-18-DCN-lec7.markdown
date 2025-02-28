@@ -1,0 +1,110 @@
+---
+layout: post
+title:  DCN Lec7-Software-defined Networking
+date:   2025-02-25
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: post-2.jpg # Add image post (optional)
+tags: [Blog, Sunset]
+author: # Add name author (optional)
+---
+
+Objective: Make Enterprise Networks easier to Manage
+
+![图片alt](/assets/img/l7p1.png "Enterprise vs. Datacenter Networks")
+
+企业网络的问题: 企业网络是异构的 Heterogeneous
+- 不同供应商的各种硬件上存在各种协议
+- 难以执行全网策略network-wide policies！
+- 使用供应商特定的命令手动配置交换机
+- 需要调整许多单独的旋钮；因此很容易出现配置错误！
+    - 多供应商网络中 62% 的网络停机时间来自人为错误
+    - 80% 的 IT 预算用于维护和运营
+
+Prior Solutions for Enforcing Network-wide Policies
+- 将中间盒放置在网络瓶颈处以施加控制
+  - 限制：流量可能会绕过中间盒；不再执行政策
+- 在顶部添加新的协议层以施加控制
+  - 例如，访问控制列表（例如，阻止具有特定源 IP 的数据包）
+  - 限制：没有解决根本原因；掩盖问题而不是解决问题. 例如，如果用户更改其 IP 地址会怎样？
+
+# Ethane’s Three Principles
+
+- “网络应由通过高级名称声明的策略进行管理”“The network should be governed by policies declared over high-level names”
+  - 使用用户名或主机名而不是动态分配的地址来表达规则
+- “策略应确定数据包所遵循的路径”“Policy should determine the path that packets follow”
+  - 例如，强制访客主机通过防火墙
+- “网络应强制数据包与其来源之间的强绑定”“The network should enforce a strong binding between a packet and its origin”
+  - 即使用户在主机之间移动，也保持一致的（用户、主机、地址）(user, host, address)绑定
+
+## Ethane Design
+
+Goal: Abstract the entire network as a simple programmable entity
+Two Key Ideas:
+- 使交换机变得非常简单
+  - 简单的转发设备
+- 中央控制器central controller — 网络的“大脑”
+  - 具有整个网络的全局视图
+  - 网络中的所有通信都需要控制器的许可
+  - 通过要求身份验证将每个用户绑定到主机和地址
+  - 根据指定的策略计算路由并在交换机中安装转发规则
+
+### How Ethane Works?五项基本活动：
+- Registration
+  - 所有用户、主机和交换机都向控制器注册以加入网络
+    - 因此控制器可以全局查看网络中所有实体！
+  - 注册是一个被动步骤 passive step
+    - 不足以通过网络发送/接收数据！
+    - 需要进一步的身份验证才能发送/接收数据
+- Bootstrapping
+  - 交换机创建以控制器为根的生成树
+  - 交换机建立到控制器的安全通道
+  - 交换机定期向控制器发送邻居信息
+    - 这样，控制器始终可以查看最新的网络拓扑
+- Authentication
+  - 网络实体上线所需
+    - 以便它们可以发送/接收数据
+  - 交换机使用注册期间提交的预配置证书pre-configured certificates进行身份验证
+  - 主机通过向控制器发送包含硬件地址的 DHCP 请求(DHCP request)进行身份验证。控制器根据注册地址检查地址，并分配 IP 地址
+  - 用户可以使用企业登录凭据enterprise login credentials（例如，Web 登录表单 login form）
+  - A Host -> IP -> User binding is created
+- Flow setup
+  - 用户 A 想要向用户 B 发送数据包
+  - 最初，交换机 1 没有转发条目forwarding entry，因此数据包被转发到控制器
+  - 控制器检查网络策略network policy是否允许用户 A 与用户 B 通信
+  - 如果允许，控制器会在路由沿线的所有交换机中安装转发规则
+- Forwarding
+  - 如果控制器允许该路径，数据包将被发回交换机 1，然后交换机 1 使用控制器安装的转发规则转发数据包
+  - 从 A 到 B 的所有后续数据包subsequent packets都将由交换机转发；无需再转到控制器
+  - 转发表条目Forwarding table entries通过不活动超时inactivity timeout或由控制器controller清除
+
+### Ethane Controller : Fault Tolerance
+
+控制器是故障的中心点,使用控制器的备份副本backup replicas提供容错能力.
+
+维护备份副本的三个选项：
+- Cold standby
+  - Backups contain registration and policy information but lack the (user, host, address) bindings
+  - 在主控制器发生故障时选择 ID 最低的备份控制器
+  - 最不复杂，但故障后收敛时间最长
+- Warm standby
+  - Backups contain binding information with weak consistency
+    - 即，不同的备份控制器可能具有不同的绑定元组子集subsets of binding tuples
+    - 但没有不一致的信息
+  - 更复杂，但从故障中恢复更快
+- Fully replicated
+  - 多个活动控制器各自保持相同状态
+  - 交换机将每个请求分发到所有控制器（主控制器和备份控制器primary and backups）
+  - 使用基于gossip协议gossip-based protocol来保持一致的事件顺序
+  - 最复杂，但故障恢复速度最快
+
+Trade-off: System complexity vs. time to recover
+
+### Ethane Policy
+
+Policy specification language called Pol-Eth.
+Each condition is a conjunction of predicates谓词的组合 which specify the properties a flow must have for a certain action.
+例如，允许从源用户“bob”到目标主机“websrv”的 HTTP 流
+![图片alt](/assets/img/l7p2.png "")
+
+编译器compiler将策略编译成交换机中的转发规则
+
