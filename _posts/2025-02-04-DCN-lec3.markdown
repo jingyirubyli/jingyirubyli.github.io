@@ -1,0 +1,103 @@
+---
+layout: post
+title:  DCN Lec3
+date:   2025-02-04
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: post-3.jpg # Add image post (optional)
+tags: [Blog, Sunset]
+author: # Add name author (optional)
+---
+- Transport (L4): (Reliable) end-to-end data delivery
+  - Mechanisms: reliability, flow and congestion control, application multiplexing
+
+# Transmission Control Protocol (TCP) 传输控制协议 (TCP)
+
+- TCP 是最流行的传输层协议
+- TCP 是一种可靠的传输协议：“可靠的传输协议确保发送应用程序发送的所有字节最终都以与发送方发送的字节顺序相同的顺序被接收应用程序接收”
+- 可靠的协议实现了四种机制：
+  - 应用程序多路复用 Application Multiplexing
+  - 可靠性 Reliability
+  - 流量控制 Flow Control
+  - 拥塞控制 Congestion Control
+
+## 应用程序多路复用 Application Multiplexing
+
+### Application Multiplexing
+- 网络层和数据链路层向主机传送数据包/从主机传送数据包
+- 但一台主机可以运行多个应用程序...
+- 传输层向主机上运行的应用程序发送数据/从主机上运行的应用程序接收数据 `— 应用程序多路复用`
+
+- 当应用程序想要访问网络时，它会打开与端口port关联的套接字Socket
+  - Socket: 将应用程序连接到网络堆栈的操作系统机制
+    - An OS mechanism that connects applications to network stack
+  - Port: 指定特定套接字的数字（通常为 16 位）
+    - 操作系统确保套接字的端口号在主机内是唯一的
+- 操作系统使用端口号进行应用程序多路复用，即向正确的应用程序发送数据包/从正确的应用程序接收数据包
+  - The port number is used by the OS for application multiplexing, i.e., to send/receive packets to/from right applications
+
+### Packet Header 数据包头
+
+数据包头必须包括（除其他内容外）：
+- Destination Address 目标地址（由网络用于将数据包发送到目标）
+- Destination Port 目标端口（由目标处的网络堆栈用于应用程序复用，即将数据包定向到正确的应用程序）
+- Source Address 源地址（由网络用于将数据包发送回源）
+- Source Port 源端口（由源处的网络堆栈用于应用程序复用，即将数据包定向到正确的应用程序）
+
+### A TCP Flow or Connection TCP 流或连接
+
+流或连接是“类似”数据包的集合
+- 网络层流是具有相同二元组的数据包集合 {src (IP) addr, dst (IP) addr}
+- 传输层流是具有相同 5 元组的数据包集合
+  - {src (IP) addr, dst (IP) addr, src port, dst port, protocol} 
+  - 对于 TCP 流，协议字段为 6（TCP protocol num: TCP 协议编号）
+
+![图片alt](/assets/img/l2p14.png "TCP Connection Timing Diagram")
+
+
+## 可靠性 Reliability
+
+
+
+
+
+
+
+
+
+
+## 流量控制 Flow Control
+
+### Receiver
+- 防止发送方溢出接收方的接收缓冲区
+- 接收方将 ACK 数据包的 TCP 标头中的“通告窗口Advertised Window”字段设置为接收方可用的接收缓冲区空间 available receive buffer space at the receiver
+### Sender
+- 收到设置了通告窗口字段Advertised Window field的数据包时：
+  - 发送方将 RWND 设置为通告窗口值
+  - 发送方的窗口大小 (W) 最多为 RWND
+    - 即，发送方最多可以有 RWND 个未确认的字节un-ACKed bytes在传输中
+    - 限制发送方可以发送的速率
+      - 最多有 RWND/RTT bytes/sec
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 拥塞控制 Congestion Control
+
+
+
+
+
+
+
+[jekyll-docs]: https://jekyllrb.com/docs/home
+[jekyll-gh]:   https://github.com/jekyll/jekyll
+[jekyll-talk]: https://talk.jekyllrb.com/
