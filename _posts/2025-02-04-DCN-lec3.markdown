@@ -51,19 +51,77 @@ author: # Add name author (optional)
   - {src (IP) addr, dst (IP) addr, src port, dst port, protocol} 
   - 对于 TCP 流，协议字段为 6（TCP protocol num: TCP 协议编号）
 
-![图片alt](/assets/img/l2p14.png "TCP Connection Timing Diagram")
+![图片alt](/assets/img/l3p1.png "TCP Connection Timing Diagram")
 
 
 ## 可靠性 Reliability
 
+### Reliability Algorithm 可靠性算法
+
+#### 算法
+- 发送方最多可以有 W 个未确认的数据包un-ACKed packets在传输中（称为“窗口window”）
+- 发送方为每个发送的数据包设置计时器并等待确认ACKs
+- 接收方为每个收到的数据包发送一个确认ACK
+- 发送方在收到每个确认后发送下一个数据包（例如，第一个确认后发送 W+1 个数据包）e.g., W+1 pkt after 1st ACK
+- 如果没有收到确认且数据包的计时器已到期，则发送方将重新发送该数据包
+
+#### “Sliding” Sender Window
+- TCP 中的发送方维护一个大小为 W 的“滑动”窗口
+  - 发送方最多可以有 W 个字节的未确认数据在传输中
+- 窗口左边缘：
+  - 正在传输的数据的开始（已发送但尚未确认）
+  - 某些数据已确认时滑动
+
+#### 可靠性算法的两个问题
+##### 接收方如何为数据包指定 ACK？
+需要为每个发送的数据包标记一个“序列号sequence number”——接收方可以使用收到的数据包的序列号作为该数据包的 ACK
+- 序列号sequence number
+  - 与每个 TCP 流关联的单调递增数字
+    - TCP 为发送的每个字节分配一个序列号
+    - 为简单起见，我们将假设为每个数据包分配了序列号
+  - TCP 流中的第一个字节被分配了一个随机序列号，称为初始序列号Initial Sequence Number (ISN)
+    - 后续字节将具有序列号 ISN+1、ISN+2、......
+    - 在 TCP 连接建立期间交换 ISN
+
+- Acknowledgment (ACK)
+  - TCP 使用一种称为“累积 ACK/Cumulative ACK”的 ACK 形式
+  - 确认最高的连续接收序列号 ACK the highest contiguous received sequence number
+
+累积 ACK/Cumulative ACK
+- Conditions to Retransmit?
+  - Duplicate ACKs or the timer expires, whichever first
+  - but duplicate ACKs only tell a loss might have occurred, not that it has occurred
+    - Packet may be reordered/delayed in network — will produce Dup ACKs
+      - Here, do not want to re-transmit on receiving the Dup ACK as the packet is not lost!
+    - Or, packet may actually be lost — will also produce Dup ACKs
+      - Here, we do want to re-transmit on receiving the Dup ACK as the packet is indeed lost!
+    - Impossible to know which one is the case
+      - Retransmit after k Dup ACKs (TCP uses k=3)
+- What packets to Retransmit?
+  - Go-Back-N
+    - 最小序列号开始重新传输所有未收到 ACK 的数据包
+    - 效率较低，但易于实现
+    - 
+![图片alt](/assets/img/l3p2.png "Go-Back-N")
 
 
+##### 如何设置最佳窗口大小 (W)？
+由流量和拥塞控制机制决定 Flow and Congestion Control mechanisms
+- 窗口大小决定发送方发送数据的速率: Send Rate ~ W/RTT bytes per sec
+- 如何设置（和更新）发送方的窗口大小（W）？
+  - 设置 W，使得发送方可以尽可能快地发送
+  - 不会使接收方过载 — 流量控制 Flow Control
+  - 不会使网络过载 — 拥塞控制 Congestion Control
 
-
-
-
-
-
+3 TCP Windows
+- Receiver window (RWND) for flow control 用于流量控制的接收窗口 (RWND)
+  - 可以发送多少字节而不会溢出接收缓冲区receiver buffer？
+  - 由接收方确定并报告给发送方
+- Congestion window (CWND) for congestion control 用于拥塞控制的拥塞窗口 (CWND) 
+  - 可以发送多少字节而不会溢出路由器/交换机缓冲区router/switch buffers？
+  - 由发送方使用某些拥塞信号（例如丢失）计算
+- Sender’s (“sliding”) window 发送方的（“滑动”）窗口
+  - W = min(CWND, RWND)
 
 ## 流量控制 Flow Control
 
@@ -79,18 +137,73 @@ author: # Add name author (optional)
       - 最多有 RWND/RTT bytes/sec
 
 
-
-
-
-
-
-
-
-
-
-
-
 ## 拥塞控制 Congestion Control
+
+### TCP 拥塞控制基础知识
+
+- 发送方维护一个拥塞窗口Congestion Window (CWND)
+  - 发送方最多可以有 CWND 个未确认的字节un-ACKed bytes在传输中
+- 调整拥塞窗口 (CWND)
+  - 在没有拥塞时增加 CWND
+  - 检测到拥塞时减少 CWND
+- 如何检测拥塞？
+  - 数据包丢失（3 个重复确认或超时 3 Dup ACKs or timeout）
+    - 3 Dup ACKs: 通常意味着孤立丢失 - 减少 CWND 的力度较小
+    - Timeout: 通常意味着拥塞严重 - 减少 CWND 的力度要大
+
+### Additive Increase, Multiplicative Decrease (AIMD)
+
+- 假设 CWND 以 Maximum Segment Size/MSS（最大段大小）为单位进行测量
+  - MSS 是一个可配置参数，用于指定 TCP 有效负载的最大长度
+- Additive Increase 加法增加
+  - 如果最后一个数据窗口成功，则将 CWND 增加 1 MSS On success of last window of data, increase CWND by 1 MSS
+  - i.e., CWND = CWND + 1/CWND per (new) ACK in the window
+- Multiplicative Decrease 乘法减少
+  - 检测到 3 个 Dup ACK 时：CWND = CWND/2
+  - 检测到超时时：CWND = 1 MSS
+-  “Additive” increase and “Multiplicative” decrease is fundamental
+  - 使得 TCP 中带宽的公平分配 fair share of bandwidth in TCP
+  - 增加和减少因素可能有所不同（TCP 使用效果最佳的值）
+
+### TCP Slow Start + AIMD Behavior
+一个问题: 加法增加的速度太慢了
+解决方案：TCP“慢启动Slow Start”阶段，实现快速提升
+
+- Increase
+  - “Slow Start” phase:
+    - Start with CWND = 1 MSS (hence, called slow start) and increase CWND by 1 MSS for each new ACK
+      - CWND doubles on success of last window of data
+    - Exponential Increase!
+  - Leave Slow Start phase and enter Additive Increase when:
+    - CWND >= ssthresh (slow start threshold)
+  - Additive Increase (also called “Congestion Avoidance”) phase:
+    - CWND increases by 1 MSS on success of last window of data
+- Decrease
+  - Cut CWND to half on 3 Dup ACKs:
+    - Set ssthresh = CWND/2
+    - Set CWND = CWND/2
+    - i.e., ensure CWND >= ssthresh to stay in additive increase phase
+  - Cut CWND all the way to 1 MSS on timeout:
+    - Set ssthresh = CWND/2
+    - Set CWND = 1
+    - i.e., ensure CWND < ssthresh (slow start) for fast ramp-up
+    - but only for a short duration because of detected congestion
+  - Never drop CWND below 1 MSS
+
+![图片alt](/assets/img/l3p3.png "TCP Slow Start + AIMD Behavior")
+
+# User Datagram Protocol 用户数据报协议 (UDP)
+- UDP 是一种不可靠的传输协议
+  - Application Multiplexing
+  - ~~Reliability 如果数据包丢失，则不重新传输
+  - ~~Flow Control 允许发送方以任意速率发送
+  - ~~Congestion Control 允许发送方以任意速率发送
+- UDP 是一种无连接协议 connectionless protocol
+  - 发送数据前无需建立连接
+    - 发送 方可以立即开始发送数据...
+- 与 TCP 一样，UDP 流或连接也由 5 元组标识
+  - {src addr (IP), dst addr (IP), src port, dst port, protocol: 17 (UDP)}
+
 
 
 
