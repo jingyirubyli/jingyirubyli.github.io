@@ -3,28 +3,29 @@ layout: post
 title: PageRank
 date: 2025-03-01
 description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
-img: post-1.png # Add image post (optional)
+img: pagerank.png # Add image post (optional)
 tags: [Blog, Network]
 author: # Add name author (optional)
 ---
 # 基本概念
 
 1. 背景
+
    [PageRank][PageRank] 算法由 Google 创始人 Larry Page 在斯坦福读大学时提出，又称 PR，佩奇排名。主要针对网页进行排名，计算网站的重要性，优化搜索引擎的搜索结果。PR 值是表示其重要性的因子。
 
 [PageRank]: https://en.wikipedia.org/wiki/PageRank
 
 2. 算法思想
 
-2.1 数量假设
+  2.1 数量假设
 
-当在网页模型图中，一个网页接受到的其他网页指向的入链（in-links）越多，说明该网页越重要。
+  当在网页模型图中，一个网页接受到的其他网页指向的入链（in-links）越多，说明该网页越重要。
 
-2.2 质量假设
+  2.2 质量假设
 
-当一个质量高的网页指向（out-links/出链）一个网页，说明这个被指的网页重要。
+  当一个质量高的网页指向（out-links/出链）一个网页，说明这个被指的网页重要。
 
-2.3 出链入链
+  2.3 出链入链
 
 # 算法
 
