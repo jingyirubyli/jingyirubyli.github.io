@@ -34,6 +34,8 @@ author: # Add name author (optional)
 ```math
 PR(a)_{i+1} = \sum_{i = 0}^{n} \frac{PR(T_i)_i}{L(T_i)} 
 ```
+$$x=a_0 + \frac{1^2}{a_ 1+\frac{2^2}{a_2+\frac{3^2}{a_3+ \frac{4^2}{a_4+...}}}}$$
+
 
 其中，PR(a)_(i+1)表示网页a在第i+1次迭代后的PR值，PR(T_i)_i表示网页T_i在第i次迭代后的PR值，L(T_i)表示网页T_i的出链数量。
 
