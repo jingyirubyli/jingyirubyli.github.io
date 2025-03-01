@@ -31,9 +31,9 @@ author: # Add name author (optional)
 
 1. 基本公式
 
-\[
+$$
 PR(a)_{i+1} = \sum_{i = 0}^{n} \frac{PR(T_i)_i}{L(T_i)} 
-\]
+$$
 
 
 
