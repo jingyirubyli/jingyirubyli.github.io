@@ -6,7 +6,7 @@ description: You’ll find this post in your `_posts` directory. Go ahead and ed
 img: pagerank.png # Add image post (optional)
 tags: [Blog, Network]
 author: # Add name author (optional)
-usemathjax: true
+# usemathjax: true
 ---
 # 基本概念
 
