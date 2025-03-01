@@ -1,0 +1,32 @@
+---
+layout: post
+title: Multi-LiDAR 外参自动标定算法
+date: 2025-02-19
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: post-6.jpg # Add image post (optional)
+tags: [Blog, LiDAR]
+author: # Add name author (optional)
+---
+
+无人驾驶中感知模块负责获取和理解其周围的场景信息，其性能和可靠性是整个无人驾驶系统的关键环节之一，直接影响下游的定位、路线规划和决策等控制链。通过融合多种感知传感器的数据，提高系统在复杂场景下的感知能力是无人驾驶发展的主要方向。然而无论是摄像头、毫米波雷达还是激光雷达，都有自己的坐标系，即传感器产生的数据都是基于自身坐标系的。将各传感器转换到统一坐标系的过程便是传感器的外参标定。
+
+而激光雷达点云数据包含以自身为参考原点的物体3D坐标信息。当多个雷达拼接以获得更大范围3D覆盖时，通过外参将各个激光雷达统一到全局坐标系，便能把各个雷达的点云很好地拼接起来。
+
+## 手动外参标定
+
+通过Livox View自带的标定工具可实现多个激光雷达之前的外参标定，关键技巧是要找到一处视野开阔的环境，并且在不同雷达FOV交集处有较规整醒目的建筑或物体 (下文用A表示此物体)。
+
+首先用Livox Viewer采集一帧较长积分时间的A点云数据，然后观察各个激光雷达在其FOV里所形成的A点云，微调Livox Views标定工具里的滚轮控件（调节6个变量[x,y,z,roll,pitch,yaw]），使得各FOV里A点云能完美重叠在一起为佳，此时得到的参数即为所需外参。按此方法标定的精度误差可小于0.1度。
+
+![图片alt](/assets/img/lidar1.png "手动外参标定")
+
+不难看出，此方法依赖于多雷达的共视区域，精度和效率与使用者的熟练度正相关，存在一定的局限性。
+
+简单粗暴: 就是手搓.
+
+## 自动外参标定
+
+在实际使用中，有时不方便找到用于标定的开源环境或参考物体，为此Livox推出了自动标定技术[TFAC-Livox][TFAC-Livox]算法(Target-Free Automatic Calibration)并在Github上开源。该技术主要依靠几何一致性假设，即多个雷达扫描出来的局部三维模型是一致的，通过对基准雷达(LiDAR0)进行移动建图，然后将其余雷达数据对LiDAR0的重建地图不断进行迭代配准与计算，依靠一致性假设不断减少匹配误差，直到算法收敛并且满足标定矩阵刚性不变特性（六条平行线），最后用一致性算法得出最终标定矩阵（外参）。
+
+[TFAC-Livox]: https://github.com/Livox-SDK/Livox_automatic_calibration
+
