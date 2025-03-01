@@ -3,7 +3,7 @@ layout: post
 title:  DCN Lec5-Datacenter Routing and Load Balancing
 date:   2025-02-11
 description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
-img: post-2.jpg # Add image post (optional)
+img: post-5.png # Add image post (optional)
 tags: [Blog, Sunset]
 author: # Add name author (optional)
 ---
