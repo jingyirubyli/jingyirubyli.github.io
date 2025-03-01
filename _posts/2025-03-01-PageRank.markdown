@@ -6,7 +6,7 @@ description: You’ll find this post in your `_posts` directory. Go ahead and ed
 img: pagerank.png # Add image post (optional)
 tags: [Blog, Network]
 author: # Add name author (optional)
-math: true
+
 ---
 # 基本概念
 
@@ -36,10 +36,13 @@ $$
 PR(a)_{i+1} = \sum_{i = 0}^{n} \frac{PR(T_i)_i}{L(T_i)} 
 $$
 
-
-
 其中，PR(a)_(i+1)表示网页a在第i+1次迭代后的PR值，PR(T_i)_i表示网页T_i在第i次迭代后的PR值，L(T_i)表示网页T_i的出链数量。
 
+| PR Value | PR(A) | PR(B) | PR(C) | PR(D) |
+| --- | --- | --- | --- | --- |
+| i=0 PR 初始化为1/N | 1/4 | 1/4 | 1/4 | 1/4 |
+| i=1 | 3/8 | 1/8 | 3/8 | 1/8 |
+| rank | 1 | 2 | 1 | 2 |
 
 
 
