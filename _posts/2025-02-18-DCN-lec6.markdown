@@ -4,7 +4,7 @@ title:  DCN Lec6-Datacenter Transport
 date:   2025-02-18
 description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
 img: post-6.png # Add image post (optional)
-tags: [Blog, Sunset]
+tags: [Blog, DCN]
 author: # Add name author (optional)
 ---
 
