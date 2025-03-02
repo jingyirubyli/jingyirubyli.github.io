@@ -111,7 +111,7 @@ Policy specification language called Pol-Eth.
 Each condition is a conjunction of predicates谓词的组合 which specify the properties a flow must have for a certain action.
 例如，允许从源用户“bob”到目标主机“websrv”的 HTTP 流
 
-![图片alt](/assets/img/l7p2.png "")
+![图片alt](/assets/img/l7p2.png "policy")
 
 编译器compiler将策略编译成交换机中的转发规则
 
