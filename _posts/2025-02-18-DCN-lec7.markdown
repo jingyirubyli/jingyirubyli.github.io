@@ -29,6 +29,10 @@ Prior Solutions for Enforcing Network-wide Policies
 
 # Ethane 
 
+[参考][ethane]
+
+[ethane]: https://slideplayer.com/slide/13186511/
+
 ## Three Principles
 
 - “网络应由通过高级名称声明的策略进行管理”“The network should be governed by policies declared over high-level names”

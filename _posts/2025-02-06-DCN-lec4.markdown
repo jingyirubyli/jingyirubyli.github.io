@@ -56,7 +56,9 @@ link 链接
 
 Hierarchical Multi-Rooted Tree Topology 分层多根树拓扑有如下特点: 有环路；但可通过沿树路由轻松避免; 是完全二分带宽; 有多个core switches所以有容错. 但是由于随着层数加高,所使用的交换机质量需求就提升, 导致越高层级需要使用越昂贵的交换机, 不符合低成本和低功耗的要求. 我们能否仅使用廉价的商品交换机来构建一个满足理想网络拓扑,符合所有四个要求?
 
-Fattree topology又叫“folded clos” topology.
+Fattree topology又叫“folded clos” topology.[参考][ft]
+
+[ft]: https://packetpushers.net/blog/demystifying-dcn-topologies-clos-fat-trees-part2/
 
 ## Fattree 拓扑配置
 
