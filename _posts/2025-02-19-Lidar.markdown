@@ -50,14 +50,18 @@ author: # Add name author (optional)
       - fitline: 拟合标定参数，计算最终参数矩阵
 3. 运行准备
    - 数据准备
+    
     准备双雷达标定pcd数据:
       - 基准雷达数据放在 data/Base_LiDAR_Frames/.pcd (以 100000.pcd 作为第一帧文件名，后续帧往上累加)
       - 待标定雷达数据放在 data/Target_LiDAR_Frames/.pcd (以 100000.pcd 作为第一帧文件名，后续帧往上累加)
       - 粗配准外参矩阵放在 data/Init_Matrix.txt
+
     注意：基准雷达数据和待标定雷达数据需要尽可能在时间上同步，文件名和时间戳为同步对应。(这句是官方文档说法, 但是根据我的理解应该是需要先做[时间同步][Time Synchronization].)
 
     示例数据下载: 
+
     [待标定][target]
+
     [基准][base]
 
 [Time Synchronization]: https://livox-wiki-cn.readthedocs.io/zh-cn/latest/tutorials/other_product/timestamp_sychronization.html
@@ -65,12 +69,14 @@ author: # Add name author (optional)
 [base]: https://terra-1-g.djicdn.com/65c028cd298f4669a7f0e40e50ba1131/Showcase/Base_LiDAR_Frames.tar.gz
 
    - 运行
+
     ```
     cd livox_calibration
     cp run.sh build/
     cd build
     sh run.sh
     ```
+    
     脚本首先启动可视化建图程序mapping，用基准雷达建立子地图，自动生成待匹配地图数据H-LiDAR-Map-data.pcd文件。建立完成后启动标定程序calibration，完成标定参数估计工作，最后启动 参数拟合器fitline，完成最终参数矩阵计算。
 
 
