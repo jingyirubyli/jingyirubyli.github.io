@@ -1,0 +1,18 @@
+---
+layout: post
+title: To Do List
+date: 2025-03-06
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: post.jpg # Add image post (optional)
+tags: [Blog]
+author: # Add name author (optional)
+---
+
+- [ ] [Graph Generation_Random Graph_Erdős–Rényi][Erdős–Rényi]
+- [ ] [Partitioning and Community Detection Problem][Partitioning n Community Detection]
+- [ ] [cs224w-图机器学习][图机器学习]
+
+
+[Erdős–Rényi]: https://wenku.csdn.net/column/3gijantwp0
+[Partitioning n Community Detection]: https://blog.csdn.net/PolarisRisingWar/article/details/119277189
+[图机器学习]: https://web.stanford.edu/class/cs224w/index.html
