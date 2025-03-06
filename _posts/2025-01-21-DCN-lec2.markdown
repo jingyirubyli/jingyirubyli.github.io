@@ -18,9 +18,14 @@ author: # Add name author (optional)
 - 网络层是用于连接不同本地网络的全球标准协议**global standard protocol（IP）**
 - 数据链路层允许每个局域网（LAN）内的**自主性autonomy**
 
-<p align="center">
+<!-- <p align="center">
   <img src="/assets/img/l2p1.png" alt="Network vs. Data Link Layer" width="600">
-</p>
+</p> -->
+<figure style="text-align: center;">
+  <img src="/assets/img/l2p1.png" alt="Network vs. Data Link Layer" width="600">
+  <figcaption><strong>Network vs. Data Link Layer</strong></figcaption>
+</figure>
+
 相同点:都使用同一套机制, 但是**实现方式不同**
 - 命名和寻址 Naming and Addressing
 - 目的地发现 Destination Discovery
@@ -41,18 +46,18 @@ Most popular (wired) protocol — Ethernet 以太网
 
 ### Media Access Control (MAC) Address/媒体访问控制 (MAC) 地址
 
-#### 每个网络接口（无论是物理的还是虚拟的）都有一个“MAC 地址”
-- MAC 地址是一个48位(48 bits)的标识符，通常表示为6个十六进制数字(6 bytes)，例如 00:1A:2B:3C:4D:5E
-- ff:ff:ff:ff:ff:ff 是一个特殊的 MAC 地址，称为广播地址(Broadcast address)，用于向网络中的所有设备发送数据
-  - MAC 地址的前24位（前3个字节）称为组织唯一标识符（OUI），由 IEEE 分配给网络接口卡（NIC）的制造商
-  - MAC 地址的后24位（后3个字节）由制造商分配给特定的网络接口卡
-  - MAC 地址是固定的，不能更改，除非更换网络接口卡
-- 一个设备可以有多个接口，因此有多个 MAC 地址
-- 给定网络内每个接口的 MAC 地址必须是唯一的，由网络接口卡（NIC）的制造商分配
-  - 避免地址冲突(address clashes)
-  - 设备供应商确保其接口的 MAC 地址是全球唯一的
-- MAC 地址用于在局域网（LAN）中标识设备，以便进行通信和数据传输
-- MAC 地址可以通过 ARP（地址解析协议）来解析为 IP 地址，从而实现 IP 地址和 MAC 地址之间的映射
+  #### 每个网络接口（无论是物理的还是虚拟的）都有一个“MAC 地址”
+  - MAC 地址是一个**48位(48 bits)**的标识符，通常表示为**6个十六进制数字(6 bytes)**，例如 00:1A:2B:3C:4D:5E
+  - **ff:ff:ff:ff:ff:ff** 是一个特殊的 MAC 地址，称为**广播地址(Broadcast address)**，用于向网络中的所有设备发送数据
+    - MAC 地址的前24位（前3个字节）称为组织唯一标识符（OUI），由 IEEE 分配给网络接口卡（NIC）的制造商
+    - MAC 地址的后24位（后3个字节）由制造商分配给特定的网络接口卡
+    - MAC 地址是固定的，不能更改，除非更换网络接口卡
+  - 一个设备可以有多个接口，因此有多个 MAC 地址
+  - 给定网络内每个接口的 MAC 地址必须是**unique唯一**的，由网络接口卡（NIC）的制造商分配
+    - 避免地址冲突(address clashes)
+    - 设备供应商确保其接口的 MAC 地址是**globally unique全球唯一**的
+  - MAC 地址用于在局域网（LAN）中标识设备，以便进行通信和数据传输
+  - MAC 地址可以通过 ARP（地址解析协议）来解析为 IP 地址，从而实现 IP 地址和 MAC 地址之间的映射
 
 ### Address Resolution Protocol (ARP)/地址解析协议 (ARP)
 
@@ -126,10 +131,10 @@ will never learn which port the host is reachable on!
 
 ## 网络层 Network Layer
 Most popular protocol — Internet Protocol 互联网协议(IP) 
-- Addressing: IP Adress
-- Destination Discovery: DNS
-- Forwarding: IP Forwarding
-- Routing: Network Routing Protocols (DV, LS, BGP)
+- Addressing: **IP Adress**
+- Destination Discovery: **DNS**
+- Forwarding: **IP Forwarding**
+- Routing: **Network Routing Protocols (DV, LS, BGP)**
 
 ### IP Address
 
