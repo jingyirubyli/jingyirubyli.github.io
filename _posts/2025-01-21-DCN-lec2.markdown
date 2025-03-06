@@ -278,9 +278,9 @@ Subnet Address 子网地址: IP 地址（**bitwise AND/按位与**） 子网掩�
 #### IP Forwarding Algorithm 转发算法 
 - 每个路由器都维护一个“路由表”Routing Table
   - 与交换机中的转发表相比，多出两列
-![图片alt](/assets/img/l2p13.png "Routing Table")
+
 | Destination | Cost to destination | Next hop to destination | Output Port |
-| :---:       |      :----:         |          :---:          |    :---:    |
+|:-----------:|---------------------|-------------------------|-------------|
 |             |                     |                         |             |
 
 - 收到目标 IP 字段为 d 的 IP 数据包时：
@@ -293,8 +293,7 @@ Subnet Address 子网地址: IP 地址（**bitwise AND/按位与**） 子网掩�
 
 ## Routing
 
-How do routers learn and populate the routing tables with the
-paths between sources and destinations?
+How do routers learn and populate the routing tables with the paths between sources and destinations?
 
 ### A Routing Protocol: Distributed Routing Protocols
 - 在每个路由器上运行的分布式算法
