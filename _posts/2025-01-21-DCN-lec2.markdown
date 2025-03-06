@@ -7,17 +7,17 @@ img: post-2.png # Add image post (optional)
 tags: [Blog, DCN]
 author: # Add name author (optional)
 ---
-
+# 本讲内容
 - Network (L3): “Best-effort” data delivery between networks
   - Mechanisms: naming, addressing, destination discovery, routing, forwarding
 - Data Link (L2): “Best-effort” data delivery within a local network
   - Mechanisms: naming, addressing, destination discovery, routing, forwarding
 
-## Network vs. Data Link Layer
+## Network Layer vs. Data Link Layer
 不同点:
-- 网络层是用于连接不同本地网络的全球标准协议（IP）
-- 数据链路层允许每个局域网（LAN）内的自主性
-![图片alt](/assets/img/l2p1.png "Network vs. Data Link Layer")
+- 网络层是用于连接不同本地网络的全球标准协议**global standard protocol（IP）**
+- 数据链路层允许每个局域网（LAN）内的**自主性autonomy**
+![图片alt](/assets/img/l2p1.png =600x "Network vs. Data Link Layer")
 
 相同点:都使用同一套机制, `但是实现方式不同`
 - 命名和寻址 Naming and Addressing
