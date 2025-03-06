@@ -279,9 +279,30 @@ Subnet Address 子网地址: IP 地址（**bitwise AND/按位与**） 子网掩�
 - 每个路由器都维护一个“路由表”Routing Table
   - 与交换机中的转发表相比，多出两列
 
-| Destination | Cost to destination | Next hop to destination | Output Port |
+<!-- | Destination | Cost to destination | Next hop to destination | Output Port |
 |:-----------:|---------------------|-------------------------|-------------|
-|             |                     |                         |             |
+|             |                     |                         |             | -->
+
+<table border="1">
+  <tr>
+    <th>Destination</th>
+    <th>Cost to destination</th>
+    <th>Next hop to destination</th>
+    <th>Output Port</th>
+  </tr>
+  <tr>
+    <td>A</td>
+    <td>10</td>
+    <td>B</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>B</td>
+    <td>15</td>
+    <td>C</td>
+    <td>2</td>
+  </tr>
+</table>
 
 - 收到目标 IP 字段为 d 的 IP 数据包时：
   - 运行最长前缀匹配 (LPM) 算法
