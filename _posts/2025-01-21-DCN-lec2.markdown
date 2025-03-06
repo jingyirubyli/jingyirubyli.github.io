@@ -17,9 +17,10 @@ author: # Add name author (optional)
 不同点:
 - 网络层是用于连接不同本地网络的全球标准协议**global standard protocol（IP）**
 - 数据链路层允许每个局域网（LAN）内的**自主性autonomy**
-<!-- ![图片alt](/assets/img/l2p1.png "Network vs. Data Link Layer") -->
-<img src="/assets/img/l2p1.png" alt="Network vs. Data Link Layer" width="600">
 
+<p align="center">
+  <img src="/assets/img/l2p1.png" alt="Network vs. Data Link Layer" width="600">
+</p>
 相同点:都使用同一套机制, 但是**实现方式不同**
 - 命名和寻址 Naming and Addressing
 - 目的地发现 Destination Discovery
@@ -33,11 +34,12 @@ author: # Add name author (optional)
 
 ## 数据链层 Data Link Layer
 Most popular (wired) protocol — Ethernet 以太网
-- Addressing: MAC Adress
-- Destination Discovery: ARP
-- Forwarding: MAC Forwarding
-- Routing: STP
-### Media Access Control (MAC) Address 媒体访问控制 (MAC) 地址
+- Addressing: **MAC Adress**
+- Destination Discovery: **ARP**
+- Forwarding: **MAC Forwarding**
+- Routing: **STP**
+
+### Media Access Control (MAC) Address/媒体访问控制 (MAC) 地址
 
 #### 每个网络接口（无论是物理的还是虚拟的）都有一个“MAC 地址”
 - MAC 地址是一个48位(48 bits)的标识符，通常表示为6个十六进制数字(6 bytes)，例如 00:1A:2B:3C:4D:5E
@@ -52,7 +54,7 @@ Most popular (wired) protocol — Ethernet 以太网
 - MAC 地址用于在局域网（LAN）中标识设备，以便进行通信和数据传输
 - MAC 地址可以通过 ARP（地址解析协议）来解析为 IP 地址，从而实现 IP 地址和 MAC 地址之间的映射
 
-### Address Resolution Protocol (ARP) 地址解析协议 (ARP)
+### Address Resolution Protocol (ARP)/地址解析协议 (ARP)
 
 #### 用于获取与源主机位于同一本地网络内的目标主机的 MAC 地址
 Used to get the MAC address of a destination host
