@@ -143,17 +143,22 @@ Most popular protocol — Internet Protocol 互联网协议(IP)
 ### IP Address
 
 #### IP地址组成
-- IPv4 — 32 bits — Represented as X.X.X.X where X is 8-bit decimal
-e.g., 192.168.3.29 (called “dotted decimal” format)
-- IPv6 has 128 bits... We will only focus on IPv4 in this course
-`IP Addresses are hierarchical; unlike MAC addresses that are flat`
+- **IPv4** — 32 bits — Represented as **X.X.X.X** where X is 8-bit decimal
+  - e.g., 192.168.3.29 (called “dotted decimal” format)
+- **IPv6** has 128 bits... We will only focus on IPv4 in this course
+
+**IP Addresses are hierarchical; unlike MAC addresses that are flat**
 
 {% highlight ruby %}
 dotted decimal format  192.168.3.29
 binary format  11000000.10101000.00000011.0`0011101`
 前25位为Subnet Address Prefix子网地址前缀, 后7位为Host Identifier主机标识符
 {% endhighlight %}
-![图片alt](/assets/img/l2p2.png "IP地址")
+
+<figure style="text-align: center;">
+  <img src="/assets/img/l2p2.png" alt="IP地址" width="600">
+  <figcaption>IP地址</figcaption>
+</figure>
 
 #### 子网掩码 Subnet Mask
 Subnet Mask 子网掩码用于从 IP 地址提取子网地址
@@ -165,12 +170,12 @@ Subnet Mask 子网掩码用于从 IP 地址提取子网地址
 - 192.168.3.29/255.255.255.128
 - 192.168.3.29 255.255.255.128
 
-Subnet Address 子网地址: IP 地址（按位与） 子网掩码
-- e.g., 192.168.3.29 & 255.255.240.0 = 192.168.0.0
+Subnet Address 子网地址: IP 地址（**bitwise AND/按位与**） 子网掩码
+- e.g., **192.168.3.29 & 255.255.240.0 = 192.168.0.0**
 
 无类别域间路由 Classless Inter-Domain Routing (CIDR)是一个用于给用户分配IP地址以及在互联网上有效地路由IP数据包的对IP地址进行归类的方法。
 - A flexible representation of subnet address(Flexible number of bits allocated for subnet address)
-- 子网地址在 CIDR 中表示为 X.X.X.X/n
+- 子网地址在 CIDR 中表示为 **X.X.X.X/n**
   - 为子网地址分配的前 n 位都是1,称为网络位
   - 剩余的 32-n 位是主机位
   - 子网掩码是 n 个连续的 1 后面跟着 32-n 个 0
@@ -179,7 +184,11 @@ Subnet Address 子网地址: IP 地址（按位与） 子网掩码
   - can support 2^21 IP addresses
   - in the range 128.32.0.0 to 128.63.255.255
 
-![图片alt](/assets/img/l2p3.jpg "CIDR地址解析")
+<figure style="text-align: center;">
+  <img src="/assets/img/l2p3.png" alt="CIDR地址解析" width="600">
+  <figcaption>CIDR地址解析</figcaption>
+</figure>
+
 
 #### 目标 IP 寻址类型 Types of Destination IP Addressing
 
@@ -211,43 +220,68 @@ Subnet Address 子网地址: IP 地址（按位与） 子网掩码
 - 任播 Anycast
   - 一组接收者与同一个目标 IP 相关联
   - 路由算法根据某些路由指标（例如，地理位置上最接近发送者的接收者）将消息发送到组中的单个single接收者
-  - 任播通常用于在运行相同服务的多个服务器之间平衡负载`Anycast is typically used to balance the load across multiple servers each running the same service`
-![图片alt](/assets/img/l2p4.png "目标 IP 寻址类型")
+  - 任播通常用于在运行相同服务的多个服务器之间平衡负载
+  - **Anycast is typically used to balance the load across multiple servers each running the same service**
 
-### Domain Name System (DNS) 域名系统 (DNS)
+<figure style="text-align: center;">
+  <img src="/assets/img/l2p4.png" alt="目标 IP 寻址类型" width="600">
+  <figcaption>目标 IP 寻址类型</figcaption>
+</figure>
 
-- 用户有他们想要访问的实体的名称
+### Domain Name System (DNS)/域名系统 (DNS)
+
+- 用户有他们想要访问的实体的**名称name**
   - E.g., www.cnn.com
-- 但是，互联网基于 IP 地址进行路由和转发
+- 但是，互联网基于 **IP 地址**进行路由和转发
   - 需要将名称转换为 IP 地址
 - DNS
   - A “logically” centralized infrastructure
   - 提供从名称到 IP 地址的映射
-  - A simple Query-Response Protocol: 简单的查询-响应协议
+  - A simple **Query-Response** Protocol: 简单的查询-响应协议
     - User asks DNS: what is the IP address of www.cnn.com?
     - DNS responds: 157.166.255.18
 
-![图片alt](/assets/img/l2p8.png "ARP vs. DNS")
+<figure style="text-align: center;">
+  <img src="/assets/img/l2p8.png" alt="ARP vs. DNS" width="600">
+  <figcaption>ARP vs. DNS</figcaption>
+</figure>
 
 ### IP Forwarding
 
-![图片alt](/assets/img/l2p9.png "MAC Forwarding vs. IP Forwarding")
+<figure style="text-align: center;">
+  <img src="/assets/img/l2p9.png" alt="MAC Forwarding vs. IP Forwarding" width="600">
+  <figcaption>MAC Forwarding vs. IP Forwarding</figcaption>
+</figure>
 
+<figure style="text-align: center;">
+  <img src="/assets/img/l2p10.png" alt="Complexity of IP Forwarding" width="600">
+  <figcaption>Complexity of IP Forwardings</figcaption>
+</figure>
 
-![图片alt](/assets/img/l2p10.png "Complexity of IP Forwarding")
-
-#### Longest Prefix Match (LPM) 最长前缀匹配 (LPM)
+#### Longest Prefix Match (LPM)/最长前缀匹配 (LPM)
 
 - 步骤 1 - 查找表中所有匹配的子网
-  - 给定表条目 X.X.X.X/n，将表条目的前 n 位与目标 IP 字段的前 n 位匹配
-![图片alt](/assets/img/l2p11.png "step1")
-- 步骤 2 - 从所有匹配的条目中，选择具有最长前缀的条目 — 层次结构中最深的子网！
-![图片alt](/assets/img/l2p12.png "step2")
+  - 给定表条目 **X.X.X.X/n**，将表条目的前 n 位与目标 IP 字段的前 n 位匹配
 
-#### IP 转发算法 IP Forwarding Algorithm
+<figure style="text-align: center;">
+  <img src="/assets/img/l2p11.png" alt="step1" width="600">
+  <figcaption>step1</figcaption>
+</figure>
+
+- 步骤 2 - 从所有匹配的条目中，选择具有最长前缀的条目 — 层次结构中最深的子网！
+
+<figure style="text-align: center;">
+  <img src="/assets/img/l2p12.png" alt="step2" width="600">
+  <figcaption>step2</figcaption>
+</figure>
+
+#### IP Forwarding Algorithm 转发算法 
 - 每个路由器都维护一个“路由表”Routing Table
   - 与交换机中的转发表相比，多出两列
 ![图片alt](/assets/img/l2p13.png "Routing Table")
+| Destination | Cost to destination | Next hop to destination | Output Port |
+| :---:        |    :----:   |          :---: |  :---: |
+|       |       |   |   |
 
 - 收到目标 IP 字段为 d 的 IP 数据包时：
   - 运行最长前缀匹配 (LPM) 算法
