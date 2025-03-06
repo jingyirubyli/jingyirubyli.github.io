@@ -7,13 +7,15 @@ img: post-3.png # Add image post (optional)
 tags: [Blog, DCN]
 author: # Add name author (optional)
 ---
+# 本讲内容
 - Transport (L4): (Reliable) end-to-end data delivery
   - Mechanisms: reliability, flow and congestion control, application multiplexing
 
 # Transmission Control Protocol (TCP) 传输控制协议 (TCP)
 
 - TCP 是最流行的传输层协议
-- TCP 是一种可靠的传输协议：“可靠的传输协议确保发送应用程序发送的所有字节最终都以与发送方发送的字节顺序相同的顺序被接收应用程序接收”
+- TCP 是一种可靠的传输协议：
+  >  “可靠的传输协议确保发送应用程序发送的所有字节最终都以与发送方发送的字节顺序相同的顺序被接收应用程序接收”
 - 可靠的协议实现了四种机制：
   - 应用程序多路复用 Application Multiplexing
   - 可靠性 Reliability
@@ -25,15 +27,15 @@ author: # Add name author (optional)
 ### Application Multiplexing
 - 网络层和数据链路层向主机传送数据包/从主机传送数据包
 - 但一台主机可以运行多个应用程序...
-- 传输层向主机上运行的应用程序发送数据/从主机上运行的应用程序接收数据 `— 应用程序多路复用`
+- 传输层向主机上运行的应用程序发送数据/从主机上运行的应用程序接收数据 **— 应用程序多路复用**
 
-- 当应用程序想要访问网络时，它会打开与端口port关联的套接字Socket
+- 当应用程序想要访问网络时，它会打开与端口**port**关联的套接字**Socket**
   - Socket: 将应用程序连接到网络堆栈的操作系统机制
-    - An OS mechanism that connects applications to network stack
+    > An OS mechanism that connects applications to network stack
   - Port: 指定特定套接字的数字（通常为 16 位）
     - 操作系统确保套接字的端口号在主机内是唯一的
 - 操作系统使用端口号进行应用程序多路复用，即向正确的应用程序发送数据包/从正确的应用程序接收数据包
-  - The port number is used by the OS for application multiplexing, i.e., to send/receive packets to/from right applications
+  > The port number is used by the OS for application multiplexing, i.e., to send/receive packets to/from right applications
 
 ### Packet Header 数据包头
 
@@ -51,8 +53,10 @@ author: # Add name author (optional)
   - {src (IP) addr, dst (IP) addr, src port, dst port, protocol} 
   - 对于 TCP 流，协议字段为 6（TCP protocol num: TCP 协议编号）
 
-![图片alt](/assets/img/l3p1.png "TCP Connection Timing Diagram")
-
+<figure style="text-align: center;">
+  <img src="/assets/img/l3p1.png" alt="TCP Connection Timing Diagram" width="600">
+  <figcaption>TCP Connection Timing Diagram</figcaption>
+</figure>
 
 ## 可靠性 Reliability
 
@@ -73,55 +77,61 @@ author: # Add name author (optional)
   - 某些数据已确认时滑动
 
 #### 可靠性算法的两个问题
-##### 接收方如何为数据包指定 ACK？
-需要为每个发送的数据包标记一个“序列号sequence number”——接收方可以使用收到的数据包的序列号作为该数据包的 ACK
-- 序列号sequence number
-  - 与每个 TCP 流关联的单调递增数字
-    - TCP 为发送的每个字节分配一个序列号
-    - 为简单起见，我们将假设为每个数据包分配了序列号
-  - TCP 流中的第一个字节被分配了一个随机序列号，称为初始序列号Initial Sequence Number (ISN)
-    - 后续字节将具有序列号 ISN+1、ISN+2、......
-    - 在 TCP 连接建立期间交换 ISN
 
-- Acknowledgment (ACK)
-  - TCP 使用一种称为“累积 ACK/Cumulative ACK”的 ACK 形式
-  - 确认最高的连续接收序列号 ACK the highest contiguous received sequence number
+1. 接收方如何为数据包指定 ACK？
 
-累积 ACK/Cumulative ACK
-- Conditions to Retransmit?
-  - Duplicate ACKs or the timer expires, whichever first
-  - but duplicate ACKs only tell a loss might have occurred, not that it has occurred
-    - Packet may be reordered/delayed in network — will produce Dup ACKs
-      - Here, do not want to re-transmit on receiving the Dup ACK as the packet is not lost!
-    - Or, packet may actually be lost — will also produce Dup ACKs
-      - Here, we do want to re-transmit on receiving the Dup ACK as the packet is indeed lost!
-    - Impossible to know which one is the case
-      - Retransmit after k Dup ACKs (TCP uses k=3)
-- What packets to Retransmit?
-  - Go-Back-N
-    - 最小序列号开始重新传输所有未收到 ACK 的数据包
-    - 效率较低，但易于实现
-    - 
-![图片alt](/assets/img/l3p2.png "Go-Back-N")
+  需要为每个发送的数据包标记一个“序列号sequence number”——接收方可以使用收到的数据包的序列号作为该数据包的 ACK
+  - 序列号sequence number
+    - 与每个 TCP 流关联的单调递增数字
+      - TCP 为发送的每个字节分配一个序列号
+      - 为简单起见，我们将假设为每个数据包分配了序列号
+    - TCP 流中的第一个字节被分配了一个随机序列号，称为初始序列号Initial Sequence Number (ISN)
+      - 后续字节将具有序列号 ISN+1、ISN+2、......
+      - 在 TCP 连接建立期间交换 ISN
+    - **W 决定发送方可以发送的最大速率（~W/RTT bytes per sec）** *RTT: Round-Trip Time*
 
+  - Acknowledgment (ACK)
+    - TCP 使用一种称为“累积 ACK/Cumulative ACK”的 ACK 形式
+    - 确认最高的连续接收序列号 ACK the highest contiguous received sequence number
 
-##### 如何设置最佳窗口大小 (W)？
-由流量和拥塞控制机制决定 Flow and Congestion Control mechanisms
-- 窗口大小决定发送方发送数据的速率: Send Rate ~ W/RTT bytes per sec
-- 如何设置（和更新）发送方的窗口大小（W）？
-  - 设置 W，使得发送方可以尽可能快地发送
-  - 不会使接收方过载 — 流量控制 Flow Control
-  - 不会使网络过载 — 拥塞控制 Congestion Control
+  累积 ACK/Cumulative ACK
+  - Conditions to Retransmit?
+    - Duplicate ACKs or the timer expires, whichever first
+    - but duplicate ACKs only tell a loss might have occurred, not that it has occurred
+      - Packet may be reordered/delayed in network — will produce Dup ACKs
+        - Here, do not want to re-transmit on receiving the Dup ACK as the packet is not lost!
+      - Or, packet may actually be lost — will also produce Dup ACKs
+        - Here, we do want to re-transmit on receiving the Dup ACK as the packet is indeed lost!
+      - Impossible to know which one is the case
+        - Retransmit after k Dup ACKs (TCP uses k=3)
+  - What packets to Retransmit?
+    - Go-Back-N
+      - 最小序列号开始重新传输所有未收到 ACK 的数据包
+      - 效率较低，但易于实现
 
-3 TCP Windows
-- Receiver window (RWND) for flow control 用于流量控制的接收窗口 (RWND)
-  - 可以发送多少字节而不会溢出接收缓冲区receiver buffer？
-  - 由接收方确定并报告给发送方
-- Congestion window (CWND) for congestion control 用于拥塞控制的拥塞窗口 (CWND) 
-  - 可以发送多少字节而不会溢出路由器/交换机缓冲区router/switch buffers？
-  - 由发送方使用某些拥塞信号（例如丢失）计算
-- Sender’s (“sliding”) window 发送方的（“滑动”）窗口
-  - W = min(CWND, RWND)
+  <figure style="text-align: center;">
+    <img src="/assets/img/l3p2.png" alt="Go-Back-N" width="600">
+    <figcaption>Go-Back-N</figcaption>
+  </figure>
+  
+2. 如何设置最佳窗口大小 (W)？
+
+  由流量和拥塞控制机制决定 Flow and Congestion Control mechanisms
+  - 窗口大小决定发送方发送数据的速率: Send Rate ~ W/RTT bytes per sec
+  - 如何设置（和更新）发送方的窗口大小（W）？
+    - 设置 W，使得发送方可以尽可能快地发送
+    - 不会使接收方过载 — 流量控制 Flow Control
+    - 不会使网络过载 — 拥塞控制 Congestion Control
+
+  3 TCP Windows
+  - Receiver window (RWND) for flow control 用于流量控制的接收窗口 (RWND)
+    - 可以发送多少字节而不会溢出接收缓冲区receiver buffer？
+    - 由接收方确定并报告给发送方
+  - Congestion window (CWND) for congestion control 用于拥塞控制的拥塞窗口 (CWND) 
+    - 可以发送多少字节而不会溢出路由器/交换机缓冲区router/switch buffers？
+    - 由发送方使用某些拥塞信号（例如丢失）计算
+  - Sender’s (“sliding”) window 发送方的（“滑动”）窗口
+    - W = min(CWND, RWND)
 
 ## 流量控制 Flow Control
 
