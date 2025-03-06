@@ -291,16 +291,14 @@ Subnet Address 子网地址: IP 地址（**bitwise AND/按位与**） 子网掩�
     <th>Output Port</th>
   </tr>
   <tr>
-    <td>A</td>
-    <td>10</td>
-    <td>B</td>
-    <td>1</td>
+    <td></td>
+    <td></td>
+
   </tr>
   <tr>
-    <td>B</td>
-    <td>15</td>
-    <td>C</td>
-    <td>2</td>
+    <td></td>
+    <td></td>
+
   </tr>
 </table>
 
