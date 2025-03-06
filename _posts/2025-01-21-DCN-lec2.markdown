@@ -312,7 +312,7 @@ Subnet Address 子网地址: IP 地址（**bitwise AND/按位与**） 子网掩�
 #### IP Forwarding Algorithm 转发算法 
 - 每个路由器都维护一个“路由表”Routing Table
   - 与交换机中的转发表相比，多出两列
-  - 
+
 <div style="text-align: center;">
   <table border="1">
     <tr>
