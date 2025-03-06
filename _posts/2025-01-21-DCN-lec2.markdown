@@ -165,7 +165,12 @@ Most popular (wired) protocol — Ethernet 以太网
       • Copy and send frame on every port except the port on which the frame was received on `— Broadcast`
   {% endhighlight %}
 
+### STP(Spanning Tree Protocol)生成树协议
 
+STP（Spanning Tree Protocol）是一个用于局域网中消除环路的协议，它的标准是IEEE 802.1D。STP通过将部分冗余链路强制为阻塞状态，其他链路处于转发状态，将环形网络结构修剪成无环路的树形网络结构，可实现消除环路。当处于转发状态的链路不可用时，STP重新配置网络，并激活合适的备用链路状态，恢复恢复网络连通性。
+
+狭义的STP是指IEEE 802.1D中定义的STP协议。
+广义的STP包括IEEE 802.1D中定义的STP、IEEE 802.1W中定义的快速生成树协议RSTP（Rapid Spanning Tree Protocol）和IEEE 802.1S中定义的多生成树协议MSTP（Multiple Spanning Tree Protocol）。
 
 ## 网络层 Network Layer
 Most popular protocol — Internet Protocol 互联网协议(IP) 
@@ -337,6 +342,11 @@ Subnet Address 子网地址: IP 地址（**bitwise AND/按位与**） 子网掩�
   - 否则，如果 LPM 返回 NULL：
     - 丢弃数据包
 
+### Network Routing Protocols (DV, LS, BGP)
+
+- Distance-Vector routing protocol 距离向量路由协议
+- Link State routing protocol 链路状态路由协议
+- Border Gateway Protocol 边界网关协议
 
 ## Routing
 
