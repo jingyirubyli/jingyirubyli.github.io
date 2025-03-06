@@ -73,19 +73,19 @@ Most popular (wired) protocol — Ethernet 以太网
   - ARP Request: 将 ARP 请求广播到本地网络
   <figure style="text-align: center;">
     <img src="/assets/img/l2p5.png" alt="ARP-1" width="600">
-    <figcaption>Network vs. Data Link Layer</figcaption>
+    <figcaption>ARP-1</figcaption>
   </figure>
 
   - ARP Reply: 目标主机收到请求并将其 MAC 地址发送回源主机
   <figure style="text-align: center;">
     <img src="/assets/img/l2p6.png" alt="ARP-2" width="600">
-    <figcaption>Network vs. Data Link Layer</figcaption>
+    <figcaption>ARP-2</figcaption>
   </figure>
 
   - Update local ARP table: 源主机更新其 ARP 表
   <figure style="text-align: center;">
     <img src="/assets/img/l2p7.png" alt="ARP-3" width="600">
-    <figcaption>Network vs. Data Link Layer</figcaption>
+    <figcaption>ARP-3</figcaption>
   </figure>
 
 ### MAC Forwarding
@@ -106,8 +106,7 @@ Most popular (wired) protocol — Ethernet 以太网
       • Checks the source MAC address in the frame. Let it be s.
       • Learns that host with MAC address s is reachable via port p.
       • Adds the entry <s, p> to its forwarding table.
-    • If a switch never receives a frame sourced from a host, it
-    will never learn which port the host is reachable on!
+    • If a switch never receives a frame sourced from a host, it will never learn which port the host is reachable on!
     {% endhighlight %}
 
   #### 算法 MAC Forwarding
@@ -121,17 +120,16 @@ Most popular (wired) protocol — Ethernet 以太网
       - 否则，如果不存在与 **d** 对应的条目：
         - 复制帧并将其发送到除在 **— Broadcast** 上接收帧的端口之外的每个端口上
 
-{% highlight ruby %}
-• On receiving a frame with destination MAC d:
-  • If `d = ff:ff:ff:ff:ff:ff`, copy and send frame on every port except the port on which the frame was received on `— Broadcast`
-  • If `d is not ff:ff:ff:ff:ff:ff`, then check the forwarding table for an entry <d, p>.
-  • If entry <d, p> exists:
-    • If p is same as the port on which frame was received, then `drop` the frame (otherwise frame may enter in a loop!).
-    • Else `send` frame out on port p.
-  • Else if no entry corresponding to d exists:
-    • Copy and send frame on every port except the port on which the frame was received on `— Broadcast`
-{% endhighlight %}
-
+    {% highlight ruby %}
+    • On receiving a frame with destination MAC d:
+      • If `d = ff:ff:ff:ff:ff:ff`, copy and send frame on every port except the port on which the frame was received on `— Broadcast`
+      • If `d is not ff:ff:ff:ff:ff:ff`, then check the forwarding table for an entry <d, p>.
+      • If entry <d, p> exists:
+        • If p is same as the port on which frame was received, then `drop` the frame (otherwise frame may enter in a loop!).
+        • Else `send` frame out on port p.
+      • Else if no entry corresponding to d exists:
+        • Copy and send frame on every port except the port on which the frame was received on `— Broadcast`
+    {% endhighlight %}
 
 
 
