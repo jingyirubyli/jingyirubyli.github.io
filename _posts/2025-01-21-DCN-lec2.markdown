@@ -312,21 +312,23 @@ Subnet Address 子网地址: IP 地址（**bitwise AND/按位与**） 子网掩�
 #### IP Forwarding Algorithm 转发算法 
 - 每个路由器都维护一个“路由表”Routing Table
   - 与交换机中的转发表相比，多出两列
-
-<table border="1">
-  <tr>
-    <th>Destination</th>
-    <td>Cost to destination</td>
-    <td>Next hop to destination</td>
-    <th>Output Port</th>
-  </tr>
-  <tr>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
-</table>
+  - 
+<div style="text-align: center;">
+  <table border="1">
+    <tr>
+      <th>Destination</th>
+      <td>Cost to destination</td>
+      <td>Next hop to destination</td>
+      <th>Output Port</th>
+    </tr>
+    <tr>
+      <td></td>
+      <td></td>
+      <td></td>
+      <td></td>
+    </tr>
+  </table>
+</div>
 
 - 收到目标 IP 字段为 d 的 IP 数据包时：
   - 运行最长前缀匹配 (LPM) 算法
