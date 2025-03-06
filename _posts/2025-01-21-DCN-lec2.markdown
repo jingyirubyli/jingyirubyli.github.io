@@ -316,8 +316,8 @@ Subnet Address 子网地址: IP 地址（**bitwise AND/按位与**） 子网掩�
 <table border="1">
   <tr>
     <th>Destination</th>
-    <th>Cost to destination</th>
-    <th>Next hop to destination</th>
+    <td>Cost to destination</td>
+    <td>Next hop to destination</td>
     <th>Output Port</th>
   </tr>
   <tr>
