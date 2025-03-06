@@ -15,22 +15,22 @@ author: # Add name author (optional)
 > Datacenter serves 2.6 billion active users daily.
 > In 2018, 40% of world total data was stored and processed inside datacenters.
 
-### 什么是server
+  ### 什么是server
 
-[Server][server]是:
+  [Server][server]是:
 
-[server]: https://en.wikipedia.org/wiki/Server_(computing)
+  [server]: https://en.wikipedia.org/wiki/Server_(computing)
 
-- 一个管理资源并为用户提供服务的计算机软件，通常分为文件服务器（能使用户在其它计算机存取文件），数据库服务器和应用程序服务器。
-- 运行以上软件的计算机，或称为网路主机（host）。
+  - 一个管理资源并为用户提供服务的计算机软件，通常分为文件服务器（能使用户在其它计算机存取文件），数据库服务器和应用程序服务器。
+  - 运行以上软件的计算机，或称为网路主机（host）。
 
 
-### 什么是user
+  ### 什么是user
 
-[User][user]:
-用户，又称使用者，是指使用电脑或网络服务的人，通常拥有一个用户账号，并以用户名识别。
+  [User][user]:
+  用户，又称使用者，是指使用电脑或网络服务的人，通常拥有一个用户账号，并以用户名识别。
 
-[user]: https://en.wikipedia.org/wiki/User_(computing)
+  [user]: https://en.wikipedia.org/wiki/User_(computing)
 
 ## 2. Datacenter Network和Internet的异同
 
@@ -73,18 +73,18 @@ author: # Add name author (optional)
 - 物理层Physical (L1): Bits to/from wires, cables, etc.
   - Mechanisms: signal processing, analog-to-digital conversions, etc.
 
-Layer n interfaces only with layer n-1 and layer n+1
+**Layer n interfaces only with layer n-1 and layer n+1**
 
 ## 5. 报头封装和解封装 Header Encapsulation & Decapsulation
 
 封装：将数据变为比特流的过程中，在参考模型的每一层需要添加上特定的协议报头动作: 从高层往低层依次封装, 在每一层使用特定的协议，对数据进行处理，将上层的应用数据按照OSI参考模型从上到下的依次加入相应的头部, 即在数据前添加特定的协议报头。数据进入TCP/IP协议栈时的封装过程如下：
 
-![图片alt](/assets/img/Encapsulation.png "Encapsulation")
+![图片alt](/assets/img/encapsulation.png "Encapsulation")
 
 
 解封装：封装的逆过程，数据从比特流还原为数据的过程。从底层往高层依次解封装，将一个封装好的数据按OSI参考模型从下到上依次去除相应的头部，每解封装一层，会将该层的协议报头去掉, 最终将数据传递给应用。数据进入TCP/IP协议栈时的解封装过程如下：
 
-![图片alt](/assets/img/Encapsulation.png "Decapsulation")
+![图片alt](/assets/img/decapsulation.png "Decapsulation")
 
 [参考][capsulation]
 
