@@ -296,21 +296,21 @@ Subnet Address 子网地址: IP 地址（**bitwise AND/按位与**） 子网掩�
 How do routers learn and populate the routing tables with the paths between sources and destinations?
 
 ### A Routing Protocol: Distributed Routing Protocols
-- 在每个路由器上运行的分布式算法
+- **在每个路由器上运行的分布式算法**
   - 没有一个路由器可以“完整”地查看网络；只有部分视图
   - 交换包含部分视图的消息...
   - 收集有关全局网络图的信息
-- 计算网络图中所有目的地的路径
-- 将路径信息存储在路由表routing table中
+- **计算网络图中所有目的地的路径**
+- **将路径信息存储在路由表routing table中**
   - 包含 <目标地址，输出端口> 形式的映射<destination address, output port>
   - 如果数据包的目的地是 X，则通过端口 P1 发送
   - 如果数据包的目的地是 Y，则通过端口 P2 发送
 
-- 两种分布式路由协议:
-  - 分布式路径计算 Distributed path computation
+- **两种分布式路由协议:**
+  - 分布式**路径**计算 Distributed **path** computation
     - 每个路由器使用分布式算法计算到所有其他路由器的路径，而不考虑网络拓扑
     - E.g., Spanning Tree Protocol (STP), Distance Vector Protocol (e.g.,Routing Information Protocol), Border Gateway Protocol (BGP)
-  - 分布式拓扑计算 Distributed topology computation
+  - 分布式**拓扑**计算 Distributed **topology** computation
     - 路由器使用分布式算法来学习网络拓扑
     - 每个路由器在学习到的拓扑上运行本地路径计算算法，例如 Dijkstra 的最短路径算法
     - E.g., Link State Protocol (e.g., Open Shortest Path First)
