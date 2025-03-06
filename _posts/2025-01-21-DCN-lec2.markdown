@@ -17,7 +17,8 @@ author: # Add name author (optional)
 不同点:
 - 网络层是用于连接不同本地网络的全球标准协议**global standard protocol（IP）**
 - 数据链路层允许每个局域网（LAN）内的**自主性autonomy**
-![图片alt](/assets/img/l2p1.png =600x "Network vs. Data Link Layer")
+<!-- ![图片alt](/assets/img/l2p1.png "Network vs. Data Link Layer") -->
+<img src="/assets/img/l2p1.png" alt="Network vs. Data Link Layer" width="300">
 
 相同点:都使用同一套机制, `但是实现方式不同`
 - 命名和寻址 Naming and Addressing
