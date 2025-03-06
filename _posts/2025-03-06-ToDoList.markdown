@@ -8,9 +8,9 @@ tags: [Blog]
 author: # Add name author (optional)
 ---
 
-[ ]   [Graph Generation_Random Graph_Erdős–Rényi][Erdős–Rényi]
-[ ]   [Partitioning and Community Detection Problem][Partitioning n Community Detection]
-[ ]   [cs224w-图机器学习][图机器学习]
+- [ ] [Graph Generation_Random Graph_Erdős–Rényi][Erdős–Rényi]
+- [ ] [Partitioning and Community Detection Problem][Partitioning n Community Detection]
+- [ ] [cs224w-图机器学习][图机器学习]
 
 
 [Erdős–Rényi]: https://wenku.csdn.net/column/3gijantwp0
