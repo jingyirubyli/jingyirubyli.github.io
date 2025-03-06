@@ -185,7 +185,7 @@ Subnet Address 子网地址: IP 地址（**bitwise AND/按位与**） 子网掩�
   - in the range 128.32.0.0 to 128.63.255.255
 
 <figure style="text-align: center;">
-  <img src="/assets/img/l2p3.png" alt="CIDR地址解析" width="600">
+  <img src="/assets/img/l2p3.jpg" alt="CIDR地址解析" width="600">
   <figcaption>CIDR地址解析</figcaption>
 </figure>
 
@@ -280,8 +280,8 @@ Subnet Address 子网地址: IP 地址（**bitwise AND/按位与**） 子网掩�
   - 与交换机中的转发表相比，多出两列
 ![图片alt](/assets/img/l2p13.png "Routing Table")
 | Destination | Cost to destination | Next hop to destination | Output Port |
-| :---:        |    :----:   |          :---: |  :---: |
-|       |       |   |   |
+| :---:       |      :----:         |          :---:          |    :---:    |
+|             |                     |                         |             |
 
 - 收到目标 IP 字段为 d 的 IP 数据包时：
   - 运行最长前缀匹配 (LPM) 算法
