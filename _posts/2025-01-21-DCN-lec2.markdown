@@ -18,17 +18,17 @@ author: # Add name author (optional)
 - 网络层是用于连接不同本地网络的全球标准协议**global standard protocol（IP）**
 - 数据链路层允许每个局域网（LAN）内的**自主性autonomy**
 <!-- ![图片alt](/assets/img/l2p1.png "Network vs. Data Link Layer") -->
-<img src="/assets/img/l2p1.png" alt="Network vs. Data Link Layer" width="300">
+<img src="/assets/img/l2p1.png" alt="Network vs. Data Link Layer" width="600">
 
-相同点:都使用同一套机制, `但是实现方式不同`
+相同点:都使用同一套机制, 但是**实现方式不同**
 - 命名和寻址 Naming and Addressing
 - 目的地发现 Destination Discovery
 - 转发 Forwarding
 - 路由 Routing
 
-`Why we need different set of solutions to solve the same set of problems?`
-从高层次上看，两者都解决了同一个问题：将数据从 A 点传送到 B 点！
-我们真的需要不同的解决方案吗？很遗憾，是的。因为它们的工作规模不同：本地数据传输(local data delivery)与全局数据传输(global data delivery)，这就是区别所在！
+**Why we need different set of solutions to solve the same set of problems?**
+
+从高层次上看，两者都解决了同一个问题：将数据从 A 点传送到 B 点. 但是因为它们的工作规模不同：本地数据传输(local data delivery)与全局数据传输(global data delivery)，这就是区别所在！因此需要不同的解决方案.
 
 
 ## 数据链层 Data Link Layer
