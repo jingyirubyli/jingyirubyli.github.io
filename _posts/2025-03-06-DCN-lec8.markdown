@@ -420,7 +420,7 @@ RMT 将逻辑表映射到两种物理存储结构，分别针对不同的匹配�
   - Typically used for Longest Prefix Matching for IP forwarding (Lecture 2)
 
 | **存储类型** |     **匹配方式**    |                               **特点**                              |            **典型应用场景**           |
-|:------------:|:-------------------:|:-------------------------------------------------------------------:|:-------------------------------------:|
+|:------------|:-------------------|:-------------------------------------------------------------------|:-------------------------------------|
 | **SRAM**     | 精确匹配（Exact）   | - 要求所有匹配位严格为0或1 <br> - 速度快、功耗低，但容量有限            | MAC地址表、精确IP地址匹配（如流表）   |
 | **TCAM**     | 三元匹配（Ternary） | - 支持通配符（*），允许部分位为“无关” <br> - 容量小、成本高，但灵活性强 | 最长前缀匹配（LPM）、ACL规则、QoS策略 |
 
@@ -434,4 +434,6 @@ RMT 将逻辑表映射到两种物理存储结构，分别针对不同的匹配�
 ## Packet Scheduling: PIEO
 RMT 的一个局限性在于 RMT 仅专注于使数据包处理可编程, 也就是RMT把我们塞给他处理的东西全部当作是“packet”, 并不考虑别的, 比如packet排队/调度. 因此要决定先发哪个包后发哪个包, 需要新的方法.
 
-> PIEO: A Fast, Scalable, and Programmable Packet Scheduler
+> [PIEO: A Fast, Scalable, and Programmable Packet Scheduler][PIEO]
+
+[PIEO]: https://web.ics.purdue.edu/~vshriva/courses/papers/pieo_2019.pdf
