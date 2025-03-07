@@ -153,7 +153,6 @@ RMT（Reconfigurable Match Table，可重构匹配表） 是一种灵活的网�
 
 示例代码片段（P4语言）：
 
-    ```
     parser MyParser {
         // 定义解析流程
         state start {
@@ -177,9 +176,9 @@ RMT（Reconfigurable Match Table，可重构匹配表） 是一种灵活的网�
         }
         // 其他状态定义...
     }
-    ```
 
-4. 动态调整能力
+
+1. 动态调整能力
 
 解析图的设计支持运行时重构，以适应网络协议的变化：
 
@@ -245,7 +244,6 @@ RMT（Reconfigurable Match Table，可重构匹配表） 是一种灵活的网�
 
 用户通过P4的**控制逻辑（Control Plane）**定义表图的结构。以下是一个简化的P4代码示例：
 
-    ```
     control MyControl {
         // 定义匹配表及其动作
         table l2_table {
@@ -283,7 +281,6 @@ RMT（Reconfigurable Match Table，可重构匹配表） 是一种灵活的网�
             }
         }
     }
-    ```
 
 解析以下表图:    
 <figure style="text-align: center;">
@@ -354,7 +351,7 @@ MAC FORWARD与IP地址：三层路由依赖MAC转发后的IP头部信息。
 RCP与IP地址：动态路由协议需基于IP地址更新路由表。
 ACL的全局依赖：ACL规则综合所有层级字段实现细粒度过滤。
 
-4. 表图的动态特性
+1. 表图的动态特性
 
 - 运行时可重构：
   
@@ -403,7 +400,7 @@ ACL的全局依赖：ACL规则综合所有层级字段实现细粒度过滤。
 ### Match-Action Forwarding Model 匹配-动作转发模型
 
 <figure style="text-align: center;">
-<img src="/assets/img/l8p7.png" alt="Match-Action Forwarding Model" width="500"><img src="/assets/img/l8p7.png" alt="Match-Action Forwarding Model" width="500">
+<img src="/assets/img/l8p7.png" alt="Match-Action Forwarding Model" width="500"><img src="/assets/img/l8p8.png" alt="Match-Action Forwarding Model" width="500">
 <figcaption>Match-Action Forwarding Model</figcaption>
 </figure>
 
@@ -424,7 +421,92 @@ RMT 将逻辑表映射到两种物理存储结构，分别针对不同的匹配�
 | **SRAM**     | 精确匹配（Exact）   | - 要求所有匹配位严格为0或1 <br> - 速度快、功耗低，但容量有限            | MAC地址表、精确IP地址匹配（如流表）   |
 | **TCAM**     | 三元匹配（Ternary） | - 支持通配符（*），允许部分位为“无关” <br> - 容量小、成本高，但灵活性强 | 最长前缀匹配（LPM）、ACL规则、QoS策略 |
 
+解析示例:
+<figure style="text-align: center;">
+<img src="/assets/img/l8p9.png" alt="RMT Logical to Physical Table Mapping" width="600">
+<figcaption>RMT Logical to Physical Table Mapping</figcaption>
+</figure>
+
+左侧部分：协议关系与匹配条件
+  - 协议层次关系
+    - 以太网（ETH）是基础层，IPv4 和 IPv6 依赖于 ETH 解析后进行匹配。
+    - TCP 依赖于 IPv4 或 IPv6 解析后进行匹配。
+  - 匹配方式
+    - 目标 MAC 地址精确匹配
+    - 目标 IPv4 地址的三元匹配, 目标 IPv6 地址的三元匹配
+    - 目标 TCP 端口的匹配采用 Exact Match（精确匹配），意味着查找时不会进行范围匹配，而是直接基于哈希表或特定地址索引。
+
+右侧部分：逻辑表到物理表的映射
+  - 物理表按照 Stage（阶段） 组织，每个阶段可以存储不同的逻辑表。
+    - 主要存储结构：
+      - TCAM（Ternary Content Addressable Memory，三态内容可寻址存储器）
+        - 用于存储复杂匹配规则，例如 IPv4 和 IPv6 查找。
+        - 存储宽度为 640b。
+      - SRAM HASH
+        - 用于存储基于哈希的精确匹配，如 ETH 和 TCP 端口匹配。
+        - 也存储 640b。
+    - 逻辑表映射
+      - Physical Stage 1：尚未分配具体逻辑表，可能作为初步解析阶段。
+        - SRAM HASH：存储 Logical ETH Table，用于以太网（Ethernet）头部的精确匹配操作。
+      - Physical Stage 2：
+        - TCAM：存储 Logical IPv4 Table 和 Logical IPv6 Table，即 IPv4/IPv6 地址匹配逻辑。
+      - Physical Stage n：
+        - SRAM HASH：Logical TCP Table 存储在后续阶段，表示 TCP 端口匹配依赖于 IPv4/IPv6 查找结果。
+    - 依赖关系
+      - Logical TCP Table 依赖于 Logical IPv4 Table 或 Logical IPv6 Table，即 TCP 匹配发生在 IP 匹配之后。
+
+关键结论
+  - 管道化匹配过程：
+    - 以太网头解析后进行 IPv4/IPv6 查找。
+    - IPv4/IPv6 查找完成后，才能进行 TCP 端口匹配。
+  - TCAM 适用于多前缀匹配，SRAM 适用于哈希匹配：
+    - IPv4/IPv6 查找 使用 TCAM，因为 IP 地址匹配通常涉及掩码（前缀匹配）。
+    - 以太网和 TCP 端口匹配 使用 SRAM HASH，因为这些匹配通常是 精确匹配，适合哈希查找。
+
+该图描述了 RMT 交换机中的逻辑表如何映射到物理硬件，展示了协议层次、匹配方式以及依赖关系。它反映了数据包在交换机中匹配转发规则时的管道化结构，优化了查找效率，同时支持可编程性。在 RMT 架构中，物理阶段的资源分配取决于具体的设计需求。将 Logical ETH Table 分配到 Physical Stage 1 的 SRAM HASH 中，符合以太网头部需要精确匹配的特点。
+
 ### Action Processing Model 动作处理模型
+
+该模型常用于 P4 语言的可编程交换机，帮助网络管理员定义自定义数据处理逻辑，比如流量计数、负载均衡、封包修改等。
+
+<figure style="text-align: center;">
+<img src="/assets/img/l8p10.png" alt="Action Processing Model" width="600">
+<figcaption>Action Processing Model</figcaption>
+</figure>
+
+模型组成
+
+1. Header In（输入头部）
+   - 代表输入到 ALU（算术逻辑单元）的数据，主要是 数据包的头部字段，例如 MAC 地址、IP 地址、TCP 端口等。
+   - 这些头部字段会作为 ALU 计算的输入之一。
+2. MUX（多路复用器）
+   - 选择 ALU 的输入来源，可以是：数据包头部字段（Header In）; 其他数据（如 SRAM 存储的自定义数据，例如计数器）
+3. Data（数据）
+   -  存储在交换机寄存器（SRAM）中的 匹配结果，例如：计数器（packet counter）, 统计信息, 其他自定义数据
+4. Instruction（指令）
+   - 规定 ALU 如何操作输入数据，包括：
+     - 加法（Add）
+     - 减法（Subtract）
+     - 位移运算（Bit Shift Left/Right）
+   - 但不支持复杂运算，如 乘法（Multiply）和除法（Divide）。
+5. ALU（算术逻辑单元）
+   - 负责执行指令操作，对输入数据（Header In 或 SRAM 数据）进行计算，最终输出修改后的数据。
+
+运作流程
+
+   - 匹配阶段：
+     - 交换机先查找数据包的匹配项（例如，根据 IP 地址匹配路由表）。
+     - 如果匹配成功，则可能从 SRAM 读取存储的数据（例如，统计计数器）。
+   - 指令执行阶段：
+     - ALU 根据 Instruction（指令） 执行简单计算，例如：
+       - 计数器递增（Add 1）
+       - 计算 TTL（生存时间）减少（Subtract 1）
+       - 标志位的左移/右移（Bit Shift Left/Right）
+     - 但不支持复杂计算（如乘法或除法）。
+   - 输出阶段：
+     - 经过 ALU 计算后，数据可能被修改，并写回到 包头字段 或 交换机寄存器，然后进入后续的 转发/丢弃 逻辑。
+     - ALU 的输出是（修改后的）数据包头字段
+
 
 ### RMT Switch Specifications
 
