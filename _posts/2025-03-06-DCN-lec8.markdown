@@ -286,46 +286,68 @@ RMT（Reconfigurable Match Table，可重构匹配表） 是一种灵活的网�
 <figcaption>Reconfigurable Tables : Table Graph</figcaption>
 </figure>
 
-    3.1 组件定义
+3.1 组件定义
 
-    | 组件        | 说明                                                                                                |
-    |-------------|---------------------------------------------------------------------------------------------------------|
-    | VLAN        | 虚拟局域网，用于在二层网络中划分独立的广播域，隔离不同用户或业务流量。                                          |
-    | ETHERTYPE   | 以太网类型字段（2字节），指示数据帧载荷中封装的协议类型（如0x0800代表IPv4，0x86DD代表IPv6）。                   |
-    | MAC FORWARD | MAC地址转发逻辑，交换机或路由器根据目的MAC地址决定数据帧的转发端口。                                            |
-    | IPV4-DA     | IPv4目的地址，用于三层路由决策（最长前缀匹配）。                                                                |
-    | IPV6-DA     | IPv6目的地址，功能类似IPv4-DA，但地址空间更大且支持更灵活的路由策略。                                           |
-    | RCP         | 可能为路由控制协议（Routing Control Protocol），用于动态路由信息交换（如OSPF、BGP）。需结合上下文确认具体协议。 |
-    | ACL         | 访问控制列表，基于规则（如源/目的IP、端口号）过滤流量，允许或拒绝数据包通过。                                   |
+| 组件        | 说明                                                                                                |
+|-------------|---------------------------------------------------------------------------------------------------------|
+| VLAN        | 虚拟局域网，用于在二层网络中划分独立的广播域，隔离不同用户或业务流量。                                          |
+| ETHERTYPE   | 以太网类型字段（2字节），指示数据帧载荷中封装的协议类型（如0x0800代表IPv4，0x86DD代表IPv6）。                   |
+| MAC FORWARD | MAC地址转发逻辑，交换机或路由器根据目的MAC地址决定数据帧的转发端口。                                            |
+| IPV4-DA     | IPv4目的地址，用于三层路由决策（最长前缀匹配）。                                                                |
+| IPV6-DA     | IPv6目的地址，功能类似IPv4-DA，但地址空间更大且支持更灵活的路由策略。                                           |
+| RCP         | 可能为路由控制协议（Routing Control Protocol），用于动态路由信息交换（如OSPF、BGP）。需结合上下文确认具体协议。 |
+| ACL         | 访问控制列表，基于规则（如源/目的IP、端口号）过滤流量，允许或拒绝数据包通过。                                   |
 
-    3.2 依赖关系分析
+3.2 依赖关系分析
 
-    箭头表示输入依赖，即下游组件的处理需要上游组件提供数据。具体流程如下：
+箭头表示输入依赖，即下游组件的处理需要上游组件提供数据。具体流程如下：
 
-    - VLAN ← ETHERTYPE
-      - 依赖逻辑：
-          在解析数据帧时，首先读取ETHERTYPE字段：
-          - 若ETHERTYPE=0x8100，表示数据帧包含VLAN标签，需先提取VLAN ID，再进行后续处理。
-          - 若未携带VLAN标签，则直接进入MAC转发阶段。
-      - 作用：VLAN划分依赖于ETHERTYPE字段的判断。
-    - MAC FORWARD ← IPV4-DA / IPV6-DA
-      - 依赖逻辑：
-        在二层转发（MAC FORWARD）完成后，若需进行三层路由，需提取IP头部的目的地址：
-        - 若为IPv4数据包，使用IPV4-DA查询路由表。
-        - 若为IPv6数据包，使用IPV6-DA查询路由表。
-      - 作用：IP目的地址是三层路由决策的关键输入。
-    - RCP ← IPV4-DA / IPV6-DA
-      - 依赖逻辑：
-        动态路由协议（如OSPF、BGP）需要基于IP目的地址生成或更新路由表：
-        - IPv4和IPv6地址分别对应不同的路由表项和协议处理逻辑。
-      - 作用：路由控制协议依赖IP地址信息维护网络拓扑和路径选择。
-    - ACL ← 所有上游组件
-      - 依赖逻辑：
-        ACL规则可能基于以下字段进行匹配：
-        - 二层：VLAN ID、源/目的MAC地址。
-        - 三层：源/目的IPv4/IPv6地址。
-        - 四层：TCP/UDP端口号。
-      - 作用：ACL是流量过滤的最后一步，依赖所有前期解析的字段执行安全策略。
+- VLAN ← ETHERTYPE
+    - 依赖逻辑：
+        在解析数据帧时，首先读取ETHERTYPE字段：
+        - 若ETHERTYPE=0x8100，表示数据帧包含VLAN标签，需先提取VLAN ID，再进行后续处理。
+        - 若未携带VLAN标签，则直接进入MAC转发阶段。
+    - 作用：VLAN划分依赖于ETHERTYPE字段的判断。
+- MAC FORWARD ← IPV4-DA / IPV6-DA
+    - 依赖逻辑：
+    在二层转发（MAC FORWARD）完成后，若需进行三层路由，需提取IP头部的目的地址：
+    - 若为IPv4数据包，使用IPV4-DA查询路由表。
+    - 若为IPv6数据包，使用IPV6-DA查询路由表。
+    - 作用：IP目的地址是三层路由决策的关键输入。
+- RCP ← IPV4-DA / IPV6-DA
+    - 依赖逻辑：
+    动态路由协议（如OSPF、BGP）需要基于IP目的地址生成或更新路由表：
+    - IPv4和IPv6地址分别对应不同的路由表项和协议处理逻辑。
+    - 作用：路由控制协议依赖IP地址信息维护网络拓扑和路径选择。
+- ACL ← 所有上游组件
+    - 依赖逻辑：
+    ACL规则可能基于以下字段进行匹配：
+    - 二层：VLAN ID、源/目的MAC地址。
+    - 三层：源/目的IPv4/IPv6地址。
+    - 四层：TCP/UDP端口号。
+    - 作用：ACL是流量过滤的最后一步，依赖所有前期解析的字段执行安全策略。
+
+3.3 完整处理流程示例
+
+数据帧进入设备：
+解析ETHERTYPE字段，判断是否包含VLAN标签。
+VLAN处理：
+若存在VLAN标签，剥离并记录VLAN ID，用于后续流量隔离。
+MAC地址转发：
+根据目的MAC地址查询MAC表，确定输出端口（二层转发）。
+IP路由决策：
+提取IP头部中的目的地址（IPv4或IPv6），查询路由表确定下一跳。
+路由协议交互：
+通过RCP（如BGP）与其他设备交换路由信息，动态更新路由表。
+ACL过滤：
+根据预定义规则检查流量，允许合法数据包通过或丢弃非法流量。
+
+3.4 关键依赖总结
+
+VLAN与ETHERTYPE：VLAN划分需优先解析以太网类型字段。
+MAC FORWARD与IP地址：三层路由依赖MAC转发后的IP头部信息。
+RCP与IP地址：动态路由协议需基于IP地址更新路由表。
+ACL的全局依赖：ACL规则综合所有层级字段实现细粒度过滤。
 
 4. 表图的动态特性
 
@@ -373,3 +395,28 @@ RMT（Reconfigurable Match Table，可重构匹配表） 是一种灵活的网�
 
 但解析和表格图只是模型的抽象,没有展示如何构建交换机.
 
+## Match-Action Forwarding Model 匹配-动作转发模型
+
+<figure style="text-align: center;">
+<img src="/assets/img/l8p7.png" alt="Match-Action Forwarding Model" width="500"><img src="/assets/img/l8p7.png" alt="Match-Action Forwarding Model" width="500">
+<figcaption>Match-Action Forwarding Model</figcaption>
+</figure>
+
+## RMT Logical to Physical Table Mapping RMT 逻辑到物理表映射
+
+物理存储类型与匹配方式:
+
+RMT 将逻辑表映射到两种物理存储结构，分别针对不同的匹配需求：
+
+- **SRAM**: Used for **exact matching**
+  - i.e., every bit must be either 0 or 1
+- **TCAM**: Used for **ternary matching**, i.e.,can match “wildcard” bits
+  - e.g., 128.84.*.* (Here * represents wildcard bits, i.e., they could be 0 or 1)
+  - Typically used for Longest Prefix Matching for IP forwarding (Lecture 2)
+
+| **存储类型** |     **匹配方式**    |                               **特点**                              |            **典型应用场景**           |
+|:------------:|:-------------------:|:-------------------------------------------------------------------:|:-------------------------------------:|
+| **SRAM**     | 精确匹配（Exact）   | - 要求所有匹配位严格为0或1  - 速度快、功耗低，但容量有限            | MAC地址表、精确IP地址匹配（如流表）   |
+| **TCAM**     | 三元匹配（Ternary） | - 支持通配符（*），允许部分位为“无关”  - 容量小、成本高，但灵活性强 | 最长前缀匹配（LPM）、ACL规则、QoS策略 |
+
+## Action Processing Model 动作处理模型
