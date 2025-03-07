@@ -494,20 +494,20 @@ RMT 将逻辑表映射到两种物理存储结构，分别针对不同的匹配�
 
 运作流程
 
-   - 匹配阶段：
-     - 交换机先查找数据包的匹配项（例如，根据 IP 地址匹配路由表）。
-     - 如果匹配成功，则可能从 SRAM 读取存储的数据（例如，统计计数器）。
-   - 指令执行阶段：
-     - ALU 根据 Instruction（指令） 执行简单计算，例如：
-       - 计数器递增（Add 1）
-       - 计算 TTL（生存时间）减少（Subtract 1）
-       - 标志位的左移/右移（Bit Shift Left/Right）
-     - 但不支持复杂计算（如乘法或除法）。
-   - 输出阶段：
-     - 经过 ALU 计算后，数据可能被修改，并写回到 包头字段 或 交换机寄存器，然后进入后续的 转发/丢弃 逻辑。
-     - ALU 的输出是（修改后的）数据包头字段
+1. 匹配阶段：
+   - 交换机先查找数据包的匹配项（例如，根据 IP 地址匹配路由表）。
+   - 如果匹配成功，则可能从 SRAM 读取存储的数据（例如，统计计数器）。
+2. 指令执行阶段：
+   - ALU 根据 Instruction（指令） 执行简单计算，例如：
+     - 计数器递增（Add 1）
+     - 计算 TTL（生存时间）减少（Subtract 1）
+     - 标志位的左移/右移（Bit Shift Left/Right）
+   - 但不支持复杂计算（如乘法或除法）。
+3. 输出阶段：
+   - 经过 ALU 计算后，数据可能被修改，并写回到 包头字段 或 交换机寄存器，然后进入后续的 转发/丢弃 逻辑。
+   - ALU 的输出是（修改后的）数据包头字段
 
-可编程数据平面中具有并行处理的能力，主要用于网络设备（如 P4 交换机）的数据包处理。
+可编程数据平面中具有并行处理的能力，主要用于网络设备（如 P4 交换机）的数据包处理。交因为换机的一个处理阶段（Stage）中 可以包含多个 ALU, 这些 ALU 同时处理多个数据包头字段（Header Fields）。VLIW 指令（Very Long Instruction Word）, 超长指令字, 控制多个 ALU 同时执行不同的计算。通过 单个 VLIW 指令，可以让多个 ALU 在同一时钟周期内执行不同操作。数据包在匹配阶段（Match）后，查找到相关的条目，并生成 匹配结果。这个结果 传递给 VLIW 指令，用于控制多个 ALU 的运算逻辑。**ALUs are cheap!**例如现代网络芯片（如 Tofino）设计中，ALU 的硬件成本低廉，可以大规模并行部署。
 
 <figure style="text-align: center;">
 <img src="/assets/img/l8p11.png" alt="Multiple ALUs Per Stage" width="600">
@@ -553,6 +553,11 @@ RMT 的一个局限性在于 RMT 仅专注于使数据包处理可编程, 也就
    2. **调度算法**选择下一个要传输的数据包，平衡公平性、优先级和速率约束。
    3. 所选数据包被发送到**输出端口**并传输到线路上。
 
+<figure style="text-align: center;">
+<img src="/assets/img/l8p13.png" alt="Packet Scheduling 101" width="600">
+<figcaption>Packet Scheduling 101</figcaption>
+</figure>
+
 **现代数据包调度系统的理想特性**
 
 1. 可编程性: 支持多种包调度算法（例如 FIFO、WFQ、优先级排队），以适应不同的网络要求（例如 VoIP 的低延迟、批量数据的公平性）。
@@ -560,8 +565,93 @@ RMT 的一个局限性在于 RMT 仅专注于使数据包处理可编程, 也就
 3. 链路速度和性能：确保在**可预测的超低延迟**内完成调度决策（例如，100Gbps 时每数据包 120 纳秒）。在 100Gbps 时，1500 字节 (MTU) 数据包需要约 120 纳秒才能传输。调度程序必须在当前数据包完成传输*之前*决定下一个数据包。
 
 <figure style="text-align: center;">
-<img src="/assets/img/l8p12.png" alt="Desirable Properties Trade-of" width="600">
-<figcaption>Desirable Properties Trade-of</figcaption>
+<img src="/assets/img/l8p12.png" alt="Desirable Properties Trade-off" width="600">
+<figcaption>Desirable Properties Trade-off</figcaption>
 </figure>
 
-同时实现这三个特性（可编程性、可扩展性和性能）是一项挑战. 如何构建一个同时可编程、可扩展、高速(Programmable, Scalable, High-speed)的数据包调度程序？
+同时实现这三个特性（可编程性、可扩展性和性能）是一项挑战. 
+
+**1. 可编程性**
+- **目标**：支持多种调度算法（例如，FIFO、PIFO、UPS）以满足不同的网络要求。
+- **软件方法**：
+  - **优先级队列抽象**：**PIFO**（先入先出）和**UPS**（基于紧急程度的调度程序）等框架支持灵活的算法实现（例如，加权公平排队、截止时间感知调度）。
+  - **动态配置**：软件定义的调度程序允许在运行时调整优先级规则。
+- **硬件支持**：
+  - 可编程交换机/ASIC 在硬件中实现优先级队列，在保持灵活性的同时实现低延迟决策。
+- **限制**：
+  - 复杂算法（例如，分层调度）可能会超出硬件资源限制。
+  - 表现力和计算开销之间的权衡。
+
+
+**2. 可扩展性**
+- **目标**：管理 **10,000+ 个并发流**（在云/数据中心中很常见）。
+- **硬件创新**：
+  - **基于哈希的流跟踪**：使用最少的内存高效地将数据包映射到流。
+  - **PIFO 结构**：通过将流分组为优先级层来扩展到大量流计数。
+- **软件技术**:
+  - **分层调度**: 通过将流聚合到类别中（例如，“高优先级”、“尽力而为”）来降低复杂性。
+- **限制**:
+  - 在极端规模下，为高级算法（例如，每流公平性）维护每个流的状态变得不切实际。
+
+**3. 性能**
+- **目标**: 在**确定性纳秒**内做出调度决策（例如，100Gbps 链路为 120 纳秒）。
+- **硬件加速**:
+  - **ASIC/FPGA**: 以线速执行调度决策，确保没有数据包丢失或增加延迟。
+  - **管道并行性**: 在硬件管道中同时处理多个数据包。
+- **软件优化**：
+  - **内核旁路**：DPDK 或 XDP 等工具可减少软件开销。
+- **限制**：
+  - 硬件解决方案（例如固定功能 ASIC）可能缺乏新算法的灵活性。
+
+<figure style="text-align: center;">
+<img src="/assets/img/l8p14.png" alt="State-of-the-Art" width="600">
+<figcaption>State-of-the-Art</figcaption>
+</figure>
+
+那么如何构建一个同时可编程、可扩展、高速(Programmable, Scalable, High-speed)的数据包调度程序？
+
+### PIEO
+
+<figure style="text-align: center;">
+<img src="/assets/img/l8p15.png" alt="PIEO" width="600">
+<figcaption>PIEO</figcaption>
+</figure>
+
+#### PIEO Scheduler Abstraction
+
+
+Push-In-Extract-Out Primitive
+
+
+Expressiveness of PIEO
+
+
+
+
+
+#### PIEO Hardware Design
+
+PIEO 原语依赖于**有序列表(ordered list)**数据结构
+
+
+$$
+\begin{Bmatrix}
+   a & b \\
+   c & d
+\end{Bmatrix}
+$$
+
+
+
+<figure style="text-align: center;">
+<img src="/assets/img/l8p16.png" alt="PIEO: Conclusion" width="600">
+<figcaption>PIEO: Conclusion</figcaption>
+</figure>
+
+PIEO的两个关键贡献：
+
+- 一种用于数据包调度的新型**可编程**抽象和原语
+  - 比任何最先进的硬件数据包调度程序都更具表现力
+- 一种**快速**且**可扩展**的调度程序硬件设计
+  - 在 4 个时钟周期内做出调度决策
+  - 轻松扩展到数万个流
