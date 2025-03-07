@@ -507,6 +507,14 @@ RMT 将逻辑表映射到两种物理存储结构，分别针对不同的匹配�
      - 经过 ALU 计算后，数据可能被修改，并写回到 包头字段 或 交换机寄存器，然后进入后续的 转发/丢弃 逻辑。
      - ALU 的输出是（修改后的）数据包头字段
 
+可编程数据平面中具有并行处理的能力，主要用于网络设备（如 P4 交换机）的数据包处理。
+
+<figure style="text-align: center;">
+<img src="/assets/img/l8p11.png" alt="Multiple ALUs Per Stage" width="600">
+<figcaption>Multiple ALUs Per Stage</figcaption>
+</figure>
+
+
 
 ### RMT Switch Specifications
 
@@ -519,3 +527,41 @@ RMT 的一个局限性在于 RMT 仅专注于使数据包处理可编程, 也就
 > [PIEO: A Fast, Scalable, and Programmable Packet Scheduler][PIEO]
 
 [PIEO]: https://web.ics.purdue.edu/~vshriva/courses/papers/pieo_2019.pdf
+
+### Packet scheduling 数据包调度
+
+数据包调度是网络管理中的一个关键机制，它决定数据包何时以及以何种顺序传输到网络（“到线”）。
+
+**核心组件**
+1. **数据包队列**：
+   - 在安排数据包进行传输之前临时存储它们。
+   - 可能存在多个队列以对不同流量类型进行优先级排序（例如，VoIP 与文件下载）。
+
+2. **调度算法**：
+   - 决定下一个从队列发送的数据包。
+   - 常用算法：
+     - **公平排队 (FQ)**：确保在各个流之间公平分配带宽。
+     - **加权公平排队 (WFQ)**：为队列分配优先级权重。
+     - **速率限制/策略**：丢弃或延迟超过预定义速率的数据包。
+     - **步调**：平滑流量突发以避免拥塞。
+
+3. **输出端口**：
+   - 数据包离开设备（例如路由器、交换机）的物理/虚拟接口。
+
+**工作原理**
+   1. 数据包到达并根据规则（例如，优先级、源/目的地）分类到队列中。
+   2. **调度算法**选择下一个要传输的数据包，平衡公平性、优先级和速率约束。
+   3. 所选数据包被发送到**输出端口**并传输到线路上。
+
+**现代数据包调度系统的理想特性**
+
+1. 可编程性: 支持多种包调度算法（例如 FIFO、WFQ、优先级排队），以适应不同的网络要求（例如 VoIP 的低延迟、批量数据的公平性）。
+2. 可扩展性挑战：以最小的内存/CPU 开销高效地跟踪和优先处理 10,000 多个流。
+3. 链路速度和性能：确保在**可预测的超低延迟**内完成调度决策（例如，100Gbps 时每数据包 120 纳秒）。在 100Gbps 时，1500 字节 (MTU) 数据包需要约 120 纳秒才能传输。调度程序必须在当前数据包完成传输*之前*决定下一个数据包。
+
+<figure style="text-align: center;">
+<img src="/assets/img/l8p12.png" alt="Desirable Properties Trade-of" width="600">
+<figcaption>Desirable Properties Trade-of</figcaption>
+</figure>
+
+同时实现这三个特性（可编程性、可扩展性和性能）是一项挑战. 如何构建一个同时可编程、可扩展、高速(Programmable, Scalable, High-speed)的数据包调度程序？
