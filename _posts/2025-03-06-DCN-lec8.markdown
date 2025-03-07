@@ -642,7 +642,7 @@ PIEO 调度程序只考虑在任何给定时间调度rank最小的合格元素.
 
 对[18,1]作enqueue操作(“Push-In”): 将该element插入到其rank值指定的位置,即[13,4]和[19,6]之间, 如图所示.
 
-在t<sub>current</sub> = 7时作dequeue操作(“Extract-Out”): 使用filter : t<sub>current</sub> ≥ t<sub>eligible</sub> 筛选符合要求的元素, 即<font color=#008000>[13,4]</font>, [19,6], [21,2], 然后返回“rank最小的合格”元素, 即[13,4].
+在t<sub>current</sub> = 7时作dequeue操作(“Extract-Out”): 使用filter : t<sub>current</sub> ≥ t<sub>eligible</sub> 筛选符合要求的元素, 即[13,4], [19,6], [21,2], 然后返回“rank最小的合格”元素, 即[13,4].
 
 PIEO的表达力
 
