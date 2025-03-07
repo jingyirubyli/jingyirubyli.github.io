@@ -622,7 +622,7 @@ RMT 的一个局限性在于 RMT 仅专注于使数据包处理可编程, 也就
 我们想要Scheduling Algorithms回答这样两个问题: 什么时候元素才有资格被调度？在符合条件的元素中按什么顺序进行调度？在PIEO中针对when使用t<sub>eligible</sub>值进行编码, 对what order使用rank值进行编码. 整个PIEO调度算法可以被简单地抽象为以下算法:
 
 - Whenever the link is idle:
-  -  Among all elements satisfying the eligibility predicate t<sub>current<sub> ≥ t<sub>eligible<sub> : Schedule the smallest ranked element
+  -  Among all elements satisfying the eligibility predicate t<sub>current</sub> ≥ t<sub>eligible</sub> : Schedule the smallest ranked element
 
 PIEO 调度程序只考虑在任何给定时间调度rank最小的合格元素.
 
@@ -631,7 +631,7 @@ PIEO 调度程序只考虑在任何给定时间调度rank最小的合格元素.
 **P**ush-**I**n-**E**xtract-**O**ut Primitive
 
 <figure style="text-align: center;">
-<img src="/assets/img/l8p17.png" alt="Push-In-Extract-Out Primitive" width="400">
+<img src="/assets/img/l8p17.png" alt="Push-In-Extract-Out Primitive" width="600">
 <figcaption>Push-In-Extract-Out Primitive</figcaption>
 </figure>
 
@@ -657,22 +657,22 @@ PIEO的表达力
 PIEO 原语依赖于**有序列表(ordered list)**数据结构
 
 <figure style="text-align: center;">
-<img src="/assets/img/l8p19.png" alt="PIEO Hardware Design" width="400">
+<img src="/assets/img/l8p19.png" alt="PIEO Hardware Design" width="600">
 <figcaption>PIEO Hardware Design</figcaption>
 </figure>
 
 从根本上来说，是否有必要并行访问和比较 O(N) 个元素，以便在 O(1) 时间内维护一个（精确）有序列表（大小为 N）？
 我们提出了一种设计，可以在 O(1) 时间内维护一个（精确）有序列表，但只需并行访问和比较 O(N) 个元素。
 
-> “All problems in computer science can be solved by another level of indirection”       ——David Wheeler
+> “All problems in computer science can be solved by another level of **indirection**.”       ——David Wheeler
 
 <figure style="text-align: center;">
-<img src="/assets/img/l8p18.png" alt="PIEO Hardware Architecture" width="400">
+<img src="/assets/img/l8p18.png" alt="PIEO Hardware Architecture" width="600">
 <figcaption>PIEO Hardware Architecture</figcaption>
 </figure>
 
 <figure style="text-align: center;">
-<img src="/assets/img/l8p16.png" alt="PIEO: Conclusion" width="400">
+<img src="/assets/img/l8p16.png" alt="PIEO: Conclusion" width="500">
 <figcaption>PIEO: Conclusion</figcaption>
 </figure>
 
