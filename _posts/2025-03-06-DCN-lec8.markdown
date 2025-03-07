@@ -507,7 +507,7 @@ RMT 将逻辑表映射到两种物理存储结构，分别针对不同的匹配�
    - 经过 ALU 计算后，数据可能被修改，并写回到 包头字段 或 交换机寄存器，然后进入后续的 转发/丢弃 逻辑。
    - ALU 的输出是（修改后的）数据包头字段
 
-可编程数据平面中具有并行处理的能力，主要用于网络设备（如 P4 交换机）的数据包处理。交因为换机的一个处理阶段（Stage）中 可以包含多个 ALU, 这些 ALU 同时处理多个数据包头字段（Header Fields）。VLIW 指令（Very Long Instruction Word）, 超长指令字, 控制多个 ALU 同时执行不同的计算。通过 单个 VLIW 指令，可以让多个 ALU 在同一时钟周期内执行不同操作。数据包在匹配阶段（Match）后，查找到相关的条目，并生成 匹配结果。这个结果 传递给 VLIW 指令，用于控制多个 ALU 的运算逻辑。**ALUs are cheap!**例如现代网络芯片（如 Tofino）设计中，ALU 的硬件成本低廉，可以大规模并行部署。
+可编程数据平面中具有并行处理的能力，主要用于网络设备（如 P4 交换机）的数据包处理。因为交换机的一个处理阶段（Stage）中 可以包含多个 ALU, 这些 ALU 同时处理多个数据包头字段（Header Fields）。VLIW 指令（Very Long Instruction Word）, 超长指令字, 控制多个 ALU 同时执行不同的计算。通过 单个 VLIW 指令，可以让多个 ALU 在同一时钟周期内执行不同操作。数据包在匹配阶段（Match）后，查找到相关的条目，并生成 匹配结果。这个结果 传递给 VLIW 指令，用于控制多个 ALU 的运算逻辑。**ALUs are cheap!** 例如现代网络芯片（如 Tofino）设计中，ALU 的硬件成本低廉，可以大规模并行部署。
 
 <figure style="text-align: center;">
 <img src="/assets/img/l8p11.png" alt="Multiple ALUs Per Stage" width="600">
@@ -619,11 +619,34 @@ RMT 的一个局限性在于 RMT 仅专注于使数据包处理可编程, 也就
 
 #### PIEO Scheduler Abstraction
 
+我们想要Scheduling Algorithms回答这样两个问题: 什么时候元素才有资格被调度？在符合条件的元素中按什么顺序进行调度？在PIEO中针对when使用t<sub>eligible</sub>值进行编码, 对what order使用rank值进行编码. 整个PIEO调度算法可以被简单地抽象为以下算法:
 
-Push-In-Extract-Out Primitive
+- Whenever the link is idle:
+  -  Among all elements satisfying the eligibility predicate t<sub>current<sub> ≥ t<sub>eligible<sub> : Schedule the smallest ranked element
+
+PIEO 调度程序只考虑在任何给定时间调度rank最小的合格元素.
+
+> PIEO scheduler simply schedules the **smallest ranked eligible** element at **any given time**.
+
+**P**ush-**I**n-**E**xtract-**O**ut Primitive
+
+<figure style="text-align: center;">
+<img src="/assets/img/l8p17.png" alt="Push-In-Extract-Out Primitive" width="400">
+<figcaption>Push-In-Extract-Out Primitive</figcaption>
+</figure>
+
+根据调度算法scheduling algorithm的选择进行编程, 对每个element赋给两个值:rank和t<sub>eligible</sub>. 然后将所有elements按照rank升序排列,得到一个ordered list. 根据算法:
+
+> Whenever the link is idle:
+>> Among all elements satisfying the eligibility predicate t<sub>current<sub> ≥ t<sub>eligible<sub> : Schedule the smallest ranked element
+
+对[18,1]作enqueue操作(“Push-In”): 将该element插入到其rank值指定的位置,即[13,4]和[19,6]之间, 如图所示.
+
+在t<sub>current<sub> = 7时作dequeue操作(“Extract-Out”): 使用filter : t<sub>current<sub> ≥ t<sub>eligible<sub> 筛选符合要求的元素, 即[13,4], [19,6], [21,2], 然后返回“rank最小的合格”元素, 即[13,4].
+
+PIEO的表达力
 
 
-Expressiveness of PIEO
 
 
 
@@ -633,18 +656,23 @@ Expressiveness of PIEO
 
 PIEO 原语依赖于**有序列表(ordered list)**数据结构
 
+<figure style="text-align: center;">
+<img src="/assets/img/l8p19.png" alt="PIEO Hardware Design" width="400">
+<figcaption>PIEO Hardware Design</figcaption>
+</figure>
 
-$$
-\begin{Bmatrix}
-   a & b \\
-   c & d
-\end{Bmatrix}
-$$
+从根本上来说，是否有必要并行访问和比较 O(N) 个元素，以便在 O(1) 时间内维护一个（精确）有序列表（大小为 N）？
+我们提出了一种设计，可以在 O(1) 时间内维护一个（精确）有序列表，但只需并行访问和比较 O(N) 个元素。
 
-
+> “All problems in computer science can be solved by another level of indirection”       ——David Wheeler
 
 <figure style="text-align: center;">
-<img src="/assets/img/l8p16.png" alt="PIEO: Conclusion" width="600">
+<img src="/assets/img/l8p18.png" alt="PIEO Hardware Architecture" width="400">
+<figcaption>PIEO Hardware Architecture</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+<img src="/assets/img/l8p16.png" alt="PIEO: Conclusion" width="400">
 <figcaption>PIEO: Conclusion</figcaption>
 </figure>
 
