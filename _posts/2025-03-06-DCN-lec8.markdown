@@ -638,11 +638,11 @@ PIEO 调度程序只考虑在任何给定时间调度rank最小的合格元素.
 根据调度算法scheduling algorithm的选择进行编程, 对每个element赋给两个值:rank和t<sub>eligible</sub>. 然后将所有elements按照rank升序排列,得到一个ordered list. 根据算法:
 
 > Whenever the link is idle:
->> Among all elements satisfying the eligibility predicate t<sub>current<sub> ≥ t<sub>eligible<sub> : Schedule the smallest ranked element
+>   Among all elements satisfying the eligibility predicate t<sub>current</sub> ≥ t<sub>eligible</sub> : Schedule the smallest ranked element
 
 对[18,1]作enqueue操作(“Push-In”): 将该element插入到其rank值指定的位置,即[13,4]和[19,6]之间, 如图所示.
 
-在t<sub>current<sub> = 7时作dequeue操作(“Extract-Out”): 使用filter : t<sub>current<sub> ≥ t<sub>eligible<sub> 筛选符合要求的元素, 即[13,4], [19,6], [21,2], 然后返回“rank最小的合格”元素, 即[13,4].
+在t<sub>current</sub> = 7时作dequeue操作(“Extract-Out”): 使用filter : t<sub>current</sub> ≥ t<sub>eligible</sub> 筛选符合要求的元素, 即[13,4], [19,6], [21,2], 然后返回“rank最小的合格”元素, 即[13,4].
 
 PIEO的表达力
 
