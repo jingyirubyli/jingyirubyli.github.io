@@ -147,7 +147,9 @@ DCTCP 有两个参数：**K**（在交换机处）和 **g**（在发送方处）
 
 ---
 
-# NDP: Just Start, Spray, Trim, Pull
+# [NDP: Just Start, Spray, Trim, Pull][NDP]
+
+[NDP]: https://dl.acm.org/doi/pdf/10.1145/3098822.3098825
 
 全栈解决方案——包括发送方、交换机、接收方
 > A full stack solution — involves sender, switch, receiver
