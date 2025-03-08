@@ -87,19 +87,19 @@ author: # Add name author (optional)
 
 这张图描述了一个典型的数据包处理流水线，依次经过解析、L2 处理、L3 处理、ACL 处理，最终重新封装并输出数据包。该结构常见于软件定义网络（SDN）交换机或高性能网络设备中，优化数据包转发效率，同时提供灵活的网络管理能力。
 
-但是……如果您需要灵活性怎么办？所谓灵活性flexibility包括：
-- 添加新表
-- 添加新标题字段
-- 添加不同操作
+### 但是……如果您需要灵活性怎么办？
 
-SDN 强调对灵活性的需求。 在SDN中，一个重要的概念就是数据平面和控制平面的分离。控制平面就是我们常说的控制器，如果采用openflow协议，数据平面就是支持openflow的交换机。控制平面与数据平面之间仅能通过openflow协议进行通讯。openflow协议有以下的特点：预先定义好的控制器与数据平面设备之间通信的报文格式; openflow是一种狭义的南向协议，是协议相关的，数据平面和控制平面都需要实现该协议。
+所谓灵活性**flexibility**包括：
+- 添加新表 table
+- 添加新标题字段 header field
+- 添加不同操作 action
+
+**SDN 强调对灵活性的需求。** 在SDN中，一个重要的概念就是数据平面和控制平面的分离。控制平面就是我们常说的控制器，如果采用openflow协议，数据平面就是支持openflow的交换机。控制平面与数据平面之间仅能通过openflow协议进行通讯。openflow协议有以下的特点：预先定义好的控制器与数据平面设备之间通信的报文格式; openflow是一种狭义的南向协议，是协议相关的，数据平面和控制平面都需要实现该协议。虽然openflow为SDN奠定了基础，但在实际开发中，openflow还存在着比较大的局限。它无法做到协议不相关，由于必须遵循openflow协议来进行编程，而无法根据自己的需要进行额外扩展，很不灵活。openflow只能在已经固化的交换机数据处理逻辑上，通过流表、组表等指导数据流处理，却无法重新定义交换机处理数据的逻辑。此外，在openflow的版本迭代速度比较快，字段的变化也非常多。在openflow 1.0版本中仅支持12个匹配字段，1.3版本中支持40个匹配字段，到了1.5版本则可以支持45个匹配字段。随着版本的更迭需要对字段进行更改，如果是软件层面的控制器可以比较方便的修改，但是对于数据平面，特别是支持openflow的硬件交换机来说，每次修改协议都需要重新编写数据包的处理逻辑。可以说，openflow的这种可扩展性非常差的设计大大阻碍了openflow的推广和使用。[参考][P4]
+
+[P4]: https://yeya24.github.io/post/p4/
 
 - SDN 为控制平面control plane提供编程控制
 - 要完全实现 SDN 的愿景, 我们需要在数据平面data plane中拥有同样的灵活性！
-
-虽然openflow为SDN奠定了基础，但在实际开发中，openflow还存在着比较大的局限。它无法做到协议不相关，由于必须遵循openflow协议来进行编程，而无法根据自己的需要进行额外扩展，很不灵活。openflow只能在已经固化的交换机数据处理逻辑上，通过流表、组表等指导数据流处理，却无法重新定义交换机处理数据的逻辑。此外，在openflow的版本迭代速度比较快，字段的变化也非常多。在openflow 1.0版本中仅支持12个匹配字段，1.3版本中支持40个匹配字段，到了1.5版本则可以支持45个匹配字段。随着版本的更迭需要对字段进行更改，如果是软件层面的控制器可以比较方便的修改，但是对于数据平面，特别是支持openflow的硬件交换机来说，每次修改协议都需要重新编写数据包的处理逻辑。可以说，openflow的这种可扩展性非常差的设计大大阻碍了openflow的推广和使用。
-
-
 
 ### 现有的解决方案
 
@@ -112,28 +112,31 @@ SDN 强调对灵活性的需求。 在SDN中，一个重要的概念就是数据
 
 我们需要一个Programmable Switch ASIC！
 
-
-
 ---
 
 ## RMT(Reconfigurable Match Table) Design 可重构匹配表
 
-RMT（Reconfigurable Match Table，可重构匹配表） 是一种灵活的网络数据包处理架构，核心特点如下：
+**RMT（Reconfigurable Match Table，可重构匹配表）** 是一种灵活的网络数据包处理架构，核心特点如下：
 
 1. Reconfigurable 可自定义
-   - parse custom header fields 解析自定义：支持用户定义数据包的头部字段解析规则（如协议类型、字段结构）。
-   - create custom match tables 匹配表自定义：允许用户创建专用匹配表（如路由表、ACL表）
-   - take custom actions 动作自定义: 指定每条表项的匹配条件与对应动作（如转发、丢弃、修改字段）。
+   - **parse custom header fields** 解析自定义：支持用户定义数据包的头部字段解析规则（如协议类型、字段结构）。
+   - **create custom match tables** 匹配表自定义：允许用户创建专用匹配表（如路由表、ACL表）
+   - **custom actions** 动作自定义: 指定每条表项的匹配条件与对应动作（如转发、丢弃、修改字段）。
 2. Two key abstractions 两个关键抽象模型:
    - Parse Graph 解析图: 定义数据包头部字段的解析流程，逐层提取所需信息（如以太网头→IP头→TCP头）。
    - Table Graph 表图: 描述匹配表之间的逻辑关系与动作执行顺序（如先查L2表→再查L3表→最后执行ACL过滤）。
 3. Can be programmed using a domain-specific language called P4
-   - 通过领域专用语言P4 (Programming Protocol-Independent Packet Processors) 实现编程。
+   - 通过领域专用语言**P4** (**P**rogramming **P**rotocol-Independent **P**acket **P**rocessors) 实现编程。
    - 声明式特性：用户只需声明“要做什么”（如解析哪些字段、如何匹配和动作），无需关注底层硬件实现细节。
 
-### 解析图（Parse Graph）
+### 解析图（Parse Graph）--自定义字段
 
 解析图（Parse Graph）是RMT（可重构匹配表）模型中的一个核心抽象，用于定义数据包头部字段的解析流程。它决定了数据包从进入系统开始，如何逐层提取和处理不同协议层的头部信息。
+
+<figure style="text-align: center;">
+<img src="/assets/img/l8p20.png" alt="Parse Graph" width="300"><img src="/assets/img/l8p21.png" alt="Parse Graph" width="300"><img src="/assets/img/l8p22.png" alt="Parse Graph" width="300">
+<figcaption>Parse Graph</figcaption>
+</figure>
 
 1. 解析图的基本定义
 
@@ -157,34 +160,15 @@ RMT（Reconfigurable Match Table，可重构匹配表） 是一种灵活的网�
   - 解析以太网头后，根据EtherType字段（如0x0800代表IPv4，0x86DD代表IPv6）决定下一层解析逻辑。
   - 在IP头中，根据Protocol字段（如6代表TCP，17代表UDP）确定传输层协议。
 
-示例代码片段（P4语言）：
+示例代码片段（P4语言）：解析器可以实现为**有限状态机(finite state machine)**
 
-    parser MyParser {
-        // 定义解析流程
-        state start {
-            transition parse_ethernet;
-        }
-        state parse_ethernet {
-            packet.extract(hdr.ethernet);  // 提取以太网头
-            transition select(hdr.ethernet.etherType) {
-                0x0800: parse_ipv4;       // 若为IPv4，跳转到IPv4解析
-                0x86DD: parse_ipv6;       // 若为IPv6，跳转到IPv6解析
-                default: accept;          // 其他情况结束解析
-            }
-        }
-        state parse_ipv4 {
-            packet.extract(hdr.ipv4);     // 提取IPv4头
-            transition select(hdr.ipv4.protocol) {
-                6: parse_tcp;             // 若为TCP，继续解析TCP头
-                17: parse_udp;            // 若为UDP，继续解析UDP头
-                default: accept;
-            }
-        }
-        // 其他状态定义...
-    }
+<figure style="text-align: center;">
+<img src="/assets/img/l8p23.png" alt="Programming Parser in P4" width="600">
+<figcaption>Programming Parser in P4</figcaption>
+</figure>
 
 
-1. 动态调整能力
+4. 动态调整能力
 
 解析图的设计支持运行时重构，以适应网络协议的变化：
 
@@ -212,11 +196,9 @@ RMT（Reconfigurable Match Table，可重构匹配表） 是一种灵活的网�
 - 可维护性：协议变更仅需调整解析图定义，无需修改硬件逻辑。
 - 兼容性：支持混合协议环境（如传统IPv4与新兴IPv6共存）。
 
-
 解析图是RMT模型中实现协议无关性和灵活数据处理的核心机制。通过用户自定义的解析规则，它能够适应复杂多变的网络环境，为后续的匹配表查询和动作执行提供精确的输入数据。这种设计使得网络设备（如交换机、路由器）能够通过软件编程（如P4）快速响应新协议需求，是软件定义网络（SDN）和可编程数据平面的关键技术之一。
 
-
-### 表图（Table Graph）
+### 表图（Table Graph）--可重构表
 
 表图（Table Graph）是RMT（可重构匹配表）模型中的另一个核心抽象，用于定义数据包在匹配和动作执行阶段的逻辑流程。它描述了匹配表之间的依赖关系、动作执行顺序以及条件分支逻辑，确保数据包根据用户定义的策略高效处理。
 
@@ -250,43 +232,10 @@ RMT（Reconfigurable Match Table，可重构匹配表） 是一种灵活的网�
 
 用户通过P4的**控制逻辑（Control Plane）**定义表图的结构。以下是一个简化的P4代码示例：
 
-    control MyControl {
-        // 定义匹配表及其动作
-        table l2_table {
-            key = {
-                hdr.ethernet.dstMac: exact;  // 精确匹配目的MAC地址
-            }
-            actions = {
-                set_l2_forward;  // 自定义动作：设置转发端口
-                drop;            // 内置动作：丢弃数据包
-            }
-            default_action = drop;  // 默认动作为丢弃
-        }
-
-        table l3_table {
-            key = {
-                hdr.ipv4.dstAddr: lpm;  // 最长前缀匹配目的IP地址
-            }
-            actions = {
-                set_next_hop;    // 自定义动作：设置下一跳IP
-                decrement_ttl;   // 内置动作：减少TTL
-            }
-        }
-
-        // 定义表图的执行流程
-        apply {
-            if (l2_table.apply().hit) {      // 先查L2表
-                l3_table.apply();            // 若L2表匹配成功，再查L3表
-                if (l3_table.apply().hit) {
-                    // 执行L3表动作（如转发）
-                } else {
-                    drop();                 // 若L3表匹配失败，丢弃
-                }
-            } else {
-                drop();                     // 若L2表匹配失败，直接丢弃
-            }
-        }
-    }
+<figure style="text-align: center;">
+<img src="/assets/img/l8p24.png" alt="Programming Match Table in P4" width="600">
+<figcaption>Programming Match Table in P4</figcaption>
+</figure>
 
 解析以下表图:    
 <figure style="text-align: center;">
@@ -310,24 +259,24 @@ RMT（Reconfigurable Match Table，可重构匹配表） 是一种灵活的网�
 
 箭头表示输入依赖，即下游组件的处理需要上游组件提供数据。具体流程如下：
 
-- VLAN ← ETHERTYPE
+- VLAN → ETHERTYPE
     - 依赖逻辑：
         在解析数据帧时，首先读取ETHERTYPE字段：
         - 若ETHERTYPE=0x8100，表示数据帧包含VLAN标签，需先提取VLAN ID，再进行后续处理。
         - 若未携带VLAN标签，则直接进入MAC转发阶段。
     - 作用：VLAN划分依赖于ETHERTYPE字段的判断。
-- MAC FORWARD ← IPV4-DA / IPV6-DA
+- MAC FORWARD → IPV4-DA / IPV6-DA
     - 依赖逻辑：
     在二层转发（MAC FORWARD）完成后，若需进行三层路由，需提取IP头部的目的地址：
     - 若为IPv4数据包，使用IPV4-DA查询路由表。
     - 若为IPv6数据包，使用IPV6-DA查询路由表。
     - 作用：IP目的地址是三层路由决策的关键输入。
-- RCP ← IPV4-DA / IPV6-DA
+- RCP → IPV4-DA / IPV6-DA
     - 依赖逻辑：
     动态路由协议（如OSPF、BGP）需要基于IP目的地址生成或更新路由表：
     - IPv4和IPv6地址分别对应不同的路由表项和协议处理逻辑。
     - 作用：路由控制协议依赖IP地址信息维护网络拓扑和路径选择。
-- ACL ← 所有上游组件
+- ACL → 所有上游组件
     - 依赖逻辑：
     ACL规则可能基于以下字段进行匹配：
     - 二层：VLAN ID、源/目的MAC地址。
@@ -337,18 +286,14 @@ RMT（Reconfigurable Match Table，可重构匹配表） 是一种灵活的网�
 
 3.3 完整处理流程示例
 
-数据帧进入设备：
-解析ETHERTYPE字段，判断是否包含VLAN标签。
-VLAN处理：
-若存在VLAN标签，剥离并记录VLAN ID，用于后续流量隔离。
-MAC地址转发：
-根据目的MAC地址查询MAC表，确定输出端口（二层转发）。
-IP路由决策：
-提取IP头部中的目的地址（IPv4或IPv6），查询路由表确定下一跳。
-路由协议交互：
-通过RCP（如BGP）与其他设备交换路由信息，动态更新路由表。
-ACL过滤：
-根据预定义规则检查流量，允许合法数据包通过或丢弃非法流量。
+- 从VLAN表开始，处理虚拟局域网相关信息;
+- 然后流向ETHERTYPE表，识别以太网帧类型;
+- ETHERTYPE根据不同的以太网类型将流量分配到三个不同方向：
+  - MAC FORWARD表：处理MAC地址转发
+  - IPV4-DA表：处理IPv4目标地址
+  - IPV6-DA表：处理IPv6目标地址
+- 这三个表的输出都汇集到RCP(路由控制协议)表;
+- 最后流向ACL(访问控制列表)表，进行访问控制.
 
 3.4 关键依赖总结
 
@@ -357,7 +302,7 @@ MAC FORWARD与IP地址：三层路由依赖MAC转发后的IP头部信息。
 RCP与IP地址：动态路由协议需基于IP地址更新路由表。
 ACL的全局依赖：ACL规则综合所有层级字段实现细粒度过滤。
 
-1. 表图的动态特性
+4. 表图的动态特性
 
 - 运行时可重构：
   
