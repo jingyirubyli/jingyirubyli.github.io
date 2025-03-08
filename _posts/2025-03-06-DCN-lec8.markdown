@@ -640,22 +640,73 @@ PIEO 调度程序只考虑在任何给定时间调度rank最小的合格元素.
 > Whenever the link is idle:
 >   Among all elements satisfying the eligibility predicate t<sub>current</sub> ≥ t<sub>eligible</sub> : Schedule the smallest ranked element
 
-对[18,1]作enqueue操作(“Push-In”): 将该element插入到其rank值指定的位置,即[13,4]和[19,6]之间, 如图所示.
+入队: 对[18,1]作enqueue操作(“Push-In”): 将该element插入到其rank值指定的位置,即[13,4]和[19,6]之间, 如图所示.
 
-在t<sub>current</sub> = 7时作dequeue操作(“Extract-Out”): 使用filter : t<sub>current</sub> ≥ t<sub>eligible</sub> 筛选符合要求的元素, 即[13,4], [19,6], [21,2], 然后返回“rank最小的合格”元素, 即[13,4].
+出队: 在t<sub>current</sub> = 7时作dequeue操作(“Extract-Out”): 使用filter : t<sub>current</sub> ≥ t<sub>eligible</sub> 筛选符合要求的元素, 即[13,4], [19,6], [21,2], 然后返回“rank最小的合格”元素, 即[13,4].
+
+指定dequeue出队: 可以直接提取特定的元素（根据 rank 值）。例如直接取出 rank = 19 对应的元素 [19,6]，不受 t<sub>eligible</sub> 约束。
+
 
 PIEO的表达力
 
+PIEO 如何进行调度
+  - 每个元素都有 start_time（开始时间）和 finish_time（完成时间）。
+  - 在时间 x 进行调度时，选取 virtual_time(x) ≥ start_time 的元素，并调度 finish_time 最小的元素。
+  - 在 PIEO 结构中：
+	•	rank = finish_time（决定元素在队列中的优先级）。
+	•	t<sub>eligible</sub> = start_time（决定元素何时可以被考虑）。
+	•	调度规则：当 virtual_time(x) ≥ t<sub>eligible</sub>，即可进行任务选择。
 
+PIEO 能够表达的调度策略
 
+- 工作保护（Work conserving）
+	•	任务始终尽可能利用可用资源，不会浪费带宽或 CPU 时间。
+	•	示例：DRR（Deficit Round Robin）、WFQ（Weighted Fair Queueing）、WF²Q。
 
+- 非工作保护（Non-work conserving）
+	•	任务可能会延迟执行，即使资源可用，也可能限制执行速率。
+	•	示例：Token Bucket（令牌桶）、RCSP（Rate-Controlled Static Priority）。
+
+- 分层调度（Hierarchical scheduling）
+	•	任务在多个级别上进行调度，比如不同的优先级队列组合。
+	•	示例：HPFQ（Hierarchical Packet Fair Queueing）。
+
+- 异步调度（Asynchronous scheduling）
+	•	处理任务可能存在异步行为，比如防止任务长期饥饿。
+	•	示例：D³（动态延迟调度）、Starvation avoidance（避免饥饿）。
+
+- 优先级调度（Priority scheduling）
+	•	任务按照优先级执行，常见于实时系统。
+	•	示例：SJF（Shortest Job First），SRTF（Shortest Remaining Time First），LSTF（Least Slack Time First），EDF（Earliest Deadline First）。
+
+- 复杂调度策略（Complex scheduling policies）
+	•	可以混合任务整形（Shaping）和任务排序（Ordering）。
+	•	右下角示例：多个应用（APP）受到 Rate limit（速率限制） 约束，然后按照 优先级 进行调度。
 
 
 
 #### PIEO Hardware Design
 
-PIEO 原语依赖于**有序列表(ordered list)**数据结构
+PIEO 原语依赖于**有序列表(ordered list)**数据结构: PIEO（Push-In-Extract-Out）原语需要使用有序列表（Ordered List）作为其底层数据结构，以便进行高效的元素插入（Push-In）和提取（Extract-Out）。其设计权衡：在速度（Speed） 和 可扩展性（Scalability） 之间需要找到平衡。
 
+硬件资源 vs. 时间复杂度
+
+图中展示了不同数据结构在硬件资源占用（Flip-Flops & Comparators）与时间复杂度（Time Complexity）上的关系：
+	•	横轴（X 轴）：时间复杂度（Time Complexity）。
+	•	纵轴（Y 轴）：硬件资源消耗（Hardware Resource，如触发器 Flip-Flops 和比较器 Comparators）。
+
+PIFO（Push-In First-Out）在 SIGCOMM 2016 会议提出
+	•	PIFO 结构使用 Flip-Flops 进行高速调度，但 无法扩展到大规模数据，因为它的资源需求是 O(N)，难以在 大规模队列 中保持高效性。
+	•	PIFO 不能使用 SRAM，意味着它不能利用传统存储器结构进行扩展，因此难以扩展到大规模系统。
+
+| **方式**                                        | **时间复杂度** | **硬件资源消耗** | **优势** | **劣势** |
+|-------------------------------------------------|----------------|------------------|----------|----------|
+| **PIFO（Flip-Flops）**                          | O(1)           | O(N)             | 速度快   | 难以扩展 |
+| **数组或链表（Array / Linked-list in Memory）** | O(N)           | O(1)             | 易扩展   | 速度慢   |
+
+	•	PIFO：硬件资源占用高，时间复杂度为 O(1)，但无法扩展。
+	•	数组 / 链表（Array / Linked List in Memory）：占用较少硬件资源，但操作时间复杂度是 O(N)，影响调度效率。
+    
 <figure style="text-align: center;">
 <img src="/assets/img/l8p19.png" alt="PIEO Hardware Design" width="600">
 <figcaption>PIEO Hardware Design</figcaption>
