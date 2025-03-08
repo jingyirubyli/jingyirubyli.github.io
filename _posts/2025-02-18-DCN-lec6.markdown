@@ -94,7 +94,7 @@ TCP 窗口在检测到拥塞时总是减半（3 个 Dup ACK）,而不考虑拥�
    - 如果数据包到达时，数据包所添加的输出队列的占用率 > K，则 IP 报头中到达数据包的 ECN 位设置为 11
    - 
 <figure style="text-align: center;">
-<img src="/assets/img/l6p9.png" alt="IPv4 header format" width="300">
+<img src="/assets/img/l6p9.png" alt="IPv4 header format" width="600">
 <figcaption>IPv4 header format</figcaption>
 </figure>
 
@@ -103,7 +103,7 @@ TCP 窗口在检测到拥塞时总是减半（3 个 Dup ACK）,而不考虑拥�
    - 收到 ECN 位设置为 11 的数据包时：接收方将该数据包 ACK 的 TCP 标头中的 ECE（ECN-Echo）标志设置为 1，以通知发送方拥塞
 
 <figure style="text-align: center;">
-<img src="/assets/img/l6p10.png" alt="TCP segment header" width="300">
+<img src="/assets/img/l6p10.png" alt="TCP segment header" width="600">
 <figcaption>TCP segment header</figcaption>
 </figure>
 
@@ -116,7 +116,7 @@ TCP 窗口在检测到拥塞时总是减半（3 个 Dup ACK）,而不考虑拥�
      - 如果 α 是 1，窗口会像 TCP 中一样减半
   
 <figure style="text-align: center;">
-<img src="/assets/img/l6p11.png" alt="last window size = 10; g = 1" width="300">
+<img src="/assets/img/l6p11.png" alt="last window size = 10; g = 1" width="600">
 <figcaption>last window size = 10; g = 1</figcaption>
 </figure>
 
