@@ -5,110 +5,251 @@ date:   2025-02-06
 description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
 img: post-4.png # Add image post (optional)
 tags: [Blog, DCN]
-author: Adam Neilson # Add name author (optional)
+author:  # Add name author (optional)
 ---
 
-连接数据中心内的主机, 需要交换机拓扑来连接所有主机.
+数据中心有数十万台主机/服务器, 显然无法使用单个交换机连接所有主机/服务器, 而且即使是高端路由器通常也只有几百个端口. 因此要连接数据中心内的所有主机, 需要一个好的交换机拓扑.
+
+---
 
 # 什么是理想的网络拓扑？
 
 ## 性能指标
 
-- Bandwidth 带宽
+1. Bandwidth 带宽
   - 单位时间内通过网络发送的最大位数 Max number of bits 
-  - 单位: bits per second or bps
-- Throughput 吞吐量
+  - 单位: bits per second/bps
+2. Throughput 吞吐量
   - 衡量网络带宽利用率bandwidth utilization
-  - 单位: bits per second or bps
+  - 单位: bits per second/bps
   - 0 ≤ network throughput ≤ network bandwidth
 
 带宽和吞吐量的区别:
   - 带宽是物理网络组件的属性, 表示网络的最大容量
+
+<figure style="text-align: center;">
+<img src="/assets/img/l4p1.png" alt="Bandwidth" width="600">
+<figcaption>Fast feedback loop between ToR switches</figcaption>
+</figure>
+
   - 吞吐量是网络实际传输的数据量, 取决于物理网络上通信所采用的机制
 
-- Delay or Latency 延迟
+<figure style="text-align: center;">
+<img src="/assets/img/l4p2.png" alt="Throughput" width="600">
+<figcaption>Throughput</figcaption>
+</figure>
+
+3. Delay or Latency 延迟
   - 假设您正在从点 A 向点 B 发送一个比特
   - 延迟Delay or Latency时间是该比特从点 A 到点 B 所需的时间
   - 对于大小为 N 比特的数据包：延迟是第一位离开点 A 和最后一位到达点 B 之间的总时间
   - 单位: seconds
 
-link 链接
-所有链接都假定为“全双工full duplex”，即，假设链接带宽为 B，则可以同时以带宽 B 在两个方向上发送数据
+<figure style="text-align: center;">
+<img src="/assets/img/l4p3.png" alt="Delay" width="200">
+<figcaption>Delay</figcaption>
+</figure>
+
+> link 链接: 所有链接都假定为“**全双工full duplex**”，即，假设链接带宽为 B，则可以同时以带宽 B 在两个方向上发送数据
+
+<figure style="text-align: center;">
+<img src="/assets/img/l4p4.png" alt="Links are full duplex" width="400">
+<figcaption>Links are full duplex</figcaption>
+</figure>
 
 ## 理想网络拓扑的特点
 
-- No loops 无环路（或至少易于检测和避免）:路由简单, e.g., a tree-like topology
-- Full bisection bandwidth 全二分带宽
+1. **No loops 无环路（或至少易于检测和避免）**:路由简单, e.g., a tree-like topology
+
+<figure style="text-align: center;">
+<img src="/assets/img/l4p5.png" alt="A Tree Topology" width="300">
+<figcaption>A Tree Topology</figcaption>
+</figure>
+
+2. **Full bisection bandwidth 全二分带宽**
   - 每对唯一的主机都应该能够同时以最大网络接口带宽进行通信
     - 更正式地，假设每个主机的链路带宽为 B
-      - 然后，对于每个“排列”流量“Permutation” traffic（其中每个主机最多发送 1 个流并最多接收 1 个流.
+      - 然后，对于每个“排列”流量/“**Permutation**” traffic（其中每个主机最多发送 1 个流并最多接收 1 个流.
         - 网络中每个流的吞吐量必须等于主机链路带宽，即 B
-        - 给定 N 个主机，可以有 N! 个不同的完全排列流量
-    - 全二分带宽拓扑也称为 1:1 subscribed
+        - 给定 N 个主机，可以有 **N!** 个不同的完全排列流量
+
+    |        **Flows**       | **Permutation Traffic?** |
+    |:----------------------:|:------------------------:|
+    |    1->2, 1->3, 2->4    |            NO            |
+    |    1->2, 3->2, 2->4    |            NO            |
+    |    1->2, 2->1, 3->4    |            YES           |
+    | 1->2, 2->3, 3->4, 4->1 | YES (“Full” Permutation) |
+
+    - 全二分带宽拓扑也称为 **1:1 subscribed**
       - X:1 oversubscription 意味着在最坏情况下，只有 1/X 的主机带宽用于通信
-- Fault tolerant 容错
+
+    判断下图拓扑是否是全双工:
+
+    <figure style="text-align: center;">
+    <img src="/assets/img/l4p6.png" alt="Not a full bisection bandwidth topology" width="600">
+    <figcaption>Not a full bisection bandwidth topology</figcaption>
+    </figure>
+
+    不是. 因为存在一种排列流量/Permutation traffic，网络中并非每个流的吞吐量都是B. 例如，1->3、2->4 — 两个流中至少有一个的吞吐量 < B, 因为它们需要共享两个交换机之间的瓶颈链路.
+
+    判断下图拓扑是否是全双工:
+
+    <figure style="text-align: center;">
+    <img src="/assets/img/l4p7.png" alt="A full bisection bandwidth topology" width="400">
+    <figcaption>A a full bisection bandwidth topology</figcaption>
+    </figure>
+
+    是. 因为对于每个排列流量，都可以为每个流分配一条路径，从而为每个流分配吞吐量 B。
+
+    <figure style="text-align: center;">
+    <img src="/assets/img/l4p8.png" alt="Paths for an example permutation traffic" width="600">
+    <figcaption>Paths for an example permutation traffic</figcaption>
+    </figure>
+
+3. Fault tolerant 容错
   - 能够应对链路和交换机故障, 确保所有主机即使在发生故障时也能保持连接
   - 例如，主机之间有多条不相交的路径
-- Low cost and power 低成本、低功耗
+
+    <figure style="text-align: center;">
+    <img src="/assets/img/l4p9.png" alt="Fault tolerant" width="400">
+    <figcaption>Fault tolerant</figcaption>
+    </figure>
+
+4. Low cost and power 低成本、低功耗
   - 可使用廉价、低功耗的交换机switch和链路link构建
+
+---
 
 # Fattree Topology 胖树拓扑
 
-Hierarchical Multi-Rooted Tree Topology 分层多根树拓扑有如下特点: 有环路；但可通过沿树路由轻松避免; 是完全二分带宽; 有多个core switches所以有容错. 但是由于随着层数加高,所使用的交换机质量需求就提升, 导致越高层级需要使用越昂贵的交换机, 不符合低成本和低功耗的要求. 我们能否仅使用廉价的商品交换机来构建一个满足理想网络拓扑,符合所有四个要求?
+Hierarchical Multi-Rooted Tree Topology/分层多根树拓扑有如下特点: 有环路；但可通过沿树路由轻松避免; 是完全二分带宽(假设红色链路的带宽是绿色链路的两倍); 有多个core switches所以有容错. 但是由于随着层数加高,所使用的交换机质量需求就提升, 导致越高层级需要使用越昂贵的交换机, 不符合低成本和低功耗的要求. 
 
-Fattree topology又叫“folded clos” topology.[参考][ft]
+<figure style="text-align: center;">
+<img src="/assets/img/l4p10.png" alt="Hierarchical Multi-Rooted Tree Topology" width="600">
+<figcaption>Hierarchical Multi-Rooted Tree Topology</figcaption>
+</figure>
+
+我们能否仅使用廉价的商品交换机来构建一个满足理想网络拓扑,符合所有四个要求?
+
+[Fattree topology][ft]又叫“folded clos” topology.
 
 [ft]: https://packetpushers.net/blog/demystifying-dcn-topologies-clos-fat-trees-part2/
 
+<figure style="text-align: center;">
+<img src="/assets/img/l4p11.png" alt="Fattree Topology" width="600">
+<figcaption>Fattree Topology</figcaption>
+</figure>
+
 ## Fattree 拓扑配置
 
-所有交换机都是相同的: same # of ports and same bandwidth per port
-
-拓扑具有多层，每层具有相同的聚合带宽aggregate bandwidth
-
-具有 k 端口交换机的两层 fattree（“叶-脊”）（edge/ToR + aggregate routers）可以支持k^2/2个具有完全二分带宽full bisection bandwidth的主机: k ToR + k/2 aggregate routers.
-
-具有 k 端口交换机的三层 fattree（edge/ToR + aggregate + core）可以支持k^3/4个具有完全二分带宽的主机: k^2/2 ToR + k^2/2 aggregate + k^2/4 core switches.
+- 所有交换机都是相同的: 
+  - same # of ports and same bandwidth per port
+- 拓扑具有多层，每层具有相同的聚合带宽aggregate bandwidth
+- 具有 k 端口交换机的两层 fattree（“叶-脊”）（edge/ToR + aggregate routers）可以支持k^2/2个具有完全二分带宽full bisection bandwidth的主机:
+  - k ToR + k/2 aggregate switches.
+- 具有 k 端口交换机的三层 fattree（edge/ToR + aggregate + core）可以支持k^3/4个具有完全二分带宽的主机: 
+  - k^2/2 ToR + k^2/2 aggregate + k^2/4 core switches.
 
 ## 构建Fattree
 
-Fattree拓扑满足上述四个性质. 且由于全二分带宽性质, 排列流量中每条流都存在不相交路径. 但是在线环境中很难找到这些路径: 需要一个智能路由协议.
+递归构建更大的交换机单元（racks, pods），并将这些单元的链接扩展到更高层级中尽可能多的不同交换机.
+
+例: 使用 4-port 路由器构建 3 层 fattree: 这里 k = 4，因此 # hosts = 16，# ToR = 8，# Agg = 8，# Core = 4
+
+<figure style="text-align: center;">
+<img src="/assets/img/l4p12.png" alt="k = 4 Fattree Topology" width="600">
+<figcaption>k = 4 Fattree Topology</figcaption>
+</figure>
+
+Fattree 性质:
+
+1. 有循环；但很容易检测和避免: 只需沿着树走
+1. 低成本、低功耗: 仅使用廉价的switch构建
+2. 容错: 网络中有多条冗余路径
+3. 全二分带宽: 置换流量中，每条流都存在不相交的路径
+
+Fattree拓扑满足上述四个性质. 且由于全二分带宽性质, 排列流量中每条流都存在不相交路径. 但是在线环境中很难找到这些路径: 需要一个智能**路由协议/routing protocol**.
 
 ## Tree Routing Protocol 树形路由协议
 
 - 给定源主机 S 和目标主机 D：
-  - 从 S 向上到 S 和 D 的最小公共祖先 — upstream
-  - 从最小公共祖先向下到 D — downstream
+  - 从 S 向上到 S 和 D 的最小公共祖先 — **upstream**
+  - 从最小公共祖先向下到 D — **downstream**
 - 为什么要在上游的最小公共祖先处停止？
   - 实现低路径延迟（等待时间）
 
-在downstream，从最低公共祖先到 D 仅有一条路径,这一点非常好. 但是在upstream，从 S 到最低公共祖先有多条路径. 如何选择路径？cost = # of hops: 希望负载平衡Load Balancing.
+<figure style="text-align: center;">
+<img src="/assets/img/l4p13.png" alt="Tree Routing : Example" width="600">
+<figcaption>Tree Routing : Example</figcaption>
+</figure>
+
+在downstream，从最低公共祖先到 D 仅有一条路径,这一点非常好. 但是在upstream，从 S 到最低公共祖先有多条路径. 如何选择路径？cost = # of hops: 选择路径希望达到负载平衡Load Balancing.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l4p14.png" alt="Which path to choose?" width="600">
+<figcaption>Which path to choose?</figcaption>
+</figure>
+
+负载平衡的两个目标:
 
 - 沿上游路径均匀地平衡流量负载
   - 需要最佳地利用可用带宽
 - 确保 TCP 流内没有数据包重新排序
-  - TCP 流内的所有数据包都必须采用相同的路径！否则，TCP 的行为将不理想: 可能会认为重新排序的数据包已丢失，并且
-不必要地减慢速度.
+  - TCP 流内的所有数据包都必须采用相同的路径！否则，TCP 的行为将不理想: 可能会认为重新排序的数据包已丢失，并且不必要地减慢速度.
 
-### Flow-Level Equal Cost Multi Path
+## Flow-Level Equal Cost Multi Path(ECMP)
 
-Flow-level ECMP (Equal Cost Multi Path) load balancing algorithm:流级 ECMP（等价多路径）负载均衡算法：
+Flow-level ECMP (Equal Cost Multi Path) load balancing algorithm/流级 ECMP（等价多路径）负载均衡算法：
 
 - 对于每个 TCP 流，在所有具有相同成本的路径中，均匀随机地选择一条路径（path cost = # of hops from source to destination）
 - 每个交换机都独立做出决定
-- Stateless无状态算法 — 简单、快速实现 — 因此很受欢迎！
+- Stateless/无状态算法 — 简单、快速实现 — 因此很受欢迎！
   - 即，对于 ECMP，交换机上不维护负载平衡状态
   - 仅使用传入数据包头值做出决定：
-  - 收到具有 5 元组 <sIP、dIP、sPort、dPort、TCP> 的数据包时：
-    - Output upstream port = hash(5-tuple) % # of upstream ports: 输出上游端口 = hash(5 元组) % 上游端口数
-  - 属性 1：哈希函数确保均匀的负载平衡
-  - 属性 2：所有具有相同 5 元组的数据包都从同一端口发出，即没有数据包重新排序
+    - 收到具有 5 元组 <sIP、dIP、sPort、dPort、TCP> 的数据包时：
+      - Output upstream port = hash(5-tuple) % # of upstream ports: 
+      - 输出上游端口 = hash(5 元组) % 上游端口数
+    - 属性 1：哈希函数确保均匀的负载平衡
+    - 属性 2：所有具有相同 5 元组的数据包都从同一端口发出，即没有数据包重新排序
 
+<figure style="text-align: center;">
+<img src="/assets/img/l4p15.png" alt="ToR处的端口计算" width="600">
+<figcaption>ToR处的端口计算</figcaption>
+</figure>
 
-# Jellyfish拓扑
+<figure style="text-align: center;">
+<img src="/assets/img/l4p16.png" alt="Aggregate处的端口计算" width="600">
+<figcaption>Aggregate处的端口计算</figcaption>
+</figure>
 
-Jellyfish拓扑的目标包括实现类似Taftree拓扑的高二分带宽, 还有一个新目标:增量扩展Incremental expansion, 即在不影响网络拓扑结构的情况下添加或删除节点. 而Fattree拓扑是一种结构化拓扑,这正是导致粗略的设计点: 例如三层Fattree有确定数量的服务器, 如果k=24, 则恰好可以支持3456台服务器,以此类推. 而Jellyfish的设计理念正是使用随机拓扑,完全没有结构.
+<figure style="text-align: center;">
+<img src="/assets/img/l4p17.png" alt="Core处的端口计算" width="600">
+<figcaption>Core处的端口计算</figcaption>
+</figure>
 
-Jellyfish的吞吐量throughput也比Fattree更高,因为吞吐量与服务器之间的平均路径长度密切相关:平均路径长度较小 => 吞吐量更高. 而随机图中的平均路径长度低于 Fattree, 例如，三层Fattree大多数目的地都可以从源6 hops到达.
+# [Jellyfish拓扑][jf]
 
-Jellyfish的趣点也很明显: 对于较小的网络/稀疏图，可能效率不高. 可能由于随机连接导致网络分区; 树形结构可能对局部性有用; 布线复杂性更高; 需要更复杂的路由和拥塞控制，以有效利用可用带宽.因此，Fattree 仍然是当今数据中心的主导拓扑结构.
+[jf]: https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final82.pdf
+
+<figure style="text-align: center;">
+  <a href="https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final82.pdf" target="_blank">
+    <img src="/assets/img/l4p20.png" alt="Jellyfish" width="600">
+  </a>
+<figcaption>Jellyfish</figcaption>
+</figure>
+
+另一个拓扑结构叫做Jellyfish, 其目标包括实现类似Taftree拓扑的高二分带宽, 还有一个新目标:增量扩展Incremental expansion. 所谓Incremental expansion, 即在不影响网络拓扑结构的情况下添加或删除节点. 而Fattree拓扑是一种结构化拓扑,这正是导致粗略的设计点: 例如三层Fattree有确定数量的服务器(k^3/4), 如果k=24, 则恰好可以支持3456台服务器,以此类推. 而Jellyfish的设计理念正是使用随机拓扑,完全没有结构.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l4p19.png" alt="The links between switches are selected at random" width="600">
+<figcaption>The links between switches are selected at random</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+<img src="/assets/img/l4p19.png" alt="Jellyfish的增量扩展" width="600">
+<figcaption>Jellyfish的增量扩展</figcaption>
+</figure>
+
+Jellyfish的吞吐量/throughput也比Fattree更高,因为吞吐量与服务器之间的平均路径长度密切相关:平均路径长度较小 => 吞吐量更高. 而随机图中的平均路径长度低于 Fattree, 例如，三层Fattree大多数目的地都可以从源6 hops到达.
+
+Jellyfish的缺点也很明显: 对于较小的网络/稀疏图，可能效率不高. 可能由于随机连接导致网络分区; 树形结构可能对局部性有用; 布线复杂性更高; 需要更复杂的路由和拥塞控制，以有效利用可用带宽. 因此，Fattree 仍然是当今数据中心的主导拓扑结构.
