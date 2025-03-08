@@ -61,14 +61,14 @@ author: # Add name author (optional)
 在多条路径上发送数据包并不一定会导致重新排序. 相反，路径之间的延迟差异可能会导致数据包重新排序: 如果数据包P1 在Path1 (延迟150 ms)上发送, 并且数据包 P2 随后立即在在Path2(延迟100 ms) 上发送, 则P2 将在 P1 之前到达, 从而导致重新排序。
 
 <figure style="text-align: center;">
-<img src="/assets/img/l5p6.png" alt="Reordering" width="600">
+<img src="/assets/img/l5p6.png" alt="Reordering" width="400">
 <figcaption>Reordering</figcaption>
 </figure>
 
 同理，数据包 P1仍然在Path1发送, P2 在 P1 发送后 50 ms以上在Path2 上发送，则P1 将在 P2 之前到达, 因此自然就无需重新排序。
 
 <figure style="text-align: center;">
-<img src="/assets/img/l5p7.png" alt="No reordering" width="600">
+<img src="/assets/img/l5p7.png" alt="No reordering" width="400">
 <figcaption>No reordering</figcaption>
 </figure>
 
@@ -152,7 +152,7 @@ Global load estimation for path selection:
 跟踪每对架顶式 (ToR) 交换机之间的路径拥塞, 交换机与其他​​交换机交换本地链路利用率值local link utilization values, 在拥塞最少的路径上发送每个流.
 
 <figure style="text-align: center;">
-<img src="/assets/img/l5p12.png" alt="Fast feedback loop between ToR switches" width="600">
+<img src="/assets/img/l5p12.png" alt="Fast feedback loop between ToR switches" width="400">
 <figcaption>Fast feedback loop between ToR switches</figcaption>
 </figure>
 
