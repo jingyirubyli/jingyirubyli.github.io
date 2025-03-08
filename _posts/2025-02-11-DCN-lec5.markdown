@@ -52,7 +52,9 @@ author: # Add name author (optional)
 
 ---
 
-# Flowlet Aware Routing Engine (FLARE)/Flowlet 感知路由引擎
+# [Flowlet Aware Routing Engine (FLARE)][flare]/Flowlet 感知路由引擎
+
+[flare]: https://groups.csail.mit.edu/netmit/wordpress/wp-content/themes/netmit/papers/flare.pdf
 
 ## FLARE Design
 
@@ -147,7 +149,9 @@ Global load estimation for path selection:
 
 ---
 
-# CONGA
+# [CONGA][conga]
+
+[conga]: https://people.csail.mit.edu/alizadeh/papers/conga-sigcomm14.pdf
 
 跟踪每对架顶式 (ToR) 交换机之间的路径拥塞, 交换机与其他​​交换机交换本地链路利用率值local link utilization values, 在拥塞最少的路径上发送每个流.
 
@@ -166,21 +170,21 @@ Global load estimation for path selection:
 假设一个数据包到达 L0，目的地是 L2, 路径数为4, Congestion-To-ToR Table（拥塞表）存储 L0 到 L2 可能的路径（1、2、3、4）。表格为空；则选择一条随机路径, 在数据包头中存储链路利用率信息. 假设L0 选择 路径 4（从 L0 到 L2）。路径 4 当前利用率为 5（即 Utilization: 5）。这个利用率被存储在数据包头部，然后继续传输。数据包在经过路径时，每一跳都会比较当前路径链路的利用率与数据包头部记录的值：在每个hop，pkt.util = max(pkt.util, link.util). 例如，在 L1 交换机时，路径 4 的链路利用率可能上升到了 8。由于 max(5, 8) = 8，数据包头部的 pkt.util 更新为 8。当数据包到达目标 ToR（L2）后，路径的最大利用率值 8 会被反馈回 L0。这样，L0 交换机在未来的路径选择时可以考虑不同路径的拥塞情况：如果路径 4 持续拥塞，L0 可能会选择路径 1、2 或 3 来避免网络瓶颈。这可以减少拥塞热点，提高整个网络的吞吐量和公平性。
 
 <figure style="text-align: center;">
-<img src="/assets/img/TTT.gif" alt="FSend each flowlet on the least congested path" width="400">
+<img src="/assets/img/TTT.gif" alt="FSend each flowlet on the least congested path" width="600">
 <figcaption>Send each flowlet on the least congested path</figcaption>
 </figure>
 
 ToR-To-ToR Feedback 机制的关键点：
-	1.	数据包在传输时记录路径的最大拥塞情况（pkt.util）。
-	2.	在每一跳更新 pkt.util，确保它反映最坏的链路状况。
-	3.	到达目的地后，反馈该值给源 ToR（L0），用于未来路径选择优化。
+- 数据包在传输时记录路径的最大拥塞情况（pkt.util）。
+- 在每一跳更新 pkt.util，确保它反映最坏的链路状况。
+- 到达目的地后，反馈该值给源 ToR（L0），用于未来路径选择优化。
 
 ## Load Balancing Decision
 
 将每个 flowlet 发送到最不拥堵的路径上
 
 <figure style="text-align: center;">
-<img src="/assets/img/l5p13.png" alt="FSend each flowlet on the least congested path" width="400">
+<img src="/assets/img/l5p13.png" alt="FSend each flowlet on the least congested path" width="600">
 <figcaption>Send each flowlet on the least congested path</figcaption>
 </figure>
 
