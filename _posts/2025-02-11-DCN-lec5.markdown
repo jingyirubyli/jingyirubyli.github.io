@@ -9,43 +9,82 @@ author: # Add name author (optional)
 ---
 
 # 负载平衡的流量分割 Traffic Splitting for Load Balancing
-负载平衡的必要性
+负载平衡的必要性:
+
 - 网络在源和目标之间可以有多条路径
 - 需要最佳地使用所有可用路径来最大化吞吐量
 
-因此需要跨路径的“流量分割Traffic Splitting”或“负载平衡Load Balancing”
+因此需要跨路径的“**流量分割Traffic Splitting**”或“**负载平衡Load Balancing**”
+
+<figure style="text-align: center;">
+<img src="/assets/img/l5p3.png" alt="Multiple paths between source-destination" width="600">
+<figcaption>Multiple paths between source-destination</figcaption>
+</figure>
 
 为了实现负载平衡，我们需要沿多条路径分割流量. 理想情况下，我们希望流量分割能够：
 
-- Accurate准确：每条路径都应分配公平的流量份额. 例如，带宽比路径 P2 多 X 倍的路径 P1 应分配多 X 倍的流量份额
-- 在 (TCP) 流内保持数据包顺序. 否则，TCP 性能会受到影响.
+- Accurate/准确：每条路径都应分配公平的流量份额. 例如，带宽比路径 P2 多 X 倍的路径 P1 应分配多 X 倍的流量份额
+- Maintain packet order within a (TCP) flow/在 (TCP) 流内保持数据包顺序. 否则，TCP 性能会受到影响.
 
 两种传统的分流方式Split Traffic:
 
-1. Packet-level splitting 数据包级别拆分 
-   - 路径分配是按数据包进行的
-   - 准确: 由于细粒度fine granular的流量分割
+1. Packet-level splitting 数据包级别拆分 → **Accurate**
+   - 路径分配是按数据包进行的/per packet
+   - 准确: 由于细粒度/fine granular的流量分割
    - 但可能导致流内的数据包重新排序
-2. Flow-level splitting 流级别拆分 
-   - 路径分配是按流进行的
+
+<figure style="text-align: center;">
+<img src="/assets/img/l5p4.png" alt="Packet-level splitting" width="600">
+<figcaption>Packet-level splitting</figcaption>
+</figure>
+
+2. Flow-level splitting 流级别拆分 → **No packet Reordering**
+   - 路径分配是按流进行的/per flow
    - 不进行数据包重新排序 — 来自同一流的数据包采用同一路径
    - 但不如数据包级拆分准确: 由于粗粒度coarse granular的流量拆分
 
+<figure style="text-align: center;">
+<img src="/assets/img/l5p5.png" alt="Flow-level splitting" width="600">
+<figcaption>Flow-level splitting</figcaption>
+</figure>
+
 那么我们能两全其美吗？
 
-# Flowlet Aware Routing Engine (FLARE) Flowlet 感知路由引擎
+---
+
+# Flowlet Aware Routing Engine (FLARE)/Flowlet 感知路由引擎
 
 ## FLARE Design
 
 关键切入点：为什么会发生重新排序？
 
-在多条路径上发送数据包并不一定会导致重新排序！相反，路径之间的延迟差异可能会导致数据包重新排序: 如果数据包 P1 (延迟150 ms)在路径 1 上发送, 并且数据包 P2 (100 ms)随后立即在路径 2 上发送, 则P2 将在 P1 之前到达, 从而导致重新排序。同理，数据包 P2 在路径 2 上 P1 发送后 50 ms以上发送，P1 将在 P2 之前到达, 因此自然就无需重新排序。
+在多条路径上发送数据包并不一定会导致重新排序. 相反，路径之间的延迟差异可能会导致数据包重新排序: 如果数据包P1 在Path1 (延迟150 ms)上发送, 并且数据包 P2 随后立即在在Path2(延迟100 ms) 上发送, 则P2 将在 P1 之前到达, 从而导致重新排序。
+
+<figure style="text-align: center;">
+<img src="/assets/img/l5p6.png" alt="Reordering" width="600">
+<figcaption>Reordering</figcaption>
+</figure>
+
+同理，数据包 P1仍然在Path1发送, P2 在 P1 发送后 50 ms以上在Path2 上发送，则P1 将在 P2 之前到达, 因此自然就无需重新排序。
+
+<figure style="text-align: center;">
+<img src="/assets/img/l5p7.png" alt="No reordering" width="600">
+<figcaption>No reordering</figcaption>
+</figure>
 
 更一般地，只要数据包间隔大于两条路径之间的延迟差异，就可以将数据包分配给不同的路径，而不会冒数据包重新排序的风险.
 
-TCP 流是具有相同源和目标 IP 和端口（即相同的 5 元组）的数据包集合,我们可以将流划分为 Flowlets. Flowlet 是来自同一流的 a burst of packets，其中突发中的两个连续数据包没有被time ≥ δ分隔. 如果 δ > 所考虑路径上的延迟差则, 则无需重新排序即可为 Flowlets 分配不同的路径.
+<figure style="text-align: center;">
+<img src="/assets/img/l5p8.png" alt="General situation" width="600">
+<figcaption>General situation</figcaption>
+</figure>
 
-![图片alt](/assets/img/l5p1.png "Flowlets")
+TCP 流是具有相同源和目标 IP 和端口（即相同的 5 元组）的数据包集合,我们可以将流划分为 Flowlets. Flowlet 是来自同一流的 a burst of packets，其中突发中没有任何两个连续数据包被time ≥ δ分隔. 如果 δ > 所考虑路径上的延迟差则, 则无需重新排序即可为 Flowlets 分配不同的路径.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l5p1.png" alt="Flowlets" width="600">
+<figcaption>Flowlets</figcaption>
+</figure>
 
 那么Flowlet真的存在吗? 如果一个流只有很少的几个flowlet,那么其准确度也就很接近流级拆分,意义并不大. 但幸运的是flowlet很普遍, 因为TCP是突发性的(bursty), 它发送一个数据窗口,等待ACK,然后发送另一个数据窗口. 即使是非TCP流量中也具有突发性: 操作系统和 NIC 批处理.
 
@@ -53,34 +92,69 @@ TCP 流是具有相同源和目标 IP 和端口（即相同的 5 元组）的数
 
 在每个交换机上，FLARE 都有 3 个组件:
 
-![图片alt](/assets/img/l5p2.png "FLARE Components")
+<figure style="text-align: center;">
+<img src="/assets/img/l5p2.png" alt="FLARE Components" width="600">
+<figcaption>FLARE Components</figcaption>
+</figure>
 
 1. MTBS Estimator
-   - Minimum Time Before Switch
-   - 估计路径之间的最大延迟差异: 通过定期沿路径发送 ping packet来实现
+   - **M**inimum **T**ime **B**efore **S**witch
+   - 估计路径之间的最大延迟差异: 通过定期沿路径发送**ping packet**来实现
    - 这为我们提供了flowlet之间的最小时间间隔δ
 2. Flowlet-To-Path Assigner
    - 当数据包到达时，检查数据包是否是现有flowlet的一部分
      - 5 元组是否与现有flowlet匹配？
-       - 如果不是，则此数据包是新flowlet的开始，可以沿新路径发送
+       - 如果不是，则此数据包是新flowlet的开始，可以沿新路径发送 **→ new path**
        - 如果是，则判断此数据包是否在该flowlet的最后一个数据包到达的时间δ内到达？
-         - 如果是，则此数据包是现有flowlet的一部分，必须沿相同路径发送以避免重新排序
-         - 如果不是，则此数据包是新flowlet的开始，可以沿新路径发送
-那么指定哪条新路径呢？能不能用ECMP进行路径分配? 因为上一条讲了流级ECMP, 将新流（5 元组）分配给从所有可用等价路径中均匀随机选择的路径, 但流级拆分使其不准确. 在这一讲中我们将使用Flowlet级ECMP, 将新 flowlet 分配给从所有可用等价路径中均匀随机uniformly at random选择的路径, 当拓扑具有非对称路径时，均匀随机不起作用, 就需要按非对称路径成本的比例拆分流量. 因此想到加权 Flowlet 级 ECMP: FLARE 使用“Token Counter”机制实现此想法. 
+         - 如果是，则此数据包是现有flowlet的一部分，必须沿相同路径发送以避免重新排序 **→ same path**
+         - 如果不是，则此数据包是新flowlet的开始，可以沿新路径发送 **→ new path** 
 
-3. Token Counter
-   每个交换机本地跟踪某路径与公平流量负载fair traffic load的距离, 选择具有最多 token 数的路径作为新 flowlet 的路径. 
-   - 当大小为 b 的数据包到达时，每个路径的“tokens”按以下方式递增：
-     - ti = ti + Wi * b, Σ Wi = 1
-     - ti is token count for path i, Wi is weight for path i
-   - 当大小为 b 的数据包在路径上发送时，其tokens将按如下方式减少：
-     - tj = tj − b
+那么指定哪条新路径呢？能不能用ECMP进行路径分配? 因为上一讲介绍了流级ECMP, 将新流（5 元组）分配给从所有可用等价路径中均匀随机选择的路径, 但流级拆分使其不准确. 在这一讲中我们将使用Flowlet级ECMP, 将新 flowlet 分配给从所有可用等价路径中均匀随机uniformly at random选择的路径, 当拓扑具有非对称路径时，均匀随机不起作用, 就需要按非对称路径成本的比例拆分流量. 因此想到**加权 Flowlet 级 ECMP/weighted Flowlet-level ECMP**: FLARE 使用“**Token Counter**”机制实现此想法. 
 
-存在的问题: token counter 只能在每个switch做出局部最优选择, 可能并不是全局最优选择. 这就导致一个致命缺陷: 路径选择的局部负载估计甚至可能比随机负载无关路径选择更糟糕. 路径选择的全局负载估计是最佳的, CONGA 使用全局负载估计进行路径选择.
+Token Counter for Path Assignment/路径分配的令牌计数器
+
+每个交换机本地跟踪某路径与公平流量负载fair traffic load的距离, **选择具有最多 token 数的路径作为新 flowlet 的路径**. 
+- 当大小为 *b* 的数据包到达时，每个路径 *i* 的“tokens”按以下方式递增：
+   - t<sub>i</sub> = t<sub>i</sub> + W<sub>i</sub> * b, Σ W<sub>i</sub> = 1
+   - t<sub>i</sub> is token count for path *i*, W<sub>i</sub> is weight for path *i*
+- 当大小为 b 的数据包在路径上发送时，其tokens将按如下方式减少：
+   - t<sub>j</sub> = t<sub>j</sub> − b
+
+FLARE存在的问题: token counter 只能在每个switch做出局部最优选择, 可能并不是全局最优选择. 例: 分析下图流量
+
+Random load-agnostic path selection:
+
+<figure style="text-align: center;">
+<img src="/assets/img/l5p9.png" alt="Random load-agnostic path selection" width="600">
+<figcaption>Random load-agnostic path selection</figcaption>
+</figure>
+
+Local load estimation for path selection:
+
+<figure style="text-align: center;">
+<img src="/assets/img/l5p10.png" alt="Local load estimation path selection" width="600">
+<figcaption>Local load estimation path selection</figcaption>
+</figure>
+
+Global load estimation for path selection:
+
+<figure style="text-align: center;">
+<img src="/assets/img/l5p11.png" alt="Global load estimation path selection" width="600">
+<figcaption>Global load estimation path selection</figcaption>
+</figure>
+
+这表明FLARE的一个致命缺陷: 路径选择的局部负载估计甚至可能比随机负载无关路径选择更糟糕. 路径选择的全局负载估计是最佳的, **CONGA 使用全局负载估计(global load estimation)进行路径选择**.
+
+---
 
 # CONGA
 
 跟踪每对架顶式 (ToR) 交换机之间的路径拥塞, 交换机与其他​​交换机交换本地链路利用率值local link utilization values, 在拥塞最少的路径上发送每个流.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l5p12.png" alt="Fast feedback loop between ToR switches" width="600">
+<figcaption>Fast feedback loop between ToR switches</figcaption>
+</figure>
 
 ## ToR-To-ToR Feedback Design
 
