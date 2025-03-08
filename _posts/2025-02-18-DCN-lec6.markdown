@@ -9,81 +9,159 @@ author: # Add name author (optional)
 ---
 
 数据中心内的工作负载有以下几类:
-- Partition-Aggregate (e.g., web query)
- - 对延迟敏感
+- **Partition-Aggregate** (e.g., web query)
+ - 对延迟敏感/Delay-sensitive
  - 即使是一个缓慢的工作器也会显著增加端到端延迟
-- Short flows (e.g., control state)
+- **Short flows** (e.g., control state)
   - 50KB—1MB
-  - 对延迟敏感
-- Long flows (e.g., data replication)
+  - 对延迟敏感/Delay-sensitive
+- **Long flows** (e.g., data replication)
   - 1MB—50MB
-  - 吞吐量敏感
+  - 吞吐量敏感/Throughput-sensitive
+
+<figure style="text-align: center;">
+<img src="/assets/img/l6p1.png" alt="Workloads Inside Datacenters" width="600">
+<figcaption>Workloads Inside Datacenters</figcaption>
+</figure>
 
 数据中心传输要求:
-- Low Latency 低延迟: Short flows, Partition-Aggregate workloads 短流程、分区聚合工作负载
-- High Throughput 高吞吐量: Continuous data updates, large file transfers 持续数据更新、大文件传输
+- **Low Latency 低延迟**: Short flows, Partition-Aggregate workloads 短流程、分区聚合工作负载
+- **High Throughput 高吞吐量**: Continuous data updates, large file transfers 持续数据更新、大文件传输
+
+普适观点: 同时实现这两个目标具有挑战性.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l6p2.png" alt="Tension Between Latency-Throughput" width="600">
+<figcaption>Tension Between Latency-Throughput</figcaption>
+</figure>
 
 在交换机中使用深度缓冲deep buffers,能使丢包更少,吞吐量高, 但排队会延迟, 延迟也会增加. 如果使用浅缓冲区shallow buffers, 排队小,延迟低, 但是不利于突发, 容易丢包, 吞吐量也会降低. 因此我们的目标是同时实现低队列占用率和高吞吐量.
+
+---
 
 # TCP Inside Datacenters 数据中心内部的 TCP
 
 数据中心 (DC) 内 99.9% 的流量过去都是使用 TCP 传输的, 但我们会发现 TCP 无法满足 DC 应用需求: 
 1. Synchronized Bursts 同步突发导致丢包; 
-2. Queue Build-up 大型队列导致显著延迟增加, 浪费宝贵的缓冲空间; 
+
+<figure style="text-align: center;">
+<img src="/assets/img/l6p4.png" alt="TCP Issue (1): Synchronized Bursts" width="600">
+<figcaption>TCP Issue (1): Synchronized Bursts</figcaption>
+</figure>
+
+想象每个worker只发送一个包, swicth的容量足够处理. 但是当每个worker都发送两个包, switch的容量不足以处理这些包, 因此有部分包被丢弃. 在图示每个worker发送两个包的情况下, 丢弃的流没有更多数据包, 即没有 3 个Dup ACK 可供重传, 导致这些包就被完全丢弃了. 这是任何短流量都存在的的一般问题；此时重传包必须依赖超时；TCP 超时非常保守！后果就是来自某一个工作进程的数据包被延迟, 从而延迟了整个任务！
+
+<figure style="text-align: center;">
+<img src="/assets/img/l6p5.png" alt="TCP Issue (1): Synchronized Bursts" width="600"><img src="/assets/img/l6p6.png" alt="TCP Issue (1): Synchronized Bursts" width="600">
+<figcaption>Drop</figcaption>
+</figure>
+
+2. Large Queue Build-up 大型队列导致显著延迟增加, 浪费宝贵的缓冲空间; 
+
+TCP 需要较大的缓冲区来处理突发和高吞吐量. 但是，长流会填满缓冲区, 导致短流的延迟增加.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l6p7.png" alt="TCP Issue (2): Queue Build-up" width="600">
+<figcaption>TCP Issue (2): Queue Build-up</figcaption>
+</figure>
+
 3. Aggressive Slow Down 即使在拥塞程度较低时也会大幅减速, 导致吞吐量低.
+
+TCP 窗口在检测到拥塞时总是减半（3 个 Dup ACK）,而不考虑拥塞程度. 此时3 个 Dup ACK 仅告知某些数据包已丢失, 即它们仅编码拥塞的“存在”; 而不告知丢失了多少数据包, 即它们不编码拥塞的“程度”. 这个特性可能导致吞吐量不理想. 
+
+---
 
 # DCTCP (Data Center TCP)
 
 ## TCP vs. DCTCP
 
 与TCP的相同点表现在: Cumulative ACKs; Fast Re-transmit; Slow Start; Additive Increase; Multiplicative Decrease. 但是也有两个关键区别:
-1. TCP 默认使用数据包丢弃作为拥塞信号, 发送方仅在队列完全满后才开始减速
-   DCTCP 使用显式拥塞通知Explicit Congestion Notification (ECN) 作为拥塞信号（某些后续版本的 TCP 也使用 ECN）:交换机“标记”在交换机端口队列长度 > K 时到达的数据包（通过将 IP header中的两个 ECN 位设置为 11）,端点Endpoints使用这些标记主动减速，即在数据包被丢弃之前
-2. TCP 对拥塞的存在作出反应: 检测到拥塞时始终将窗口减半, 要么由于 3 个 Dup ACK（数据包丢失）,或当窗口中的一个或多个数据包设置了 ECN 位时
-   DCTCP 对拥塞程度作出反应: 如果拥塞程度较低，即为窗口中的少量数据包设置了 ECN 位，则略微减小窗口大小; 如果拥塞程度较高，即为窗口中的大量数据包设置了 ECN 位，则更积极地减小窗口大小.
+1. TCP 默认使用**数据包丢弃/packet drop**作为拥塞信号, 发送方仅在队列完全满后才开始减速
+   DCTCP 使用**显式拥塞通知/Explicit Congestion Notification (ECN)** 作为拥塞信号（某些后续版本的 TCP 也使用 ECN）:交换机“标记”在交换机端口队列长度 > K 时到达的数据包（通过将 IP header中的两个 ECN 位设置为 11）,端点Endpoints使用这些标记主动(proactively)减速，即在数据包被丢弃之前
+
+<figure style="text-align: center;">
+<img src="/assets/img/l6p8.png" alt="ECN" width="300">
+<figcaption>ECN</figcaption>
+</figure>
+
+2. TCP 对拥塞的**存在/presence**作出反应: 检测到拥塞时始终将窗口**减半**, 要么由于 3 个 Dup ACK（数据包丢失）,或当窗口中的一个或多个数据包设置了 ECN 位时
+   DCTCP 对拥塞**程度extent**作出反应: 如果拥塞程度较低，即为窗口中的少量数据包设置了 ECN 位，则略微减小窗口大小; 如果拥塞程度较高，即为窗口中的大量数据包设置了 ECN 位，则更积极地减小窗口大小.
 
 ## DCTCP Algorithm
 
-1. At the switch:
-   - 为每个输出队列维护一个参数队列阈值 K
+1. **At the switch:**
+   - 为每个输出队列维护一个**参数队列阈值(queue threshold) K**
    - 如果数据包到达时，数据包所添加的输出队列的占用率 > K，则 IP 报头中到达数据包的 ECN 位设置为 11
-2. At the receiver:
+   - 
+<figure style="text-align: center;">
+<img src="/assets/img/l6p9.png" alt="IPv4 header format" width="300">
+<figcaption>IPv4 header format</figcaption>
+</figure>
+
+2. **At the receiver:**
    - 接收方为每个收到的数据包生成一个 ACK​​
    - 收到 ECN 位设置为 11 的数据包时：接收方将该数据包 ACK 的 TCP 标头中的 ECE（ECN-Echo）标志设置为 1，以通知发送方拥塞
-3. At the sender:
-   - 发送方维护一个值 α = (1 − g) * α + g * F, 0 ≤ α ≤ 1. 这里 F 是最后一个窗口中设置了 ECE 的 ACK 的比例, 0 < g < 1 是新样本相对于过去样本的权重
+
+<figure style="text-align: center;">
+<img src="/assets/img/l6p10.png" alt="TCP segment header" width="300">
+<figcaption>TCP segment header</figcaption>
+</figure>
+
+3. **At the sender:**
+   - 发送方维护一个值 α = (1 − g) * α + g * F, 0 ≤ α ≤ 1. 
+     - F 是最后一个窗口中设置了 ECE 的 ACK 的比例
+     - 0 < g < 1 是新样本相对于过去样本的权重
    - cwnd = cwnd * (1 − α/2)
      - 如果 α 很小（接近 0），窗口会略微减小
      - 如果 α 是 1，窗口会像 TCP 中一样减半
   
-Assuming N infinitely long flows, sharing a single bottleneck link of capacity C, and fixed round-trip time RTT
-K > (C * RTT)/7
-g < 1.386/ 2((C * RTT) + K)
+<figure style="text-align: center;">
+<img src="/assets/img/l6p11.png" alt="last window size = 10; g = 1" width="300">
+<figcaption>last window size = 10; g = 1</figcaption>
+</figure>
 
-DCTCP为何有效? 
-- 高突发容错性: 可以有大缓冲区, 适合突发; 积极标记Aggressive marking: 在整个缓冲区填满之前做出反应; 
-- 低延迟: 由于主动减速，缓冲区占用率小
-- 高吞吐量: 对拥塞程度做出反应, 当拥塞程度较低时不会积极减速
+### 选择参数值:
+DCTCP 有两个参数：**K**（在交换机处）和 **g**（在发送方处）, 假设 N 个无限长的流，共享容量为 C 的单个瓶颈链路，并且往返时间 RTT 固定, 则取:
+   - K > (C * RTT)/7
+   - $g < 1.386/ \sqrt{2((C * RTT) + K)}$
 
-TCP 算法套件的局限性
-- TCP/DCTCP 是发送方驱动传输sender-driven transport的示例, 发送方决定何时以及以何种速率发送数据包
-- 发送方驱动传输从根本上很难处理持久同步的“Incast”（Incast - 多个发送方 1 个接收方）
-  给定的发送方不知道其他发送方何时发送数据包. 在最坏的情况下，它们可以同步. 因此导致排队；所有发送方都会降低其速率; 但如果这种同步持续存在, 发送方速率将继续降低每个 RTT. 最终速率将降至接近 0, 导致拥塞崩溃Congestion Collapse.
+### DCTCP为何有效? 
 
-解决方法是采用Receiver-driven Transport接收方驱动的传输: 接收方决定何时以及以何种速率从发送方提取数据包, 可以更有效地处理同步 Incast. 因为接收方知道向其发送数据包的所有发送方,因此可以在发送方之间进行仲裁以确保不发生同步. NDP 是接收方驱动的传输的一个示例.
+- High Burst Tolerance/高突发容错性: 
+  - 可以有大缓冲区 → 适合突发; 
+  - 积极标记Aggressive marking → 在整个缓冲区填满之前做出反应; 
+- Low Latency/低延迟: 
+  - 由于主动减速，缓冲区占用率小
+- High Throughput/高吞吐量: 
+  - 对拥塞程度做出反应, 当拥塞程度较低时不会积极减速
+
+### TCP 算法套件的局限性
+- TCP/DCTCP 是**发送方驱动传输/sender-driven transport**的示例, 发送方决定何时以及以何种速率发送数据包
+- 发送方驱动传输从根本上很难处理**持久同步的/persistent synchronized “Incast”**（Incast - 多个发送方 1 个接收方）
+  - 给定的发送方不知道其他发送方何时发送数据包. 
+  - 在最坏的情况下，它们可以同步. 
+    - 导致排队；所有发送方都会降低其速率; 
+    - 但如果这种同步持续存在, 发送方速率将继续降低每个 RTT. 最终速率将降至接近 0, 导致拥塞崩溃 → Congestion Collapse.
+
+解决方法是采用**Receiver-driven Transport/接收方驱动**的传输: 接收方决定何时以及以何种速率从发送方**拉取/pull**数据包, 可以更有效地处理同步 Incast. 因为接收方知道向其发送数据包的所有发送方,因此可以在发送方之间进行仲裁以确保不发生同步. **NDP** 是接收方驱动的传输的一个示例.
+
+---
 
 # NDP: Just Start, Spray, Trim, Pull
 
 全栈解决方案——包括发送方、交换机、接收方
+> A full stack solution — involves sender, switch, receiver
 
 1. Just Start   
-无需事先握手，与 TCP/DCTCP（0 RTT setup）不同, 发送方以线速line rate发送第一个 BDP 数据
+**No prior handshake/无需事先握手**，与 TCP/DCTCP（0 RTT setup）不同, 发送方以线速line rate发送第一个 BDP 数据
 - BDP(Bandwidth-delay product) 是带宽延迟乘积, 等于瓶颈链路带宽 * 往返时间 (RTT)
 - BDP 表示每个发送方的最佳窗口大小, 但很难估计瓶颈链路带宽和 RTT — 由于排队延迟 queuing delay
-- NDP 中的发送方将 BDP 估计为host link bandwidth * (2*propagation delay) 主机链路带宽 * (2*传播延迟). 不准确，但仅在第一个 RTT 期间使用.
+- NDP 中的发送方将 BDP 估计为: host link bandwidth * (2*propagation delay) 
+  - 主机链路带宽 * (2*传播延迟). 
+  - 这个估计并不准确，但仅在第一个 RTT 期间使用.
 2. Spray
-数据包均匀分布在所有路径上, 实现均匀负载平衡. 与 TCP/DCTCP 不同，数据包重新排序不是问题
+数据包**均匀分布在(sprayed uniformly across all paths)所有路径上**, 实现均匀负载平衡. 与 TCP/DCTCP 不同，数据包重新排序不是问题
 3. Trim
-如果交换机的队列已满，则在丢弃数据包时, 交换机会修剪数据包头并将其发送给接收方, 这样接收方就知道在第一个 RTT 之后向其发送的所有发送方
+如果交换机处的队列已满，则在丢弃数据包时, 交换机会**修剪(trims)数据包头**并将其发送给接收方, 这样接收方就知道在第一个 RTT 之后向其发送的所有发送方
 4. Pull
-第一个 RTT 之后，接收方从发送方拉取数据包, 可以决定何时、以何种速率从哪个发送方拉取数据包
+第一个 RTT 之后，接收方从发送方**拉取/pull**数据包, 可以决定何时、以何种速率从哪个发送方拉取数据包
