@@ -241,7 +241,7 @@ Flow-level ECMP (Equal Cost Multi Path) load balancing algorithm/流级 ECMP（�
 另一个拓扑结构叫做Jellyfish, 其目标包括实现类似Taftree拓扑的高二分带宽, 还有一个新目标:增量扩展Incremental expansion. 所谓Incremental expansion, 即在不影响网络拓扑结构的情况下添加或删除节点. 而Fattree拓扑是一种结构化拓扑,这正是导致粗略的设计点: 例如三层Fattree有确定数量的服务器(k^3/4), 如果k=24, 则恰好可以支持3456台服务器,以此类推. 而Jellyfish的设计理念正是使用随机拓扑,完全没有结构.
 
 <figure style="text-align: center;">
-<img src="/assets/img/l4p19.png" alt="The links between switches are selected at random" width="600">
+<img src="/assets/img/l4p18.png" alt="The links between switches are selected at random" width="600">
 <figcaption>The links between switches are selected at random</figcaption>
 </figure>
 
