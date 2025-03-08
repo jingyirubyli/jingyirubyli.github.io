@@ -706,7 +706,9 @@ PIFO（Push-In First-Out）在 SIGCOMM 2016 会议提出
 
 	•	PIFO：硬件资源占用高，时间复杂度为 O(1)，但无法扩展。
 	•	数组 / 链表（Array / Linked List in Memory）：占用较少硬件资源，但操作时间复杂度是 O(N)，影响调度效率。
-    
+
+PIEO 依赖 有序列表（Ordered List） 作为数据结构。调度系统需要在 “速度（Speed）” 和 “可扩展性（Scalability）” 之间权衡。现有的 PIFO 设计虽然快，但不易扩展，而基于 数组或链表的设计可扩展，但速度较慢。未来的硬件设计 需要找到一个既能保持 O(1) 操作时间，又能扩展的解决方案，可能涉及 混合 SRAM / Flip-Flop 架构或新型数据结构。
+
 <figure style="text-align: center;">
 <img src="/assets/img/l8p19.png" alt="PIEO Hardware Design" width="600">
 <figcaption>PIEO Hardware Design</figcaption>
