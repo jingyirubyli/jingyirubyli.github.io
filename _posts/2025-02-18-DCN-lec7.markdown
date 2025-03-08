@@ -175,9 +175,65 @@ OpenFlow Switch至少包含三个部分：
 - 通过固有分布式数据源进行计算的远程存储访问
 - 跨 DC 的大规模数据同步和状态复制
 
-### WANs are very inefficient!
-- 服务间缺乏协调/Lack of co-ordination between services
-- 本地、贪婪、资源分配/Local, Greedy, Resource Allocation
+### WANs are very inefficient! 广域网效率低下的原因分析.
+1. 服务间缺乏协调/Lack of co-ordination between services
+
+<figure style="text-align: center;">
+<img src="/assets/img/l7p8.png" alt="WANs" width="600">
+<figcaption>WANs</figcaption>
+</figure>
+
+图示中, 峰值与均值利用率差异显著:峰值与平均链路利用率比值为2.17. 链路带宽需按峰值需求配置（如100%容量）。但实际平均利用率仅为46%（均值≈峰值/2.17）。大部分时间内链路处于低负载状态，导致带宽资源浪费和成本增加。有没有更好的方法? 
+
+链路承载来自不同服务的流量. 流量类型差异会导致资源冲突. 我们将流量分为两类: 
+- 背景流量（Background Traffic）
+  - 特点：延迟容忍型（如备份、软件更新），可灵活调整传输时间。 **delay-tolerant**
+  - 存在的问题：若无协调，可能占用链路资源，挤压实时流量。
+- 非背景流量（Non-background Traffic）
+  - 特点：延迟敏感型（如视频会议、实时交易），需稳定带宽和低延迟。 **delay-sensitive**
+  - 问题：峰值时段与非关键流量竞争带宽，导致拥塞或性能下降。
+
+那么我们能够协调不同的服务吗？
+
+- **Provision only for peak non-background traffic**（仅为非背景流量的峰值需求配置带宽）
+  - 含义：
+    - 根据非背景流量（如视频会议、实时交易）的历史峰值需求，预先分配足够的带宽资源。
+    - 例如：若峰值需求为 1Gbps，则链路总带宽至少配置 1Gbps。
+  - 优势：
+    - 避免关键流量在高峰期因带宽不足而丢包或延迟；
+    - 减少因过度配置带宽导致的长期成本浪费。
+  - 挑战：
+    - 需精准预测峰值（若低估会导致拥塞，高估则浪费资源）；
+    - 依赖动态监控工具实时调整流量优先级。
+- **Background traffic only uses spare bandwidth**（背景流量仅使用空闲带宽）
+  - 含义：
+    - 背景流量（如数据备份、软件更新）仅在链路未被非背景流量占用时传输；
+    - 若非背景流量占用带宽，背景流量自动降速或暂停。
+  - 实现方式：
+    - 智能调度算法：实时监测链路利用率，动态分配剩余带宽给背景流量；
+    - QoS策略：为背景流量标记低优先级（如 DSCP 中的 Best Effort 类别）。
+  - 优势：
+    - 最大化链路利用率，空闲时段高效传输非关键数据；
+    - 避免背景流量与实时流量竞争资源。
+  - 挑战：
+    - 需网络设备支持流量分类和动态带宽调整（如 SD-WAN 技术）；
+    - 背景流量可能因频繁中断导致传输时间延长。
+
+<figure style="text-align: center;">
+<img src="/assets/img/l7p9.png" alt="co-ordinate between diﬀerent services" width="600">
+<figcaption>co-ordinate between diﬀerent services</figcaption>
+</figure>
+
+2. 本地、贪婪、资源分配/Local, Greedy, Resource Allocation
+
+例如: Flows arrive in the order: F<sub>A</sub>(R1 → R6), F<sub>B</sub>(R3 → R6), F<sub>C</sub>(R4 → R6)
+
+<figure style="text-align: center;">
+<img src="/assets/img/l7p10.png" alt="Local, Greedy Path Selection " width="400"><img src="/assets/img/l7p11.png" alt="Global, Optimal Path Selection" width="400">
+<figcaption>Path Selection</figcaption>
+</figure>
+
+优化目标:
   - First order objective: Maximize throughput for each flow
   - Second order objective: Minimize latency for each flow
 
@@ -186,7 +242,13 @@ OpenFlow Switch至少包含三个部分：
 两个关键设计元素：
   - 协调服务的发送速率
   - 集中资源分配
-使用中央控制器实现两个目标
+
+**使用中央控制器central controller实现两个目标**
+
+<figure style="text-align: center;">
+<img src="/assets/img/l7p12.png" alt="Uses a central controller to achieve both goals" width="600">
+<figcaption>Uses a central controller to achieve both goals</figcaption>
+</figure>
 
 SWAN Workflow
 - 控制器计算每个服务的发送速率
@@ -198,4 +260,28 @@ SWAN Workflow
     - 可能需要将现有流移动到不同的路径
     - 可能导致暂时拥塞
   
-![图片alt](/assets/img/l7p5.png "Congestion-free Network Updates")
+例: 如图, 假设有一些新的流量到达，现在我们必须将绿色流量和蓝色流量移至新路径
+
+<figure style="text-align: center;">
+<img src="/assets/img/l7p13.png" alt="How to move?" width="600">
+<figcaption>How to move?</figcaption>
+</figure>
+
+按照一般的考虑方法, 先把绿色F<sub>B</sub>移到目标位置, 再移动蓝色F<sub>A</sub>: 造成堵塞.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l7p14.png" alt="First move the green flow, then the blue flow" width="600">
+<figcaption>First move the green flow, then the blue flow</figcaption>
+</figure>
+
+同样如果先把蓝色F<sub>A</sub>移到目标位置, 再移动绿色F<sub>B</sub>: 也会造成堵塞.
+
+Idea: 在每个link上保留 **s** 的临时容量: Scratch capacity (s) of 0.5
+
+先将蓝色F<sub>A</sub>的一半移动到目标link, 此时蓝色F<sub>A</sub>与绿色F<sub>B</sub>发生少量堵塞; 再将绿色F<sub>B</sub>全部移动到目标link, 此时堵塞发生在上面link; 再将还未移动的一半蓝色F<sub>A</sub>移到目标link; 完成move, 堵塞消失.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l7p5.png" alt="Congestion-free Network Updates" width="600">
+<figcaption>Congestion-free Network Updates</figcaption>
+</figure>
+
