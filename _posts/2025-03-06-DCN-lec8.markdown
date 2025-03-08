@@ -9,6 +9,8 @@ author: # Add name author (optional)
 ---
 # 本讲内容
 
+---
+
 ## 传统高速交换机
 
 ### Fixed function switch
