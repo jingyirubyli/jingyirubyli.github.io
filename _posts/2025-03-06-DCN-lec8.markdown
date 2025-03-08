@@ -108,6 +108,7 @@ author: # Add name author (optional)
 - FPGAs？比fixed-function ASIC switches慢 10 倍
 
 > An ASIC switch is a switch that uses an application-specific integrated circuit (ASIC) chip. ASICs are custom-made chips that are designed to perform specific functions. 
+
 > ASIC 交换机是一种使用专用集成电路 (ASIC) 芯片的交换机。ASIC 是专门为执行特定功能而设计的定制芯片。
 
 我们需要一个Programmable Switch ASIC！
@@ -397,13 +398,13 @@ RMT 将逻辑表映射到两种物理存储结构，分别针对不同的匹配�
         - 用于存储基于哈希的精确匹配，如 ETH 和 TCP 端口匹配。
         - 也存储 640b。
     - 逻辑表映射
-      - Physical Stage 1：尚未分配具体逻辑表，可能作为初步解析阶段。
+      - Physical Stage 1：
         - SRAM HASH：存储 Logical ETH Table，用于以太网（Ethernet）头部的精确匹配操作。
       - Physical Stage 2：
         - TCAM：存储 Logical IPv4 Table 和 Logical IPv6 Table，即 IPv4/IPv6 地址匹配逻辑。
       - Physical Stage n：
         - SRAM HASH：Logical TCP Table 存储在后续阶段，表示 TCP 端口匹配依赖于 IPv4/IPv6 查找结果。
-    - 依赖关系
+    - 依赖关系/Dependency arrow
       - Logical TCP Table 依赖于 Logical IPv4 Table 或 Logical IPv6 Table，即 TCP 匹配发生在 IP 匹配之后。
 
 关键结论
@@ -412,7 +413,7 @@ RMT 将逻辑表映射到两种物理存储结构，分别针对不同的匹配�
     - IPv4/IPv6 查找完成后，才能进行 TCP 端口匹配。
   - TCAM 适用于多前缀匹配，SRAM 适用于哈希匹配：
     - IPv4/IPv6 查找 使用 TCAM，因为 IP 地址匹配通常涉及掩码（前缀匹配）。
-    - 以太网和 TCP 端口匹配 使用 SRAM HASH，因为这些匹配通常是 精确匹配，适合哈希查找。
+    - 以太网和 TCP 端口匹配 使用 SRAM HASH，因为这些匹配通常是精确匹配，适合哈希查找。
 
 该图描述了 RMT 交换机中的逻辑表如何映射到物理硬件，展示了协议层次、匹配方式以及依赖关系。它反映了数据包在交换机中匹配转发规则时的管道化结构，优化了查找效率，同时支持可编程性。在 RMT 架构中，物理阶段的资源分配取决于具体的设计需求。将 Logical ETH Table 分配到 Physical Stage 1 的 SRAM HASH 中，符合以太网头部需要精确匹配的特点。
 
@@ -465,11 +466,24 @@ RMT 将逻辑表映射到两种物理存储结构，分别针对不同的匹配�
 <figcaption>Multiple ALUs Per Stage</figcaption>
 </figure>
 
-
-
 ### RMT Switch Specifications
 
+- 64 x 10Gb ports
+  - 960M packets/second
+  - 1 GHz pipeline
+- Programmable Parser
+- 32 Match-Action Stages
+- Huge TCAM: 10x current chips
+  - 64K TCAM words x 640b
+- SRAM hash tables for exact match
+  - 128K words x 640b
+- 224 action processors per stage
+- All OpenFlow Statistics counters
 
+<figure style="text-align: center;">
+<img src="/assets/img/l8p25.png" alt="RMT Chip Comparison against Fixed-Function Switches" width="600">
+<figcaption>RMT Chip Comparison against Fixed-Function Switches</figcaption>
+</figure>
 
 ---
 
@@ -510,11 +524,14 @@ RMT 的一个局限性在于 RMT 仅专注于使数据包处理可编程, 也就
 <figcaption>Packet Scheduling 101</figcaption>
 </figure>
 
-**现代数据包调度系统的理想特性**
+### 现代数据包调度系统的理想特性
 
 1. 可编程性: 支持多种包调度算法（例如 FIFO、WFQ、优先级排队），以适应不同的网络要求（例如 VoIP 的低延迟、批量数据的公平性）。
+    > Express wide-range of packet scheduling algorithms
 2. 可扩展性挑战：以最小的内存/CPU 开销高效地跟踪和优先处理 10,000 多个流。
+    > Scale to 10s of thousands of flows
 3. 链路速度和性能：确保在**可预测的超低延迟**内完成调度决策（例如，100Gbps 时每数据包 120 纳秒）。在 100Gbps 时，1500 字节 (MTU) 数据包需要约 120 纳秒才能传输。调度程序必须在当前数据包完成传输*之前*决定下一个数据包。
+    > Make scheduling decisions within deterministic few nanoseconds
 
 <figure style="text-align: center;">
 <img src="/assets/img/l8p12.png" alt="Desirable Properties Trade-off" width="600">
@@ -598,7 +615,6 @@ PIEO 调度程序只考虑在任何给定时间调度rank最小的合格元素.
 
 指定dequeue出队: 可以直接提取特定的元素（根据 rank 值）。例如直接取出 rank = 19 对应的元素 [19,6]，不受 t<sub>eligible</sub> 约束。
 
-
 PIEO的表达力
 
 PIEO 如何进行调度
@@ -634,8 +650,6 @@ PIEO 能够表达的调度策略
 - 复杂调度策略（Complex scheduling policies）
 	•	可以混合任务整形（Shaping）和任务排序（Ordering）。
 	•	右下角示例：多个应用（APP）受到 Rate limit（速率限制） 约束，然后按照 优先级 进行调度。
-
-
 
 #### PIEO Hardware Design
 
