@@ -7,16 +7,15 @@ img: post-7.png # Add image post (optional)
 tags: [Blog, DCN]
 author: # Add name author (optional)
 ---
-
-Objective: Make Enterprise Networks easier to Manage
+# SDN的目标: Make Enterprise Networks easier to Manage
 
 ![图片alt](/assets/img/l7p1.png "Enterprise vs. Datacenter Networks")
 
 企业网络的问题: 企业网络是异构的 Heterogeneous
 - 不同供应商的各种硬件上存在各种协议
 - 难以执行全网策略network-wide policies！
-- 使用供应商特定的命令手动配置交换机
-- 需要调整许多单独的旋钮；因此很容易出现配置错误！
+  - 使用供应商特定的命令手动配置交换机
+  - 需要调整许多单独的旋钮；因此很容易出现配置错误！
     - 多供应商网络中 62% 的网络停机时间来自人为错误
     - 80% 的 IT 预算用于维护和运营
 
@@ -27,9 +26,9 @@ Prior Solutions for Enforcing Network-wide Policies
   - 例如，访问控制列表（例如，阻止具有特定源 IP 的数据包）
   - 限制：没有解决根本原因；掩盖问题而不是解决问题. 例如，如果用户更改其 IP 地址会怎样？
 
-# Ethane 
+---
 
-[参考][ethane]
+# [Ethane][ethane]
 
 [ethane]: https://slideplayer.com/slide/13186511/
 
@@ -44,7 +43,8 @@ Prior Solutions for Enforcing Network-wide Policies
 
 ## Ethane Design
 
-Goal: Abstract the entire network as a simple programmable entity
+Goal: **Abstract the entire network as a simple programmable entity**
+
 Two Key Ideas:
 - 使交换机变得非常简单
   - 简单的转发设备
@@ -91,40 +91,49 @@ Two Key Ideas:
 - Cold standby
   - Backups contain registration and policy information but lack the (user, host, address) bindings
   - 在主控制器发生故障时选择 ID 最低的备份控制器
-  - 最不复杂，但故障后收敛时间最长
+  - **最不复杂，但故障后收敛时间最长**
 - Warm standby
   - Backups contain binding information with weak consistency
     - 即，不同的备份控制器可能具有不同的绑定元组子集subsets of binding tuples
     - 但没有不一致的信息
-  - 更复杂，但从故障中恢复更快
+  - **更复杂，但从故障中恢复更快**
 - Fully replicated
   - 多个活动控制器各自保持相同状态
   - 交换机将每个请求分发到所有控制器（主控制器和备份控制器primary and backups）
   - 使用基于gossip协议gossip-based protocol来保持一致的事件顺序
-  - 最复杂，但故障恢复速度最快
+  - **最复杂，但故障恢复速度最快**
 
-Trade-off: System complexity vs. time to recover
+**Trade-off: System complexity vs. time to recover**
 
 ### Ethane Policy
 
-Policy specification language called Pol-Eth.
-Each condition is a conjunction of predicates谓词的组合 which specify the properties a flow must have for a certain action.
-例如，允许从源用户“bob”到目标主机“websrv”的 HTTP 流
+- Policy specification language called **Pol-Eth**.
+- Each condition is a **conjunction of predicates**谓词的组合 which specify the properties a flow must have for a certain action.
+- 例如，允许从源用户“bob”到目标主机“websrv”的 HTTP 流
 
-![图片alt](/assets/img/l7p2.png "policy")
+<figure style="text-align: center;">
+<img src="/assets/img/l7p2.png" alt="Policy Ex." width="600">
+<figcaption>Policy Ex.</figcaption>
+</figure>
 
-编译器compiler将策略编译成交换机中的转发规则
+- 编译器compiler将策略编译成交换机中的转发规则
 
 ### Ethane Switch
-- Ethane switches use a “Flow Table”流表 for forwarding.
+- Ethane switches use a **“Flow Table”**流表 for forwarding.
 - 该策略被编译成流表的“匹配操作”规则集“Match-Action” rules
-    - 匹配数据包头packet header和元数据字段metadata fields的（子集）
-    - 采取一些操作action，例如，转发到输出端口 1、丢弃
-    - 
-![图片alt](/assets/img/l7p3.png "A Flow Table")
+    - **Match匹配**数据包头packet header和元数据字段metadata fields的（子集）
+    - 采取一些**操作action**，例如，转发到输出端口 1、丢弃
 
-- Ethane Switch vs. Traditional Switch
-![图片alt](/assets/img/l7p4.png "Moved to the controller")
+<figure style="text-align: center;">
+<img src="/assets/img/l7p3.png" alt="A Flow Table" width="600">
+<figcaption>A Flow Table</figcaption>
+</figure>
+
+下图比较Ethane Switch和Traditional Switch. 其中画圈部分被移到控制器controller处理.
+<figure style="text-align: center;">
+<img src="/assets/img/l7p4.png" alt="Ethane Switch vs. Traditional Switch" width="600">
+<figcaption>Ethane Switch vs. Traditional Switch</figcaption>
+</figure>
 
 ### Ethane Summary
 
@@ -134,18 +143,32 @@ Each condition is a conjunction of predicates谓词的组合 which specify the p
     - 通过将控制平面逻辑control plane logic转移到中央控制器central controller, 使编程和执行全局策略变得容易
 - Ethane 与传统的分布式网络架构截然不同
 
+---
+
 # OpenFlow: Communication b/w Controller & Switch
 
 Motivation: Ethane网络需要控制器与交换机通信以填充转发规则。我们需要控制器和交换机之间的通信协议。一开始，每个交换机供应商都设计了自己的协议来安装交换机转发规则, 导致网络运营商需要了解每个交换机供应商的规范,还需要针对不同供应商的不同交换机修改控制平面应用程序。OpenFlow 定义了一种可编程网络协议programmable network protocol, 该协议可以帮助管理路由器和交换机，无论底层路由器或交换机由哪家供应商制造。
 
 OpenFlow Switch至少包含三个部分：
-- Flow Table/流表：与每个条目关联的操作
-- Secure Channel/安全通道：将交换机与控制器连接起来
-- OpenFlow Protocol/OpenFlow 协议：控制器与交换机通信并填充流表条目的开放标准接口
+- **A Flow Table/流表**：与每个条目关联的操作
+- **A Secure Channel/安全通道**：将交换机与控制器连接起来
+- **The OpenFlow Protocol/OpenFlow 协议**：控制器与交换机通信并填充流表条目的开放标准接口
+
+<figure style="text-align: center;">
+<img src="/assets/img/l7p6.png" alt="OpenFlow Switch" width="600">
+<figcaption>OpenFlow Switch</figcaption>
+</figure>
+
+---
 
 # SWAN: An Application of SDN
 
 ## Inter-DC Wide Area Network (WAN)
+
+<figure style="text-align: center;">
+<img src="/assets/img/l7p7.png" alt="Inter-DC Wide Area Network (WAN)" width="600">
+<figcaption>Inter-DC Wide Area Network (WAN)</figcaption>
+</figure>
 
 ### WAN Traffic
 - 将用户数据（例如电子邮件、文档、音频/视频）复制到远程 DC 以实现可用性/持久性
@@ -158,7 +181,7 @@ OpenFlow Switch至少包含三个部分：
   - First order objective: Maximize throughput for each flow
   - Second order objective: Minimize latency for each flow
 
-### SWAN: Software-driven WAN 软件驱动广域网
+## SWAN: Software-driven WAN 软件驱动广域网
 
 两个关键设计元素：
   - 协调服务的发送速率
