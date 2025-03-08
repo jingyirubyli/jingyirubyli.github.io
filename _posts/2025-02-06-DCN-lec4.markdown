@@ -233,7 +233,7 @@ Flow-level ECMP (Equal Cost Multi Path) load balancing algorithm/流级 ECMP（�
 
 <figure style="text-align: center;">
   <a href="https://www.usenix.org/system/files/conference/nsdi12/nsdi12-final82.pdf" target="_blank">
-    <img src="/assets/img/l4p20.png" alt="Jellyfish" width="600">
+    <img src="/assets/img/l4p20.png" alt="Jellyfish" width="400">
   </a>
 <figcaption>Jellyfish</figcaption>
 </figure>
