@@ -203,8 +203,14 @@ Spider Traps（蜘蛛陷阱） 是指一组网页形成一个循环链接结构�
 - ee<sup>T</sup>: 由 1 填满的 n × n 矩阵
 - n: M 的行数/列数。
 
+如果我们设置上例中\beta=0.85, 则计算M<sup>*</sup>:
 
-1. Spider Traps 问题修正公式
+<figure style="text-align: center;">
+<img src="/assets/img/prfml15.png" alt="M<sup>*</sup>" width="200">
+<figcaption>修正M<sup>*</sup></figcaption>
+</figure>
+
+3. Spider Traps 问题修正公式
 
 
 
