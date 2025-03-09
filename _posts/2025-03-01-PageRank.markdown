@@ -259,7 +259,7 @@ SpiderTraps问题：A节点的出链指向它本身，A与其它节点之间无�
 n：M 矩阵的行数/列数
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml18.png" alt="仅仅使用β计算M" width="400">
+<img src="/assets/img/prfml18.png" alt="仅仅使用β计算M" width="600">
 <figcaption>仅仅使用β计算M</figcaption>
 </figure>
 
@@ -278,7 +278,7 @@ n：M 矩阵的行数/列数
   - 设置β =0.85，认为trap节点有85%的概率引用自己，15%的概率引用其他节点。
 
 <figure style="text-align: center;">
-<img src="/assets/img/pr11.png" alt="步骤2：解决Spider Traps" width="400">
+<img src="/assets/img/pr11.png" alt="步骤2：解决Spider Traps" width="500">
 <figcaption>步骤2：解决Spider Traps</figcaption>
 </figure>
 
