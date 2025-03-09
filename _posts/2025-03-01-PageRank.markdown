@@ -59,12 +59,12 @@ author: # Add name author (optional)
 i = 1: 
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml2.png" alt="计算PR(A)<sub>1</sub>" width="600">
+<img src="/assets/img/prfml2.png" alt="计算PR(A)<sub>1</sub>" width="400">
 <figcaption>计算PR(A)<sub>1</sub></figcaption>
 </figure>
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml3.png" alt="计算PR(B)<sub>1</sub>" width="600">
+<img src="/assets/img/prfml3.png" alt="计算PR(B)<sub>1</sub>" width="300">
 <figcaption>计算PR(B)<sub>1</sub></figcaption>
 </figure>
 
@@ -86,14 +86,14 @@ i = 1:
 将PR值转为矩阵（便于计算,及更新PR值）: 第i列的j个元素分别表示从节点i跳到其他第j个节点的概率. 如从A跳转到B或C的概率均为1/2, 从D将跳转到 A 的概率为 1。（矩阵的列表示出链）
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml4.png" alt="将PR值转为矩阵" width="400">
+<img src="/assets/img/prfml4.png" alt="将PR值转为矩阵" width="200">
 <figcaption>将PR值转为矩阵</figcaption>
 </figure>
 
 通过矩阵化表达,可以简化PR值的计算:
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml5.png" alt="通过Marcov矩阵计算PR值" width="400">
+<img src="/assets/img/prfml5.png" alt="通过Marcov矩阵计算PR值" width="200">
 <figcaption>通过Marcov矩阵计算PR值</figcaption>
 </figure>
 
@@ -102,19 +102,24 @@ i = 1:
 同样求上例中i=1时的PR值:
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml6.png" alt="通过矩阵计算i=1时的PR值" width="400">
+<img src="/assets/img/prfml6.png" alt="通过矩阵计算i=1时的PR值" width="300">
 <figcaption>通过矩阵计算i=1时的PR值</figcaption>
 </figure>
 
 i=2时的PR值(计算完成后排名变成A, C, B, D):
 <figure style="text-align: center;">
-<img src="/assets/img/prfml7.png" alt="通过矩阵计算i=2时的PR值" width="400">
+<img src="/assets/img/prfml7.png" alt="通过矩阵计算i=2时的PR值" width="300">
 <figcaption>通过矩阵计算i=2时的PR值</figcaption>
 </figure>
 
 根据PR = M*V不断迭代，经过多次迭代后所生成的列向量为网页最终的PR值。
-1. 两种方式的关系
 
+3. 两种方式的关系
+
+<figure style="text-align: center;">
+<img src="/assets/img/pr6.png" alt="两种方式的关系" width="600">
+<figcaption>两种方式的关系</figcaption>
+</figure>
 
 ## 存在的问题以及修正
 
@@ -124,7 +129,19 @@ i=2时的PR值(计算完成后排名变成A, C, B, D):
 
 那些没有指向其他页面的网页（出链为空的节点）。Dead Ends 会导致网站权重变为 0。B没有任何出链（out-links）这就是 Dead Ends，Dead Ends 会导致网站权重变为 0。例如:
 
-2. 解决方法: Teleport/随机跳转
+<figure style="text-align: center;">
+<img src="/assets/img/pr7.png" alt="Dead Ends例" width="600">
+<figcaption>Dead Ends例</figcaption>
+</figure>
+
+计算PR值:
+
+<figure style="text-align: center;">
+<img src="/assets/img/prfml8.png" alt="多次循环后模型中所有的 PR 值都会归于 0" width="300">
+<figcaption>多次循环后模型中所有的 PR 值都会归于 0</figcaption>
+</figure>
+
+1. 解决方法: Teleport/随机跳转
 
 在 PageRank 计算过程中，允许一定概率的随机跳转（通常是 15%），即用户有概率从任何页面跳转到其他任意页面，从而避免死胡同的问题。
 
