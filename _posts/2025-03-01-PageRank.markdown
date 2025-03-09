@@ -266,7 +266,21 @@ n：M 矩阵的行数/列数
 此时M不满足转移概率矩阵的性质：列之和为1。所以仅用B是解决不了DeadEnd问题。
 
 以此图为例总结两个问题的解决步骤:
+- 步骤1：先解决Dead ends 问题
+  - 对出链为0的节点，简单粗暴的假设：它的任何节点的出链为1/n
 
+<figure style="text-align: center;">
+<img src="/assets/img/pr10.png" alt="步骤1：解决Dead ends" width="400">
+<figcaption>步骤1：解决Dead ends</figcaption>
+</figure>
+
+- 步骤2：在前者基础上解决SpiderTraps
+  - 设置β =0.85，认为trap节点有85%的概率引用自己，15%的概率引用其他节点。
+
+<figure style="text-align: center;">
+<img src="/assets/img/pr11.png" alt="步骤2：解决Spider Traps" width="400">
+<figcaption>步骤2：解决Spider Traps</figcaption>
+</figure>
 
 ---
 
@@ -280,7 +294,7 @@ n：M 矩阵的行数/列数
   - 非查询相关的特性，查询结果会偏离搜索内容。
   - 通过“僵尸”网站或链接，人为刷 PageRank 值。
 
-
+---
 
 ## 代码实现
 
