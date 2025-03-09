@@ -202,7 +202,9 @@ Spider Traps（蜘蛛陷阱） 是指一组网页形成一个循环链接结构�
 - 1-\beta: 随机跳到其他网页的概率，例如：浏览 a 的时候，有一定概率会打开 b 或 c
 - ee<sup>T</sup>: 由 1 填满的 n × n 矩阵
 - n: M 的行数/列数。
-3. Spider Traps 问题修正公式
+
+
+1. Spider Traps 问题修正公式
 
 
 
