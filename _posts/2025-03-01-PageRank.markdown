@@ -298,34 +298,36 @@ n：M 矩阵的行数/列数
 
 ## 代码实现
 
-  % 导包
-  import networkx as nx
-  import matplotlib.pyplot as plt
-  import random
-  
-  Graph = nx.DiGraph()
-  Graph.add_nodes_from(range(0, 100))
-  for i in range(100):   
-      j = random.randint(0, 100)
-      k = random.randint(0, 100)
-      Graph.add_edge(k, j)
-  
-  % 绘图
-  nx.draw(Graph, with_labels=True)
-  plt.show()
+```
+% 导包
+import networkx as nx
+import matplotlib.pyplot as plt
+import random
 
-  % 打印全部点的 PR 值
-  pr = nx.pagerank(Graph, max_iter=100, alpha=0.01)
-  print(pr) 
+Graph = nx.DiGraph()
+Graph.add_nodes_from(range(0, 100))
+for i in range(100):   
+    j = random.randint(0, 100)
+    k = random.randint(0, 100)
+    Graph.add_edge(k, j)
 
-  % 最大的 PR 值
-  print(max(pr.values()))
+% 绘图
+nx.draw(Graph, with_labels=True)
+plt.show()
 
-  import operator
-  % 最大 PR 值的点
-  print(max(pr.items(), key=operator.itemgetter(1))[0])
-  % PR 值之和
-  print(sum(pr.values()))
+% 打印全部点的 PR 值
+pr = nx.pagerank(Graph, max_iter=100, alpha=0.01)
+print(pr) 
+
+% 最大的 PR 值
+print(max(pr.values()))
+
+import operator
+% 最大 PR 值的点
+print(max(pr.items(), key=operator.itemgetter(1))[0])
+% PR 值之和
+print(sum(pr.values()))
+```
 
 <figure style="text-align: center;">
 <img src="/assets/img/pr12.png" alt="代码实现" width="400">
