@@ -201,6 +201,8 @@ Spider Traps（蜘蛛陷阱） 是指一组网页形成一个循环链接结构�
 - ee<sup>T</sup>: 由 1 填满的 n × n 矩阵
 - n: M 的行数/列数。
 
+可以理解为在尽可能不影响其他结点的PR值比例的条件下，为了解决M矩阵中某列只有一行为1的问题，以1-β的概率加上到其他结点的平均概率。
+
 如果我们设置上例中\beta=0.85, 则计算M<sup>*</sup>:
 
 <figure style="text-align: center;">
@@ -210,19 +212,60 @@ Spider Traps（蜘蛛陷阱） 是指一组网页形成一个循环链接结构�
 
 3. Spider Traps 问题修正公式
 
+通过修正后的M矩阵，通过PR = M*V，解决PR值偏向有环的结点。
+<figure style="text-align: center;">
+<img src="/assets/img/prfml16.png" alt="Spider Traps问题修正公式" width="400">
+<figcaption>Spider Traps问题修正公式</figcaption>
+</figure>
 
+- β: 跟随出链（out-links）打开网页的概率，一般设为 0.8 ~0.9 之间
+- 1-β：随机跳到其他网页的概率，例如：浏览 a 的时候，有一定概率会打开 b 或 c
+- ee<sup>T</sup>：有 1 填满的 n × n 矩阵
+- V：PR 值的矩阵
 
+### 最终修正公式
 
+<figure style="text-align: center;">
+<img src="/assets/img/prfml17.png" alt="最终修正公式" width="400">
+<figcaption>最终修正公式</figcaption>
+</figure>
 
+- a = [a<sub>0</sub>, a<sub>1</sub>,..., a<sub>n</sub>]，当有一列全为时（即该节点无出链），a<sub>i</sub> = 1，其他时候 a<sub>i</sub> = 0
+- e：由 1 填满的列矩阵
+- β: 跟随出链（out-links）打开网页的概率，一般设为 0.8 ~0.9 之间
+- 1-β：随机跳到其他网页的概率，例如：浏览 a 的时候，有一定概率会打开 b 或 c
+- ee<sup>T</sup>：有 1 填满的 n × n 矩阵
+- n：M 矩阵的行数/列数
+- V：PR 值的矩阵
 
+思考这样一个问题: 在解决spider trap的时候好像在一定程度上解决了dead end问题, 还需要单独解决dead end吗? 其实Pagerank解決SpiderTraps的方法是引入了超参数β。单独一个β副作用是缓解了DeadEnds 问题，但DeadEnds问题还需要单独解决。
 
+SpiderTraps问题：A节点的出链指向它本身，A与其它节点之间无出链。这并不符合用户浏览网页的习惯。于是引入了超参数概率β，认为用户有1-β的概率会离开本网页，去向其它网页。通过对该图矩阵化的转移概率矩阵的修正，设置访问A节点的概率为β，访问其他节点的概率分别为1-β。β取值通常在0.8-0.9之间。对于没有任何出链的节点，简单假设用户的下一个浏览网页可能是互联网上的任何其它一个页面，而且概率是相等的。通过对该图矩阵化的转移概率矩阵的修正，设置从b到其他节点（包括b）的概率均为1/n，n表示这里的节点总数。这个假设简单粗暴，但想起来也符合逻辑：一个不引用任何网页的网页，也相当于引用了所有的其它网页。
 
+再来回顾一下问题: β能解决 DeadEnds 问题吗?
 
+首先在逻辑上就是不成立的，β要求当事节点有B的概率引用自己，这完全不符合DeadEnd的定义。接下来，考虑下图, 我们尝试仅仅使用β在M*V公式上是否能够解决DeadEnd。
 
+<figure style="text-align: center;">
+<img src="/assets/img/pr9.png" alt="讨论例" width="400">
+<figcaption>讨论例</figcaption>
+</figure>
 
+<figure style="text-align: center;">
+<img src="/assets/img/prfml19.png" alt="仅仅使用β" width="400">
+<figcaption>仅仅使用β</figcaption>
+</figure>
 
+n：M 矩阵的行数/列数
 
+<figure style="text-align: center;">
+<img src="/assets/img/prfml19.png" alt="仅仅使用β计算M" width="400">
+<figcaption>仅仅使用β计算M</figcaption>
+</figure>
 
+此时M不满足转移概率矩阵的性质：列之和为1。所以仅用B是解决不了DeadEnd问题。
+
+以此图为例总结两个问题的解决步骤:
 
 
 ---
