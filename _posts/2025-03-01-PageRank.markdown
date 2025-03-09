@@ -76,24 +76,20 @@ i = 1:
 | i=1 | 3/8 | 1/8 | 3/8 | 1/8 |
 | rank | 1 | 2 | 1 | 2 |
 
-<figure style="text-align: center;">
-<img src="/assets/img/pr4.png" alt="例" width="500">
-<figcaption>例</figcaption>
-</figure>
 
-2. 矩阵化表达(使用转移概率矩阵/Marcov矩阵)
+1. 矩阵化表达(使用转移概率矩阵/Marcov矩阵)
 
 将PR值转为矩阵（便于计算,及更新PR值）: 第i列的j个元素分别表示从节点i跳到其他第j个节点的概率. 如从A跳转到B或C的概率均为1/2, 从D将跳转到 A 的概率为 1。（矩阵的列表示出链）
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml4.png" alt="将PR值转为矩阵" width="200">
+<img src="/assets/img/prfml4.png" alt="将PR值转为矩阵" width="150">
 <figcaption>将PR值转为矩阵</figcaption>
 </figure>
 
 通过矩阵化表达,可以简化PR值的计算:
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml5.png" alt="通过Marcov矩阵计算PR值" width="200">
+<img src="/assets/img/prfml5.png" alt="通过Marcov矩阵计算PR值" width="100">
 <figcaption>通过Marcov矩阵计算PR值</figcaption>
 </figure>
 
@@ -130,7 +126,7 @@ i=2时的PR值(计算完成后排名变成A, C, B, D):
 那些没有指向其他页面的网页（出链为空的节点）。Dead Ends 会导致网站权重变为 0。B没有任何出链（out-links）这就是 Dead Ends，Dead Ends 会导致网站权重变为 0。例如:
 
 <figure style="text-align: center;">
-<img src="/assets/img/pr7.png" alt="Dead Ends例" width="600">
+<img src="/assets/img/pr7.png" alt="Dead Ends例" width="200">
 <figcaption>Dead Ends例</figcaption>
 </figure>
 
@@ -146,7 +142,7 @@ i=2时的PR值(计算完成后排名变成A, C, B, D):
 在 PageRank 计算过程中，允许一定概率的随机跳转（通常是 15%），即用户有概率从任何页面跳转到其他任意页面，从而避免死胡同的问题。
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml9.png" alt="修正M<sup>*</sup>" width="300">
+<img src="/assets/img/prfml9.png" alt="修正M<sup>*</sup>" width="150">
 <figcaption>修正M<sup>*</sup></figcaption>
 </figure>
 
@@ -159,9 +155,12 @@ i=2时的PR值(计算完成后排名变成A, C, B, D):
 <figcaption><sup>*</sup></figcaption>
 </figure>
 
-1. Dead Ends 问题修正公式
+3. Dead Ends 问题修正公式
 
-
+<figure style="text-align: center;">
+<img src="/assets/img/prfml12.png" alt="Dead Ends 问题修正公式" width="300">
+<figcaption>Dead Ends 问题修正公式<sup>*</sup></figcaption>
+</figure>
 
 ### Spider Traps
 
