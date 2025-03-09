@@ -8,11 +8,11 @@ tags: [Blog, Network]
 author: # Add name author (optional)
 
 ---
-# 基本概念
+## 基本概念
 
 1. 背景
 
-   [PageRank][PageRank] 算法由 Google 创始人 Larry Page 在斯坦福读大学时提出，又称 PR，佩奇排名。主要针对网页进行排名，计算网站的重要性，优化搜索引擎的搜索结果。PR 值是表示其重要性的因子。
+[PageRank][PageRank] 算法由 Google 创始人 Larry Page 在斯坦福读大学时提出，又称 PR，佩奇排名。主要针对网页进行排名，计算网站的重要性，优化搜索引擎的搜索结果。PR 值是表示其重要性的因子。
 
 [PageRank]: https://en.wikipedia.org/wiki/PageRank
 
@@ -28,87 +28,109 @@ author: # Add name author (optional)
 
   2.3 出链入链
 
-# 算法
+<figure style="text-align: center;">
+<img src="/assets/img/pr1.png" alt="出链/入链" width="600">
+<figcaption>出链/入链</figcaption>
+</figure>
+
+## 算法
 
 1. 基本公式
 
-$$
-PR(a)_{i+1} = \sum_{i = 0}^{n} \frac{PR(T_i)_i}{L(T_i)} 
-$$
+<figure style="text-align: center;">
+<img src="/assets/img/pr2.png" alt="基本公式" width="300">
+<figcaption>基本公式</figcaption>
+</figure>
 
-其中，PR(a)_(i+1)表示网页a在第i+1次迭代后的PR值，PR(T_i)_i表示网页T_i在第i次迭代后的PR值，L(T_i)表示网页T_i的出链数量。
+其中，PR(a)<sub>i+1</sub> 表示网页a在第i+1次迭代后的PR值，PR(T<sub>i</sub>)<sub>i</sub>表示网页T<sub>i</sub>在第i次迭代后的PR值，L(T<sub>i</sub>)表示网页T<sub>i</sub>的出链数量, i 为循环次数.
+
+举例: 
+
+<figure style="text-align: center;">
+<img src="/assets/img/pr3.png" alt="例" width="300">
+<figcaption>例</figcaption>
+</figure>
 
 | PR Value   | PR(A) | PR(B) | PR(C) | PR(D) |
-| :--- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- |
 | i=0 \PR 初始化为1/N | 1/4 | 1/4 | 1/4 | 1/4 |
 | i=1 | 3/8 | 1/8 | 3/8 | 1/8 |
 | rank | 1 | 2 | 1 | 2 |
 
+初始化的PR值为 1/N = 1/4 。
+
+<figure style="text-align: center;">
+<img src="/assets/img/pr4.png" alt="例" width="500">
+<figcaption>例</figcaption>
+</figure>
+
+2. 矩阵化表达(使用转移概率矩阵/Marcov矩阵)
+
+\begin{matrix}
+    1 & 2 & 3 \\\\
+    4 & 5 & 6 \\\\
+    7 & 8 & 9
+\end{Bmatrix} \tag{2}
+
+从A将跳转到 B 或 C 的概率为 1/2, 从D将跳转到 A 的概率为 1。（矩阵的列表示出链）
+
+通过矩阵化表达,可以简化PR值的计算:
+
+<figure style="text-align: center;">
+<img src="/assets/img/pr5.png" alt="通过Marcov矩阵计算PR值" width="500">
+<figcaption>通过Marcov矩阵计算PR值</figcaption>
+</figure>
 
 
+3. 两种方式的关系
 
 
+## 存在的问题以及修正
 
+### Dead Ends
 
+1. 产生原因
 
+那些没有指向其他页面的网页（出链为空的节点）。Dead Ends 会导致网站权重变为 0。B没有任何出链（out-links）这就是 Dead Ends，Dead Ends 会导致网站权重变为 0。例如:
 
-
-
-
-2. 矩阵化表达: 转移概率矩阵/马尔科夫矩阵
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-3. Dead Ends问题
-
-3.1 Dead Ends（死胡同） 是指那些没有指向其他页面的网页（出链为空的节点）。Dead Ends 会导致网站权重变为 0。
-
-3.2 解决方法: 随机跳转 (Teleport) 机制
+2. 解决方法: Teleport/随机跳转
 
 在 PageRank 计算过程中，允许一定概率的随机跳转（通常是 15%），即用户有概率从任何页面跳转到其他任意页面，从而避免死胡同的问题。
 
-修正M
-
-3.3 修正公式
+3. Dead Ends 问题修正公式
 
 
 
+### Spider Traps
+
+1. 产生原因
+
+Spider Traps（蜘蛛陷阱） 是指一组网页形成一个循环链接结构，使得 PageRank 过度集中在这些页面上，而难以传播到整个网络, 导致网站权重变为向一个节点偏移。A 节点与其他节点之间无 out-links，这就是 Spider Traps，这将会导致网站权重变为向一个节点偏移。例如:
 
 
+2. 解决方法: Random Teleport
 
 
-4. Spider Traps问题
-
-4.1 Spider Traps（蜘蛛陷阱） 是指一组网页形成一个循环链接结构，使得 PageRank 过度集中在这些页面上，而难以传播到整个网络, 导致网站权重变为向一个节点偏移。
-
-4.2 解决方法: Random Teleport
-
-修正M
-
-4.3 修正公式
+3. Spider Traps 问题修正公式
 
 
 
 
 
 
-# 优缺点
+
+
+
+
+
+
+
+
+
+
+
+
+## PageRank 的优缺点
 
 1. 优点
   - 通过网页之间的链接来决定网页的重要性，一定程度消除了人为对排名的影响。
@@ -120,5 +142,5 @@ $$
 
 
 
-# 代码实现
+## 代码实现
 
