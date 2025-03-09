@@ -60,7 +60,7 @@ i = 1:
 </figure>
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml3.png" alt="计算PR(B)<sub>1</sub>" width="300">
+<img src="/assets/img/prfml3.png" alt="计算PR(B)<sub>1</sub>" width="250">
 <figcaption>计算PR(B)<sub>1</sub></figcaption>
 </figure>
 
@@ -84,7 +84,7 @@ i = 1:
 通过矩阵化表达,可以简化PR值的计算:
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml5.png" alt="通过Marcov矩阵计算PR值" width="100">
+<img src="/assets/img/prfml5.png" alt="通过Marcov矩阵计算PR值" width="150">
 <figcaption>通过Marcov矩阵计算PR值</figcaption>
 </figure>
 
@@ -148,7 +148,7 @@ i=2时的PR值(计算完成后排名变成A, C, B, D):
 - n：M 矩阵的行数/列数
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml10.png" alt="" width="300"><img src="/assets/img/prfml11.png" alt="" width="400">
+<img src="/assets/img/prfml10.png" alt="" width="100"><img src="/assets/img/prfml11.png" alt="" width="400">
 <figcaption><sup>*</sup></figcaption>
 </figure>
 
@@ -185,7 +185,7 @@ Spider Traps（蜘蛛陷阱） 是指一组网页形成一个循环链接结构�
 步骤1：列转移概率矩阵：即B出链，指向其他结点的概率。 将列转移概率矩阵设为M矩阵。例
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml13.png" alt="将列转移概率矩阵设为M矩阵" width="200">
+<img src="/assets/img/prfml13.png" alt="将列转移概率矩阵设为M矩阵" width="100">
 <figcaption>将列转移概率矩阵设为M矩阵</figcaption>
 </figure>
 
@@ -196,8 +196,8 @@ Spider Traps（蜘蛛陷阱） 是指一组网页形成一个循环链接结构�
 <figcaption>修正M</figcaption>
 </figure>
 
-- \beta: 跟随出链（out-links）打开网页的概率，一般设为 0.8 ~0.9 之间
-- 1-\beta: 随机跳到其他网页的概率，例如：浏览 a 的时候，有一定概率会打开 b 或 c
+- β: 跟随出链（out-links）打开网页的概率，一般设为 0.8 ~0.9 之间
+- 1-β: 随机跳到其他网页的概率，例如：浏览 a 的时候，有一定概率会打开 b 或 c
 - ee<sup>T</sup>: 由 1 填满的 n × n 矩阵
 - n: M 的行数/列数。
 
@@ -206,7 +206,7 @@ Spider Traps（蜘蛛陷阱） 是指一组网页形成一个循环链接结构�
 如果我们设置上例中\beta=0.85, 则计算M<sup>*</sup>:
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml15.png" alt="M<sup>*</sup>" width="400">
+<img src="/assets/img/prfml15.png" alt="M<sup>*</sup>" width="600">
 <figcaption>修正M<sup>*</sup></figcaption>
 </figure>
 
@@ -214,7 +214,7 @@ Spider Traps（蜘蛛陷阱） 是指一组网页形成一个循环链接结构�
 
 通过修正后的M矩阵，通过PR = M*V，解决PR值偏向有环的结点。
 <figure style="text-align: center;">
-<img src="/assets/img/prfml16.png" alt="Spider Traps问题修正公式" width="400">
+<img src="/assets/img/prfml16.png" alt="Spider Traps问题修正公式" width="300">
 <figcaption>Spider Traps问题修正公式</figcaption>
 </figure>
 
@@ -247,19 +247,19 @@ SpiderTraps问题：A节点的出链指向它本身，A与其它节点之间无�
 首先在逻辑上就是不成立的，β要求当事节点有B的概率引用自己，这完全不符合DeadEnd的定义。接下来，考虑下图, 我们尝试仅仅使用β在M*V公式上是否能够解决DeadEnd。
 
 <figure style="text-align: center;">
-<img src="/assets/img/pr9.png" alt="讨论例" width="400">
+<img src="/assets/img/pr9.png" alt="讨论例" width="200">
 <figcaption>讨论例</figcaption>
 </figure>
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml19.png" alt="仅仅使用β" width="400">
+<img src="/assets/img/prfml19.png" alt="仅仅使用β" width="200">
 <figcaption>仅仅使用β</figcaption>
 </figure>
 
 n：M 矩阵的行数/列数
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml19.png" alt="仅仅使用β计算M" width="400">
+<img src="/assets/img/prfml18.png" alt="仅仅使用β计算M" width="400">
 <figcaption>仅仅使用β计算M</figcaption>
 </figure>
 
