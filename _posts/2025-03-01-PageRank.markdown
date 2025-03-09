@@ -18,15 +18,9 @@ author: # Add name author (optional)
 
 2. 算法思想
 
-  2.1 数量假设
-
-  当在网页模型图中，一个网页接受到的其他网页指向的入链（in-links）越多，说明该网页越重要。
-
-  2.2 质量假设
-
-  当一个质量高的网页指向（out-links/出链）一个网页，说明这个被指的网页重要。
-
-  2.3 出链入链
+- 数量假设: 当在网页模型图中，一个网页接受到的其他网页指向的入链（in-links）越多，说明该网页越重要。
+- 质量假设: 当一个质量高的网页指向（out-links/出链）一个网页，说明这个被指的网页重要。
+- 出链入链
 
 <figure style="text-align: center;">
 <img src="/assets/img/pr1.png" alt="出链/入链" width="400">
@@ -35,7 +29,7 @@ author: # Add name author (optional)
 
 ## 算法
 
-1. 基本公式
+### 基本公式
 
 <figure style="text-align: center;">
 <img src="/assets/img/prfml1.png" alt="基本公式" width="200">
@@ -50,7 +44,7 @@ author: # Add name author (optional)
 举例: 
 
 <figure style="text-align: center;">
-<img src="/assets/img/pr3.png" alt="例" width="300">
+<img src="/assets/img/pr3.png" alt="例" width="200">
 <figcaption>例</figcaption>
 </figure>
 
@@ -68,7 +62,7 @@ i = 1:
 <figcaption>计算PR(B)<sub>1</sub></figcaption>
 </figure>
 
-以此类推，第一次迭代求得所有网页的PR值，并根据PR值进行排序，得到结果如下。
+以此类推，迭代求得所有网页的PR值，并根据PR值进行排序，得到结果如下。
 
 | PR Value   | PR(A) | PR(B) | PR(C) | PR(D) |
 | --- | --- | --- | --- | --- |
@@ -76,7 +70,7 @@ i = 1:
 | i=1 | 3/8 | 1/8 | 3/8 | 1/8 |
 | rank | 1 | 2 | 1 | 2 |
 
-1. 矩阵化表达(使用转移概率矩阵/Marcov矩阵)
+### 矩阵化表达(使用转移概率矩阵/Marcov矩阵)
 
 将PR值转为矩阵（便于计算,及更新PR值）: 第i列的j个元素分别表示从节点i跳到其他第j个节点的概率. 如从A跳转到B或C的概率均为1/2, 从D将跳转到 A 的概率为 1。（矩阵的列表示出链）
 
@@ -109,7 +103,7 @@ i=2时的PR值(计算完成后排名变成A, C, B, D):
 
 根据PR = M*V不断迭代，经过多次迭代后所生成的列向量为网页最终的PR值。
 
-3. 两种方式的关系
+### 两种方式的关系
 
 <figure style="text-align: center;">
 <img src="/assets/img/pr6.png" alt="两种方式的关系" width="600">
@@ -206,7 +200,7 @@ Spider Traps（蜘蛛陷阱） 是指一组网页形成一个循环链接结构�
 如果我们设置上例中\beta=0.85, 则计算M<sup>*</sup>:
 
 <figure style="text-align: center;">
-<img src="/assets/img/prfml15.png" alt="M<sup>*</sup>" width="200">
+<img src="/assets/img/prfml15.png" alt="M<sup>*</sup>" width="400">
 <figcaption>修正M<sup>*</sup></figcaption>
 </figure>
 
