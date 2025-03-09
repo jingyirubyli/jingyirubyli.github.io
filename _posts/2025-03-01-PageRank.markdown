@@ -141,11 +141,25 @@ i=2时的PR值(计算完成后排名变成A, C, B, D):
 <figcaption>多次循环后模型中所有的 PR 值都会归于 0</figcaption>
 </figure>
 
-1. 解决方法: Teleport/随机跳转
+2. 解决方法: Teleport/随机跳转
 
 在 PageRank 计算过程中，允许一定概率的随机跳转（通常是 15%），即用户有概率从任何页面跳转到其他任意页面，从而避免死胡同的问题。
 
-3. Dead Ends 问题修正公式
+<figure style="text-align: center;">
+<img src="/assets/img/prfml9.png" alt="修正M<sup>*</sup>" width="300">
+<figcaption>修正M<sup>*</sup></figcaption>
+</figure>
+
+- a = [a<sub>0</sub>, a<sub>1</sub>,..., a<sub>n</sub>]，当有一列全为时（即该节点无出链），a<sub>i</sub> = 1，其他时候 a<sub>i</sub> = 0
+- e：由 1 填满的列矩阵
+- n：M 矩阵的行数/列数
+
+<figure style="text-align: center;">
+<img src="/assets/img/prfml10.png" alt="" width="300"><img src="/assets/img/prfml11.png" alt="" width="400">
+<figcaption><sup>*</sup></figcaption>
+</figure>
+
+1. Dead Ends 问题修正公式
 
 
 
