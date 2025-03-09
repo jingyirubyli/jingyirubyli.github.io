@@ -76,7 +76,6 @@ i = 1:
 | i=1 | 3/8 | 1/8 | 3/8 | 1/8 |
 | rank | 1 | 2 | 1 | 2 |
 
-
 1. 矩阵化表达(使用转移概率矩阵/Marcov矩阵)
 
 将PR值转为矩阵（便于计算,及更新PR值）: 第i列的j个元素分别表示从节点i跳到其他第j个节点的概率. 如从A跳转到B或C的概率均为1/2, 从D将跳转到 A 的概率为 1。（矩阵的列表示出链）
@@ -168,10 +167,41 @@ i=2时的PR值(计算完成后排名变成A, C, B, D):
 
 Spider Traps（蜘蛛陷阱） 是指一组网页形成一个循环链接结构，使得 PageRank 过度集中在这些页面上，而难以传播到整个网络, 导致网站权重变为向一个节点偏移。A 节点与其他节点之间无 out-links，这就是 Spider Traps，这将会导致网站权重变为向一个节点偏移。例如:
 
+<figure style="text-align: center;">
+<img src="/assets/img/pr8.png" alt="Spider Traps例" width="200">
+<figcaption>Spider Traps例</figcaption>
+</figure>
+
+按照这个规律，我们在多次循环之后，会发现这个模型中 A 的 PR 值都会归于 1，其他归为 0。即当网络中存在，只有自己指向自己时，PR值在更新过程中，含有自指向结点的PR值会逐渐归于1，其他结点归于0，此为Spider Traps问题。
+
+| **PR值**            | **PR(A)** | **PR(B)** | **PR(C)** |
+|---------------------|-----------|-----------|-----------|
+| i=0 \PR 初始化为1/N | 1/3       | 1/3       | 1/3       |
+| i=1                 | 2/3       | 1/6       | 1/6       |
+| i=2                 | 5/6       | 1/12      | 1/12      |
+| i=3                 | 11/12     | 1/24      | 1/24      |
+| i=n                 | 1         | 0         | 0         |
 
 2. 解决方法: Random Teleport
 
+步骤1：列转移概率矩阵：即B出链，指向其他结点的概率。 将列转移概率矩阵设为M矩阵。例
 
+<figure style="text-align: center;">
+<img src="/assets/img/prfml13.png" alt="将列转移概率矩阵设为M矩阵" width="200">
+<figcaption>将列转移概率矩阵设为M矩阵</figcaption>
+</figure>
+
+步骤2：修正M
+
+<figure style="text-align: center;">
+<img src="/assets/img/prfml14.png" alt="修正M" width="200">
+<figcaption>修正M</figcaption>
+</figure>
+
+- \beta: 跟随出链（out-links）打开网页的概率，一般设为 0.8 ~0.9 之间
+- 1-\beta: 随机跳到其他网页的概率，例如：浏览 a 的时候，有一定概率会打开 b 或 c
+- ee<sup>T</sup>: 由 1 填满的 n × n 矩阵
+- n: M 的行数/列数。
 3. Spider Traps 问题修正公式
 
 
