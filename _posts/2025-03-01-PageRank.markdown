@@ -10,13 +10,13 @@ author: # Add name author (optional)
 ---
 ## 基本概念
 
-1. 背景
+### 背景
 
 [PageRank][PageRank] 算法由 Google 创始人 Larry Page 在斯坦福读大学时提出，又称 PR，佩奇排名。主要针对网页进行排名，计算网站的重要性，优化搜索引擎的搜索结果。PR 值是表示其重要性的因子。
 
 [PageRank]: https://en.wikipedia.org/wiki/PageRank
 
-2. 算法思想
+### 算法思想
 
 - 数量假设: 当在网页模型图中，一个网页接受到的其他网页指向的入链（in-links）越多，说明该网页越重要。
 - 质量假设: 当一个质量高的网页指向（out-links/出链）一个网页，说明这个被指的网页重要。
@@ -26,6 +26,8 @@ author: # Add name author (optional)
 <img src="/assets/img/pr1.png" alt="出链/入链" width="400">
 <figcaption>出链/入链</figcaption>
 </figure>
+
+---
 
 ## 算法
 
@@ -109,6 +111,8 @@ i=2时的PR值(计算完成后排名变成A, C, B, D):
 <img src="/assets/img/pr6.png" alt="两种方式的关系" width="600">
 <figcaption>两种方式的关系</figcaption>
 </figure>
+
+---
 
 ## 存在的问题以及修正
 
@@ -221,7 +225,7 @@ Spider Traps（蜘蛛陷阱） 是指一组网页形成一个循环链接结构�
 
 
 
-
+---
 
 ## PageRank 的优缺点
 
