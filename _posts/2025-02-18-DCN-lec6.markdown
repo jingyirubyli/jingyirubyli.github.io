@@ -10,8 +10,8 @@ author: # Add name author (optional)
 
 数据中心内的工作负载有以下几类:
 - **Partition-Aggregate** (e.g., web query)
- - 对延迟敏感/Delay-sensitive
- - 即使是一个缓慢的工作器也会显著增加端到端延迟
+  - 对延迟敏感/Delay-sensitive
+  - 即使是一个缓慢的工作器也会显著增加端到端延迟
 - **Short flows** (e.g., control state)
   - 50KB—1MB
   - 对延迟敏感/Delay-sensitive
@@ -44,26 +44,26 @@ author: # Add name author (optional)
 数据中心 (DC) 内 99.9% 的流量过去都是使用 TCP 传输的, 但我们会发现 TCP 无法满足 DC 应用需求: 
 1. Synchronized Bursts 同步突发导致丢包; 
 
-<figure style="text-align: center;">
-<img src="/assets/img/l6p4.png" alt="TCP Issue (1): Synchronized Bursts" width="600">
-<figcaption>TCP Issue (1): Synchronized Bursts</figcaption>
-</figure>
+  <figure style="text-align: center;">
+  <img src="/assets/img/l6p4.png" alt="TCP Issue (1): Synchronized Bursts" width="600">
+  <figcaption>TCP Issue (1): Synchronized Bursts</figcaption>
+  </figure>
 
 想象每个worker只发送一个包, swicth的容量足够处理. 但是当每个worker都发送两个包, switch的容量不足以处理这些包, 因此有部分包被丢弃. 在图示每个worker发送两个包的情况下, 丢弃的流没有更多数据包, 即没有 3 个Dup ACK 可供重传, 导致这些包就被完全丢弃了. 这是任何短流量都存在的的一般问题；此时重传包必须依赖超时；TCP 超时非常保守！后果就是来自某一个工作进程的数据包被延迟, 从而延迟了整个任务！
 
-<figure style="text-align: center;">
-<img src="/assets/img/l6p5.png" alt="TCP Issue (1): Synchronized Bursts" width="600"><img src="/assets/img/l6p6.png" alt="TCP Issue (1): Synchronized Bursts" width="600">
-<figcaption>Drop</figcaption>
-</figure>
+  <figure style="text-align: center;">
+  <img src="/assets/img/l6p5.png" alt="TCP Issue (1): Synchronized Bursts" width="600"><img src="/assets/img/l6p6.png" alt="TCP Issue (1): Synchronized Bursts" width="600">
+  <figcaption>Drop</figcaption>
+  </figure>
 
 2. Large Queue Build-up 大型队列导致显著延迟增加, 浪费宝贵的缓冲空间; 
 
 TCP 需要较大的缓冲区来处理突发和高吞吐量. 但是，长流会填满缓冲区, 导致短流的延迟增加.
 
-<figure style="text-align: center;">
-<img src="/assets/img/l6p7.png" alt="TCP Issue (2): Queue Build-up" width="600">
-<figcaption>TCP Issue (2): Queue Build-up</figcaption>
-</figure>
+  <figure style="text-align: center;">
+  <img src="/assets/img/l6p7.png" alt="TCP Issue (2): Queue Build-up" width="600">
+  <figcaption>TCP Issue (2): Queue Build-up</figcaption>
+  </figure>
 
 3. Aggressive Slow Down 即使在拥塞程度较低时也会大幅减速, 导致吞吐量低.
 
@@ -77,35 +77,40 @@ TCP 窗口在检测到拥塞时总是减半（3 个 Dup ACK）,而不考虑拥�
 
 与TCP的相同点表现在: Cumulative ACKs; Fast Re-transmit; Slow Start; Additive Increase; Multiplicative Decrease. 但是也有两个关键区别:
 1. TCP 默认使用**数据包丢弃/packet drop**作为拥塞信号, 发送方仅在队列完全满后才开始减速
-   DCTCP 使用**显式拥塞通知/Explicit Congestion Notification (ECN)** 作为拥塞信号（某些后续版本的 TCP 也使用 ECN）:交换机“标记”在交换机端口队列长度 > K 时到达的数据包（通过将 IP header中的两个 ECN 位设置为 11）,端点Endpoints使用这些标记主动(proactively)减速，即在数据包被丢弃之前
 
-<figure style="text-align: center;">
-<img src="/assets/img/l6p8.png" alt="ECN" width="300">
-<figcaption>ECN</figcaption>
-</figure>
+   DCTCP 使用**显式拥塞通知/Explicit Congestion Notification (ECN)** 作为拥塞信号（某些后续版本的 TCP 也使用 ECN）:
+   - 交换机“标记”在交换机端口队列长度 > K 时到达的数据包（通过将 IP header中的两个 ECN 位设置为 11）,
+   - 端点Endpoints使用这些标记主动(proactively)减速，即在数据包被丢弃之前
+
+  <figure style="text-align: center;">
+  <img src="/assets/img/l6p8.png" alt="ECN" width="300">
+  <figcaption>ECN</figcaption>
+  </figure>
 
 2. TCP 对拥塞的**存在/presence**作出反应: 检测到拥塞时始终将窗口**减半**, 要么由于 3 个 Dup ACK（数据包丢失）,或当窗口中的一个或多个数据包设置了 ECN 位时
-   DCTCP 对拥塞**程度extent**作出反应: 如果拥塞程度较低，即为窗口中的少量数据包设置了 ECN 位，则略微减小窗口大小; 如果拥塞程度较高，即为窗口中的大量数据包设置了 ECN 位，则更积极地减小窗口大小.
+
+   DCTCP 对拥塞**程度extent**作出反应: 
+   - 如果拥塞程度较低，即为窗口中的少量数据包设置了 ECN 位，则略微减小窗口大小; 
+   - 如果拥塞程度较高，即为窗口中的大量数据包设置了 ECN 位，则更积极地减小窗口大小.
 
 ## DCTCP Algorithm
 
 1. **At the switch:**
    - 为每个输出队列维护一个**参数队列阈值(queue threshold) K**
    - 如果数据包到达时，数据包所添加的输出队列的占用率 > K，则 IP 报头中到达数据包的 ECN 位设置为 11
-   - 
-<figure style="text-align: center;">
-<img src="/assets/img/l6p9.png" alt="IPv4 header format" width="600">
-<figcaption>IPv4 header format</figcaption>
-</figure>
+  <figure style="text-align: center;">
+  <img src="/assets/img/l6p9.png" alt="IPv4 header format" width="600">
+  <figcaption>IPv4 header format</figcaption>
+  </figure>
 
 2. **At the receiver:**
    - 接收方为每个收到的数据包生成一个 ACK​​
    - 收到 ECN 位设置为 11 的数据包时：接收方将该数据包 ACK 的 TCP 标头中的 ECE（ECN-Echo）标志设置为 1，以通知发送方拥塞
 
-<figure style="text-align: center;">
-<img src="/assets/img/l6p10.png" alt="TCP segment header" width="600">
-<figcaption>TCP segment header</figcaption>
-</figure>
+  <figure style="text-align: center;">
+  <img src="/assets/img/l6p10.png" alt="TCP segment header" width="600">
+  <figcaption>TCP segment header</figcaption>
+  </figure>
 
 3. **At the sender:**
    - 发送方维护一个值 α = (1 − g) * α + g * F, 0 ≤ α ≤ 1. 
@@ -115,10 +120,10 @@ TCP 窗口在检测到拥塞时总是减半（3 个 Dup ACK）,而不考虑拥�
      - 如果 α 很小（接近 0），窗口会略微减小
      - 如果 α 是 1，窗口会像 TCP 中一样减半
   
-<figure style="text-align: center;">
-<img src="/assets/img/l6p11.png" alt="last window size = 10; g = 1" width="600">
-<figcaption>last window size = 10; g = 1</figcaption>
-</figure>
+  <figure style="text-align: center;">
+  <img src="/assets/img/l6p11.png" alt="last window size = 10; g = 1" width="600">
+  <figcaption>last window size = 10; g = 1</figcaption>
+  </figure>
 
 ### 选择参数值:
 DCTCP 有两个参数：**K**（在交换机处）和 **g**（在发送方处）, 假设 N 个无限长的流，共享容量为 C 的单个瓶颈链路，并且往返时间 RTT 固定, 则取:
@@ -141,7 +146,7 @@ DCTCP 有两个参数：**K**（在交换机处）和 **g**（在发送方处）
   - 给定的发送方不知道其他发送方何时发送数据包. 
   - 在最坏的情况下，它们可以同步. 
     - 导致排队；所有发送方都会降低其速率; 
-    - 但如果这种同步持续存在, 发送方速率将继续降低每个 RTT. 最终速率将降至接近 0, 导致拥塞崩溃 → Congestion Collapse.
+    - 但如果这种同步持续存在, 发送方速率将继续降低每个 RTT. 最终速率将降至接近 0, 导致拥塞崩溃 → **Congestion Collapse**.
 
 解决方法是采用**Receiver-driven Transport/接收方驱动**的传输: 接收方决定何时以及以何种速率从发送方**拉取/pull**数据包, 可以更有效地处理同步 Incast. 因为接收方知道向其发送数据包的所有发送方,因此可以在发送方之间进行仲裁以确保不发生同步. **NDP** 是接收方驱动的传输的一个示例.
 
@@ -154,16 +159,56 @@ DCTCP 有两个参数：**K**（在交换机处）和 **g**（在发送方处）
 全栈解决方案——包括发送方、交换机、接收方
 > A full stack solution — involves sender, switch, receiver
 
-1. Just Start   
+## Just Start   
 **No prior handshake/无需事先握手**，与 TCP/DCTCP（0 RTT setup）不同, 发送方以线速line rate发送第一个 BDP 数据
 - BDP(Bandwidth-delay product) 是带宽延迟乘积, 等于瓶颈链路带宽 * 往返时间 (RTT)
 - BDP 表示每个发送方的最佳窗口大小, 但很难估计瓶颈链路带宽和 RTT — 由于排队延迟 queuing delay
 - NDP 中的发送方将 BDP 估计为: host link bandwidth * (2*propagation delay) 
   - 主机链路带宽 * (2*传播延迟). 
   - 这个估计并不准确，但仅在第一个 RTT 期间使用.
-2. Spray
-数据包**均匀分布在(sprayed uniformly across all paths)所有路径上**, 实现均匀负载平衡. 与 TCP/DCTCP 不同，数据包重新排序不是问题
-3. Trim
-如果交换机处的队列已满，则在丢弃数据包时, 交换机会**修剪(trims)数据包头**并将其发送给接收方, 这样接收方就知道在第一个 RTT 之后向其发送的所有发送方
-4. Pull
-第一个 RTT 之后，接收方从发送方**拉取/pull**数据包, 可以决定何时、以何种速率从哪个发送方拉取数据包
+
+“Just Start” 机制旨在消除传统 TCP/DCTCP 需要的握手过程，实现 0 RTT 发送数据，提高传输效率。其核心思想是 “先发送，再调整”。传统 TCP/DCTCP 在传输前需要三次握手，而 NDP 采用 Just Start 方式，发送方无需等待接收方响应，直接开始发送数据。这样可以节省 RTT（往返时间），降低初始传输的延迟。发送方会立即发送相当于 BDP（带宽-时延积，Bandwidth-Delay Product）大小的数据，并且以线路速率（Line Rate）传输。线路速率（Line Rate） 指的是 网络接口或链路能够支持的最大理论传输速率。发送方会在一开始就按线路速率发送数据，不进行速率控制（不像 TCP 那样慢启动）。这样可以 最大化利用带宽，尽快填满瓶颈链路，提高传输效率。RTT（往返时间）包括传播时延（Propagation Delay）和排队时延（Queuing Delay）。BDP 代表了最佳窗口大小，即不导致网络拥塞情况下能填满链路的最大数据量。由于瓶颈带宽和 RTT 估算困难（例如排队时延会动态变化），NDP 采用近似计算。这种估计方式可能不准确，但它 仅在第一个 RTT 内使用，后续会通过调整（Spray、Trim、Pull 机制）优化数据传输。
+
+## Spray
+数据包**均匀分布在(sprayed uniformly across all paths)所有路径上**, 实现均匀负载平衡. 与 TCP/DCTCP 不同，数据包重新排序不是问题。NDP 的接收端不依赖数据包顺序: 传统的 TCP/DCTCP 需要维护数据包的顺序，因为 TCP 是 基于流（Stream-Based） 的协议：TCP 需要按照序列号（Sequence Number）接收数据，否则需要缓存乱序数据包，等待丢失的数据包重传，影响吞吐量和延迟。NDP 采用无状态接收（Stateless Receiver），接收端不关心数据包的顺序，而是直接处理有效数据：所有数据包可以独立处理，不需要按序列号重新排序。只要数据最终完整接收，就可以正确恢复信息，因此不会受到乱序的影响。TCP 的多路径传输（如 ECMP）会导致不同路径的时延不同，可能使某些数据包到达时间晚于后发的包，进而引发乱序问题。NDP 设计时就接受“数据包会乱序”这一事实，并通过 Pull 机制高效应对，所以根本不需要像 TCP 那样严格按照顺序处理数据。
+
+## Trim
+如果交换机处的队列已满，则在丢弃数据包时, 交换机会**修剪(trims)数据包头**并将其发送给接收方, 这样接收方就知道在第一个 RTT 之后向其发送的所有发送方。NDP 采用 Trim 机制：不丢弃整个数据包，而是丢弃数据负载（Payload），仅保留数据包头部（Header）。然后，交换机会继续转发这个被 Trim 过的包头给接收端。接收端收到 Trim 过的包头后，虽然没有数据，但它仍然可以获知哪些发送端正在向自己发送数据。由于 Trim 过程只会在网络负载高时发生，这意味着接收端可以在第一个 RTT 之后就了解到所有的活跃发送端。这种机制可以帮助接收端在 Pull 阶段更高效地请求数据。
+
+## Pull
+在 第一个 RTT 内，NDP 通过 Just Start、Spray 和 Trim 过程，让接收端快速获知所有发送端和网络负载情况。等到第一个 RTT 结束后，接收端掌握了完整的信息，就能 智能地决定 Pull 的对象、时机和速率，从而提升数据传输效率，避免传统 TCP 那样的拥塞控制问题。第一个 RTT 之后，接收方从发送方**拉取/pull**数据包, 可以决定何时、以何种速率从哪个发送方拉取数据包。
+
+1. 第一个 RTT 内发生了什么？
+
+在第一个 RTT（Round-Trip Time）内，NDP 主要完成 Just Start、Spray 和 Trim 过程，让接收端获取必要的信息：
+-	Just Start：
+   - 发送端立即以 线路速率（Line Rate） 发送 BDP（带宽-时延积）大小的数据包，不等待任何握手。
+   - 这样可以尽快填满网络，减少延迟。
+- Spray：
+  - 发送端将数据包均匀分布到所有可用路径，避免单一链路过载。
+  - 数据包可能乱序，但 NDP 设计时不依赖数据顺序，所以没有 TCP 那样的重排序问题。
+- Trim（当交换机发生拥塞时）：
+  - 交换机丢弃数据包的 负载（Payload），但**保留包头（Header）**并转发给接收端。
+  - 接收端因此能在第一个 RTT 后获知所有的活跃发送端，即使某些数据包本身丢失了。
+
+2. 第一个 RTT 之后，接收端已掌握哪些关键信息？
+
+在第一个 RTT 结束后，接收端具备以下信息：
+- 所有发送端的列表
+  - 由于 Trim 过程，接收端至少收到 所有发送端的包头，即使部分数据包丢失，仍然能确认有哪些发送端正在向它发送数据。
+- 网络负载情况
+  - 如果 Trim 发生，说明网络出现了拥塞，接收端可以据此调整 Pull 策略，以避免进一步加重负载。
+- 初步的丢包情况
+  - 由于 Just Start 过程的“盲发”特性，一些数据包可能在交换机发生丢失（Trim 过程可知）。
+  - 接收端可以分析哪些数据需要补充拉取（Pull），哪些已经成功接收。
+
+3. 为什么 Pull 过程必须等到第一个 RTT 之后？
+
+在第一个 RTT 之后，接收端已经有足够的信息，可以做出更智能的 Pull 决策，而不是盲目地请求数据：
+- 决定从哪个发送端拉取数据：
+  - 如果某些路径发生了 Trim，说明这些路径较拥堵，接收端可以优先从其他路径上的发送端请求数据。
+- 控制拉取速率（Pull Rate）：
+  - 传统 TCP 依赖发送端控制速率，可能导致网络不均衡。
+  - NDP 让接收端主动决定 Pull 速率，避免额外的排队延迟。
+- 优化带宽利用：
+  - 接收端可以根据 Trim 反馈信息，从不同发送端以最优速率拉取数据，最大化利用可用带宽，同时避免网络过载。
