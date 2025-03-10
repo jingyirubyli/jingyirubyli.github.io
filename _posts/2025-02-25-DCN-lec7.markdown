@@ -7,6 +7,28 @@ img: post-7.png # Add image post (optional)
 tags: [Blog, DCN]
 author: # Add name author (optional)
 ---
+# 本讲内容
+
+2007年，斯坦福大学的学生Martin Casado 领导了一个关于网络安全与管理的项目Ethane，该项目试图通过一个集中式的控制器，让网络管理员可以方便地定义基于网络流的安全控制策略，并将这些安全策略应用到各种网络设备中，从而实现对整个网络通讯的安全控制。
+
+2008年，基于Ethane 及其前续项目Sane的启发， Nick McKeown 教授等人提出了OpenFlow 的概念，并于当年在ACM SIGCOMM 发表了题为《OpenFlow: Enabling Innovation in Campus Networks》的论文，首次详细地介绍了OpenFlow 的概念。该篇论文除了阐述OpenFlow 的工作原理外，还列举了OpenFlow 几大应用场景。
+
+基于OpenFlow 为网络带来的可编程的特性，Nick McKeown教授和他的团队进一步提出了SDN（Software Defined Network，软件定义网络）的概念。2009年，SDN 概念入围Technology Review年度十大前沿技术，自此获得了学术界和工业界的广泛认可和大力支持。
+
+全球第一台路由器 是由斯坦福大学的 莱昂纳德·波萨克 夫妇创造的，用于斯坦福校内网络，全球网络行业的领头羊思科Cisco就是这对夫妇创建的；无独有偶，20年后，仍然是斯坦福大学，开创了SDN/Openflow的基础。
+
+SDN/Software Defined Network 软件定义网络，是一种网络设计理念。或者是一种推倒重来的理念：网络设备可以集中式软件管理，可编程化，控制转发层面分开。
+
+SDN三层模型：应用层，控制层，转发层。交换机没有“大脑”，即区别传统网络的交换机/路由器需查找MAC表/路由表，仅具备转发功能；所有的路径计算，安全策略等等全部在控制器上面计算；然后通过Openflow 协议下放给交换机；交换机根据流表(Flow Table) 进行转发。
+
+所以说，SDN并不是一项网络技术，也不是一个协议，而是一种思想，一种框架。
+
+举个例子：你在PC上写了一个python的脚本，通过北向接口API在控制器上面执行该脚本；控制器执行OpenFlow协议，通过南向接口应用到转发层的交换机上面；交换机傻傻的通过流表来进行转发。
+
+狭义上的SDN：软件定义网络。广义上的SDN：软件定义安全，软件定义存储，软件定义数据中心等等。可以说SDN是一个浪潮，席卷了整个的IT行业。
+
+---
+
 # SDN的目标: Make Enterprise Networks easier to Manage
 
 ![图片alt](/assets/img/l7p1.png "Enterprise vs. Datacenter Networks")
@@ -53,6 +75,8 @@ Two Key Ideas:
   - 网络中的所有通信都需要控制器的许可
   - 通过要求身份验证将每个用户绑定到主机和地址
   - 根据指定的策略计算路由并在交换机中安装转发规则
+
+Ethane 与传统网络最大的不同是**控制平面**和**转发平面**分离；控制层实施集中式控制，可编程化，可视化，自动化等策略，转发层通过流表和硬件进行快速转发。
 
 ### How Ethane Works?五项基本活动：
 - Registration
