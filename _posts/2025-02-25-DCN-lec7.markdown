@@ -149,7 +149,7 @@ Goal: **Abstract the entire network as a simple programmable entity**
 
 Two Key Ideas:
 - 使交换机变得非常简单
-  - 简单的转发设备
+  - 只作为简单的转发设备
 - 中央控制器central controller — 网络的“大脑”
   - 具有整个网络的全局视图
   - 网络中的所有通信都需要控制器的许可
