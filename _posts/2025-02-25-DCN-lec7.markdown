@@ -56,9 +56,9 @@ Two Key Ideas:
 
 ### How Ethane Works?五项基本活动：
 - Registration
-  - 所有用户、主机和交换机都向控制器注册以加入网络
+  - **所有用户、主机和交换机都向控制器注册以加入网络**
     - 因此控制器可以全局查看网络中所有实体！
-  - 注册是一个被动步骤 passive step
+  - 注册是一个被动步骤 **passive** step
     - 不足以通过网络发送/接收数据！
     - 需要进一步的身份验证才能发送/接收数据
 - Bootstrapping
@@ -67,16 +67,16 @@ Two Key Ideas:
   - 交换机定期向控制器发送邻居信息
     - 这样，控制器始终可以查看最新的网络拓扑
 - Authentication
-  - 网络实体上线所需
+  - **网络实体上线所需**
     - 以便它们可以发送/接收数据
   - 交换机使用注册期间提交的预配置证书pre-configured certificates进行身份验证
   - 主机通过向控制器发送包含硬件地址的 DHCP 请求(DHCP request)进行身份验证。控制器根据注册地址检查地址，并分配 IP 地址
   - 用户可以使用企业登录凭据enterprise login credentials（例如，Web 登录表单 login form）
-  - A Host -> IP -> User binding is created
+  - A **Host → IP → User** binding is created
 - Flow setup
   - 用户 A 想要向用户 B 发送数据包
   - 最初，交换机 1 没有转发条目forwarding entry，因此数据包被转发到控制器
-  - 控制器检查网络策略network policy是否允许用户 A 与用户 B 通信
+  - 控制器检查网络策略**network policy**是否允许用户 A 与用户 B 通信
   - 如果允许，控制器会在路由沿线的所有交换机中安装转发规则
 - Forwarding
   - 如果控制器允许该路径，数据包将被发回交换机 1，然后交换机 1 使用控制器安装的转发规则转发数据包
@@ -137,11 +137,11 @@ Two Key Ideas:
 
 ### Ethane Summary
 
-- Ethane 旨在通过以下方式使网络更易于管理：
-  - 利用集中控制方案centralized
+- **Ethane 旨在通过以下方式使网络更易于管理：**
+  - 利用集中控制方案**centralized**
     - 使交换机变得非常简单（仅执行转发）...
-    - 通过将控制平面逻辑control plane logic转移到中央控制器central controller, 使编程和执行全局策略变得容易
-- Ethane 与传统的分布式网络架构截然不同
+    - 通过将控制平面逻辑control plane logic转移到中央控制器**central controller**, 使编程和执行全局策略变得容易
+- **Ethane 与传统的分布式网络架构截然不同**
 
 ---
 
@@ -174,6 +174,8 @@ OpenFlow Switch至少包含三个部分：
 - 将用户数据（例如电子邮件、文档、音频/视频）复制到远程 DC 以实现可用性/持久性
 - 通过固有分布式数据源进行计算的远程存储访问
 - 跨 DC 的大规模数据同步和状态复制
+
+这三条从上到下, 越来越不latency sensitive, 而volume越来越大.
 
 ### WANs are very inefficient! 广域网效率低下的原因分析.
 1. 服务间缺乏协调/Lack of co-ordination between services
