@@ -124,12 +124,24 @@ Prior Solutions for Enforcing Network-wide Policies
 
 ## Three Principles
 
-- “网络应由通过高级名称声明的策略进行管理”“The network should be governed by policies declared over high-level names”
-  - 使用用户名或主机名而不是动态分配的地址来表达规则
-- “策略应确定数据包所遵循的路径”“Policy should determine the path that packets follow”
-  - 例如，强制访客主机通过防火墙
-- “网络应强制数据包与其来源之间的强绑定”“The network should enforce a strong binding between a packet and its origin”
-  - 即使用户在主机之间移动，也保持一致的（用户、主机、地址）(user, host, address)绑定
+> “The network should be governed by policies declared over high-level names”
+> “网络应由通过高级名称声明的策略进行管理”
+  - 传统网络通常使用 IP 地址 进行访问控制和管理，但是 IP 地址是动态分配的，用户的 IP 地址可能会变化（例如 DHCP）。
+  - Ethane 提倡使用更稳定的标识符（如用户名、主机名）来定义策略，而不是依赖 IP 地址。
+    - 传统方式：“阻止 IP 地址 192.168.1.100 访问服务器” → IP 可能会变动，规则容易失效。
+    - Ethane 方式：“阻止用户名 Alice 访问服务器” → 无论 Alice 连接哪个设备，规则都有效。
+> “Policy should determine the path that packets follow”
+> “策略应确定数据包所遵循的路径”
+  - 在传统网络中，数据包的路径通常由路由协议（如 OSPF、BGP） 决定，安全策略是额外附加的（如防火墙）。
+  - Ethane 认为，策略本身应该决定数据包的转发路径，确保所有流量都经过必要的安全检查。
+    - 传统方式：访客（Guest）连接到网络，默认流量按照最短路径转发，可能绕过安全设备。
+    - Ethane 方式：访客的流量必须经过防火墙，以确保符合安全策略，即使网络拓扑发生变化。
+> “The network should enforce a strong binding between a packet and its origin”
+> “网络应强制数据包与其来源之间的强绑定”
+  - 传统网络中，用户可以通过伪造 IP 地址（IP Spoofing）来伪装身份，绕过安全策略。
+  - Ethane 采用用户、设备、IP 地址 (user, host, address) 的强绑定，确保数据包的来源是真实可追踪的。
+    - 传统方式：Alice 可以更换设备，或者修改 IP 地址来绕过网络访问限制。
+    - Ethane 方式：无论 Alice 连接到哪台设备，她的身份都与她的网络活动绑定，安全策略始终适用。
 
 ## Ethane Design
 
