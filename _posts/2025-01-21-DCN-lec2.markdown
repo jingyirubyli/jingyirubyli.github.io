@@ -13,6 +13,8 @@ author: # Add name author (optional)
 - Data Link (L2): “Best-effort” data delivery within a local network
   - Mechanisms: naming, addressing, destination discovery, routing, forwarding
 
+---
+
 ## Network Layer vs. Data Link Layer
 
 ### 网络层和数据链路层比较 
@@ -67,6 +69,7 @@ author: # Add name author (optional)
   <figcaption>switch and router</figcaption>
 </figure>
 
+---
 
 ## 数据链层 Data Link Layer
 Most popular (wired) protocol — Ethernet 以太网
@@ -135,13 +138,13 @@ Most popular (wired) protocol — Ethernet 以太网
       - 将条目 **<s, p>** 添加到其转发表中。
     - 如果交换机从未收到来自主机的帧，它将永远不会获悉主机可通过哪个端口到达！
 
-  {% highlight ruby %}
-  • When a switch receives a frame on port p:
-    • Checks the source MAC address in the frame. Let it be s.
-    • Learns that host with MAC address s is reachable via port p.
-    • Adds the entry <s, p> to its forwarding table.
-  • If a switch never receives a frame sourced from a host, it will never learn which port the host is reachable on!
-  {% endhighlight %}
+```java
+  When a switch receives a frame on port p:
+    Checks the source MAC address in the frame. Let it be s.
+    Learns that host with MAC address s is reachable via port p.
+    Adds the entry <s, p> to its forwarding table.
+  If a switch never receives a frame sourced from a host, it will never learn which port the host is reachable on!
+```
 
 #### 算法 MAC Forwarding
 
@@ -171,6 +174,8 @@ STP（Spanning Tree Protocol）是一个用于局域网中消除环路的协议�
 
 狭义的STP是指IEEE 802.1D中定义的STP协议。
 广义的STP包括IEEE 802.1D中定义的STP、IEEE 802.1W中定义的快速生成树协议RSTP（Rapid Spanning Tree Protocol）和IEEE 802.1S中定义的多生成树协议MSTP（Multiple Spanning Tree Protocol）。
+
+---
 
 ## 网络层 Network Layer
 Most popular protocol — Internet Protocol 互联网协议(IP) 
