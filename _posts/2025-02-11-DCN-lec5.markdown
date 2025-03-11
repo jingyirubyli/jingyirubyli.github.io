@@ -133,7 +133,7 @@ Random load-agnostic path selection:
 <figcaption>Random load-agnostic path selection</figcaption>
 </figure>
 
-Local load estimation for path selection: 同样TCP以均匀分配开始, 20G+20G; 收到UDP影响变为10G+20G; 但是FLARE认为原路径容量是1:1(40G:40G), 所以将20G中的5G移到10G, 则为15G+15G; 但是10G是UDP利用剩余的最大容量, 因此最终为10G+15G, 总和为30G+10G+15G=55G.
+Local load estimation for path selection: 同样TCP以均匀分配开始, 20G+20G; 受到UDP影响变为10G+20G; 但是FLARE认为原路径容量是1:1(40G:40G), 所以将20G中的5G移到10G, 则为15G+15G; 但是10G是UDP利用剩余的最大容量, 因此最终为10G+15G, 总和为30G+10G+15G=55G.
 
 <figure style="text-align: center;">
 <img src="/assets/img/l5p10.png" alt="Local load estimation path selection" width="600">
