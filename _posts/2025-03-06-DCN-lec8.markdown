@@ -823,3 +823,8 @@ PIEO的两个关键贡献：
 - 一种**快速**且**可扩展**的调度程序硬件设计
   - 在 4 个时钟周期内做出调度决策
   - 轻松扩展到数万个流
+
+
+注: 可以参考[该网址][pieo], 基本是该论文的中文翻译. Vishal Shrivastav在课上没有详细讲.
+
+[pieo]: https://cloud.tencent.com/developer/article/1639553
