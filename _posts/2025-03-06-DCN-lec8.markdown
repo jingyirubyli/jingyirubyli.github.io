@@ -725,7 +725,93 @@ PIEO调度程序包括一个有序列表，该列表支持三个基本操作: en
 <figcaption>PIEO Hardware Architecture</figcaption>
 </figure>
 
-<figure style="text-align: center;">
+**四个时钟周期实施**
+
+**入队（f）**:示例进入大小为16的元素的PIEO排序列表（大小为4的8个子列表）
+
+- 周期 1：选择目标子列表
+	-	进行 并行比较操作，确定适合 f 插入的子列表：
+	  -	比较 Ordered-SublistArray[i].smallest_rank > f.rank，生成 位向量 。
+	-	将 位向量 送入 优先级编码器，输出索引 j。
+	-	选择 Ordered-SublistArray[j-1] 指向的 子列表 S 作为目标子列表，并准备入队。
+
+- 周期 2：读取子列表
+	-	从SRAM读取子列表 S：
+	-	如果 S 已满，入队操作会导致S中的尾部元素被推出。
+	-	为了存储被推出的元素，读取 紧随 S 的子列表 S’，前提是：
+    -	S' 仍有空位，或
+    -	S' 是一个新创建的空子列表。
+
+- 周期 3：确定插入位置 & 处理溢出
+	-	确定 f 在 S 中的插入位置：
+    -	通过 并行比较，查找满足 S.Rank-Sublist[i].rank > f.rank 的位置。
+    -	通过 Eligibility-Sublist 进一步检查 S.Eligibility-Sublist[i] > f.send_time 的插入合法性。
+	-	处理 S 的溢出（若 S 已满）：
+    -	S.Rank-Sublist 的 tail 元素 移动到 S'.Rank-Sublist 头部。
+    -	通过 并行比较 S'.Eligibility-Sublist[i] > S[tail].send_time，并使用 优先级编码 确定 S’ 内合适的位置。
+    -	若 S' 最初为空，可将其移至 S 右侧以保持 Ordered-Sublist-Array 有序。
+
+- 周期 4：执行入队/出队 & 更新结构
+	-	在上个周期计算出的目标位置执行入队/出队：
+	- 	S（和 S'）更新后写回 SRAM。
+	-	更新 Ordered-Sublist-Array 的元数据：
+    -	num（当前子列表中的元素数）。
+    -	Minimum_rank（从 RankSublist 读取）。
+    -	minimum_send_time（从 Eligibility-Sublist 读取）。
+
+PIEO 入队四个周期总结：
+  -	周期 1：通过 并行比较 和 优先级编码器 选择合适的 子列表 S 进行插入。
+  -	周期 2：从 SRAM 读取 S，若 S 已满，则读取 S’ 以存储被推出的元素。
+  -	周期 3：确定 f 在 S 的插入位置，若 S 满，则将溢出元素移至 S’ 并调整顺序。
+  -	周期 4：执行 入队/出队，写回 SRAM，并更新 Ordered-Sublist-Array 的元数据。
+
+**出队(f)** 操作旨在从 Global-Ordered-List 中返回 “排名最低的合格”元素。
+
+- 周期 1：选择包含“最小排名的合格”元素的子列表 S
+  - 进行 并行比较：检查 curr_time ≥ Ordered-SublistArray[i].smallest_send_time。
+  - 通过 优先级编码器，选择满足条件的 最小索引 i，即 S = Ordered-SublistArray[i]。
+  - 由于 Ordered-SublistArray 按 minimum_rank 排序，因此 S 保证包含整个列表中 排名最低的合格元素。
+
+- 周期 2：读取 S 并可能读取 S’
+  - 从 SRAM 读取 S，获取其 Rank-Sublist 和 Eligibility-Sublist。
+  - 处理 S 部分变空的情况：
+    - 若 S 在出队后可能部分变空，则查找 S 相邻的子列表 S’：
+      - S’ 可以是 S 左侧或右侧的子列表。
+      - 选择 未满 的子列表 S’（如果左右都有未满子列表，则可选两个）。
+      - 若 S’ 左右都满，则仅读取 S。
+	  -	目的是确保出队后 S 不会变成“部分满”状态，从而避免违反 不变量 1（即子列表应尽量保持满或空）。
+
+- 周期 3：确定出队元素位置 & 可能调整 S 和 S’
+  - 确定要出队的元素：
+    - 通过 优先级编码器 在 S.Rank-Sublist 中找到满足 curr_time ≥ S.Rank-Sublist[i].send_time 的最小索引 idx。
+    - S.Rank-Sublist[idx] 即为 “最小排名合格”元素，它将作为 出队（dequeue）操作的最终输出。
+  - 处理 S 已满的情况：
+    - 若 S 在出队前是满的，则需要 从 S’ 移动一个元素到 S，以确保 S 在出队后仍然满。
+    - 如何确定要移动的元素？
+      - 在 S'.Eligibility-Sublist 中，通过 并行比较 S'.Eligibility-Sublist[i] == e.send_time 找到 e 在 S’ 中的位置。
+      - 在 S.Eligibility-Sublist 中，通过 并行比较 S.Eligibility-Sublist[i] > e.send_time 找到 e 在 S 的插入位置。
+	  -	如何移动？
+      - 如果 S’ 在 S 左侧，则将 S’ 的 头部元素 移到 S 的尾部。
+      - 如果 S’ 在 S 右侧，则将 S’ 的 尾部元素 移到 S 的头部。
+  - 调整 Ordered-Sublist-Array（如果需要）：
+    - 若 S 或 S’ 在出队后变空，则重新排列 Ordered-Sublist-Array，将空子列表移动到 逻辑分区的开头，保持结构整齐。
+
+- 周期 4：执行入队/出队 & 更新结构
+	- 在上个周期计算出的目标位置执行出队：
+  	- S（以及可能调整的 S'）的数据被修改。
+	- 将 S（和 S’）写回 SRAM，确保数据一致性。
+	- 更新 Ordered-Sublist-Array 的元数据：
+    -	num：当前子列表中的元素数。
+    -	Minimum_rank：从 RankSublist 读取，表示该子列表的最小排名值。
+    -	minimum_send_time：从 Eligibility-Sublist 读取，表示该子列表的最小发送时间。
+
+总结
+  -	周期 1：选择包含最小排名合格元素的子列表 S。
+  -	周期 2：从 SRAM 读取 S，若 S 可能部分变空，则读取 相邻未满子列表 S’ 以调整。
+  -	周期 3：确定出队元素的位置，若 S 满则从 S’ 移动元素填充 S，确保结构完整。
+  -	周期 4：执行入队/出队，写回 SRAM，并更新 Ordered-Sublist-Array 的元数据。
+
+<figure  style="text-align: center;">
 <img src="/assets/img/l8p16.png" alt="PIEO: Conclusion" width="500">
 <figcaption>PIEO: Conclusion</figcaption>
 </figure>
