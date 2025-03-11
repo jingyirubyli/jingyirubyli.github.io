@@ -168,6 +168,12 @@ author: # Add name author (optional)
 <figcaption>Programming Parser in P4</figcaption>
 </figure>
 
+对应parse graph:
+
+<figure style="text-align: center;">
+<img src="/assets/img/l8p26.png" alt="对应parse graph" width="400">
+<figcaption>对应parse graph</figcaption>
+</figure>
 
 4. 动态调整能力
 
