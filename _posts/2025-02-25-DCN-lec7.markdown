@@ -126,22 +126,27 @@ Prior Solutions for Enforcing Network-wide Policies
 
 > “The network should be governed by policies declared over high-level names”
 > “网络应由通过高级名称声明的策略进行管理”
-  - 传统网络通常使用 IP 地址 进行访问控制和管理，但是 IP 地址是动态分配的，用户的 IP 地址可能会变化（例如 DHCP）。
-  - Ethane 提倡使用更稳定的标识符（如用户名、主机名）来定义策略，而不是依赖 IP 地址。
-    - 传统方式：“阻止 IP 地址 192.168.1.100 访问服务器” → IP 可能会变动，规则容易失效。
-    - Ethane 方式：“阻止用户名 Alice 访问服务器” → 无论 Alice 连接哪个设备，规则都有效。
+
+- 传统网络通常使用 IP 地址 进行访问控制和管理，但是 IP 地址是动态分配的，用户的 IP 地址可能会变化（例如 DHCP）。
+- Ethane 提倡使用更稳定的标识符（如用户名、主机名）来定义策略，而不是依赖 IP 地址。
+  - 传统方式：“阻止 IP 地址 192.168.1.100 访问服务器” → IP 可能会变动，规则容易失效。
+  - Ethane 方式：“阻止用户名 Alice 访问服务器” → 无论 Alice 连接哪个设备，规则都有效。
+
 > “Policy should determine the path that packets follow”
 > “策略应确定数据包所遵循的路径”
-  - 在传统网络中，数据包的路径通常由路由协议（如 OSPF、BGP） 决定，安全策略是额外附加的（如防火墙）。
-  - Ethane 认为，策略本身应该决定数据包的转发路径，确保所有流量都经过必要的安全检查。
-    - 传统方式：访客（Guest）连接到网络，默认流量按照最短路径转发，可能绕过安全设备。
-    - Ethane 方式：访客的流量必须经过防火墙，以确保符合安全策略，即使网络拓扑发生变化。
+
+- 在传统网络中，数据包的路径通常由路由协议（如 OSPF、BGP） 决定，安全策略是额外附加的（如防火墙）。
+- Ethane 认为，策略本身应该决定数据包的转发路径，确保所有流量都经过必要的安全检查。
+  - 传统方式：访客（Guest）连接到网络，默认流量按照最短路径转发，可能绕过安全设备。
+  - Ethane 方式：访客的流量必须经过防火墙，以确保符合安全策略，即使网络拓扑发生变化。
+
 > “The network should enforce a strong binding between a packet and its origin”
 > “网络应强制数据包与其来源之间的强绑定”
-  - 传统网络中，用户可以通过伪造 IP 地址（IP Spoofing）来伪装身份，绕过安全策略。
-  - Ethane 采用用户、设备、IP 地址 (user, host, address) 的强绑定，确保数据包的来源是真实可追踪的。
-    - 传统方式：Alice 可以更换设备，或者修改 IP 地址来绕过网络访问限制。
-    - Ethane 方式：无论 Alice 连接到哪台设备，她的身份都与她的网络活动绑定，安全策略始终适用。
+
+- 传统网络中，用户可以通过伪造 IP 地址（IP Spoofing）来伪装身份，绕过安全策略。
+- Ethane 采用用户、设备、IP 地址 (user, host, address) 的强绑定，确保数据包的来源是真实可追踪的。
+  - 传统方式：Alice 可以更换设备，或者修改 IP 地址来绕过网络访问限制。
+  - Ethane 方式：无论 Alice 连接到哪台设备，她的身份都与她的网络活动绑定，安全策略始终适用。
 
 ## Ethane Design
 
@@ -282,9 +287,9 @@ OpenFlow Switch至少包含三个部分：
 - **A Flow Table/流表**：交换机用于存储流表项(与每个条目关联的操作)的表。
   - 每张流表都由很多条流表项组成，比如一张流表有16K，那么这张流表就有16K流表项(flow entry)。
     - 流表项是流表的最小单位，每条流表项对应了网络中传输的一条流，流表项是OpenFlow中最核心的元素，根据OpenFlow标准，每条流表项的组成部分如下：
-    | Match Fields | Priority | Counter | Instruction | Timeout  | Cookie   |
-    |--------------|----------|---------|-------------|----------|----------|
-    | 匹配字段     | 优先级   | 计数器  | 指令        | 超时时间 | 附属属性 |
+| Match Fields | Priority | Counter | Instruction | Timeout  | Cookie   |
+|--------------|----------|---------|-------------|----------|----------|
+| 匹配字段     | 优先级   | 计数器  | 指令        | 超时时间 | 附属属性 |
     - 流表项的组成部分是controller和交换机之间传输数据结构，是对流表项的逻辑描述，并不是与芯片转发表中的实际字段一一对应。流表查找的过程通俗来讲就是对进来的报文，用流表指定的字段去匹配查找，如果匹配到一条流表项，就执行这条流表项所规定的指令。
 
   - 其中匹配域用于区分不同的数据流，网络数据包进入交换机之后会匹配流表中的流表项，匹配到同一条流表的数据包被称为数据流，即Data Flow，简称 Flow。
@@ -299,7 +304,7 @@ OpenFlow Switch至少包含三个部分：
   - 在 OpenFlow协议中, Controller通过一套标准的消息接口,告诉交换机,报文从哪些Port进来,就要去查哪张流表,匹配到一条流表项(Flow Entry)之后,就要去执行这条流表项所规定的指令,然后要么直接转发出去或者丢弃,要么继续去查找下一个指定的流表(由匹配到的这条流表项来指定),然后重复这个过程,直到报文被丢弃或者转发出去。
 
 <figure style="text-align: center;">
-<img src="/assets/img/l7p6.png" alt="OpenFlow Switch" width="600">
+<img src="/assets/img/l7p6.png" alt="OpenFlow Switch" width="300">
 <figcaption>OpenFlow Switch</figcaption>
 </figure>
 
