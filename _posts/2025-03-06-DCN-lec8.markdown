@@ -662,7 +662,7 @@ PIEO 能够表达的调度策略
 PIEO 原语依赖于**有序列表(ordered list)**数据结构: PIEO（Push-In-Extract-Out）原语需要使用有序列表（Ordered List）作为其底层数据结构，以便进行高效的元素插入（Push-In）和提取（Extract-Out）。其设计权衡：在速度（Speed） 和 可扩展性（Scalability） 之间需要找到平衡。
 
 <figure style="text-align: center;">
-<img src="/assets/img/l8p27.png" alt="PIEO编程框架" width="600">
+<img src="/assets/img/l8p28.png" alt="PIEO编程框架" width="600">
 <figcaption>PIEO编程框架</figcaption>
 </figure>
 
