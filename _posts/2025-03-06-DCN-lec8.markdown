@@ -724,7 +724,7 @@ PIFO不需要SRAM, 它只把整个列表储存在Flip-Flop中, 在其中进行�
 <figcaption>PIEO 将sublists储存在SRAM中</figcaption>
 </figure>
 
-接下来在Flip-Flop中, 从SRAM取\sqrt{N}的列表存入, 这就是指向子列表的指针, 这些指针同样按照rank升序排列. 因此很显然Flip-Flop的大小是\sqrt{N}, 而不是原先的N. 那么我们已经了解了硬件设计的架构,如何做入队/出队操作呢? 基本的操作都使用四个时钟周期完成: 1. select: 选择哪个sublist需要移入或者移除(S); 2. 从SRAM中读取该选定的S; 3. 在S上做与在Flip-Flop中同样的Enq/Deq操作; 4. 将结果S写回SRAM.
+接下来在Flip-Flop中, 从SRAM取<sqrt>N</sqrt>的列表存入, 这就是指向子列表的指针, 这些指针同样按照rank升序排列. 因此很显然Flip-Flop的大小是\sqrt{N}, 而不是原先的N. 那么我们已经了解了硬件设计的架构,如何做入队/出队操作呢? 基本的操作都使用四个时钟周期完成: 1. select: 选择哪个sublist需要移入或者移除(S); 2. 从SRAM中读取该选定的S; 3. 在S上做与在Flip-Flop中同样的Enq/Deq操作; 4. 将结果S写回SRAM.
 
 <figure style="text-align: center;">
 <img src="/assets/img/l8p31.png" alt="Clock 1" width="600">
