@@ -57,7 +57,7 @@ author: # Add name author (optional)
         <figcaption>L3 Stage</figcaption>
         </figure>
 
-    - ACL Stage（访问控制列表阶段）
+    - ACL(Access Control List) Stage（访问控制列表阶段）
       - 负责基于预定义的安全策略进行数据包过滤，决定数据包是否被允许通过或丢弃。
       - **表结构：ACL: 4k（4k条目）。**
       - **匹配方式：三元匹配（Ternary Match），支持通配符（如匹配源/目的IP、端口范围等）。**
