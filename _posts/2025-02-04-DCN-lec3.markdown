@@ -76,6 +76,23 @@ author: # Add name author (optional)
   - 正在传输的数据的开始（已发送但尚未确认）
   - 某些数据已确认时滑动
 
+**W determines the max rate at which sender can send (~ W/RTT bytes per sec)**
+
+最大发送速率 ≈ W / RTT （单位：字节/秒）
+  -	W 是窗口大小（单位：字节），即一次可以发送的最大数据量。
+    - 如果 W 变大（即允许发送更多数据），那么发送速率会提高。
+  -	RTT 是往返时延（单位：秒），即数据包从发送方到达接收方并收到确认的时间。
+    -	如果 RTT 变大（网络延迟增加），那么发送速率会降低。
+  - 发送速率的单位是 字节/秒（bytes per second），表示发送方每秒可以发送多少数据。
+
+示例：
+
+假设：拥塞窗口 W = 100 KB（100 × 1024 字节）, RTT = 0.1 秒
+
+那么，最大发送速率 ≈ (100 × 1024) / 0.1 = 1 MB/s
+
+这个公式在 TCP 拥塞控制（如 AIMD、CUBIC 等）以及 流量控制 中广泛使用，用于衡量网络传输的可行速率。
+
 #### 可靠性算法的两个问题
 
 1. 接收方如何为数据包指定 ACK？
@@ -138,6 +155,7 @@ author: # Add name author (optional)
 ### Receiver
 - 防止发送方溢出接收方的接收缓冲区
 - 接收方将 ACK 数据包的 TCP 标头中的“通告窗口Advertised Window”字段设置为接收方可用的接收缓冲区空间 available receive buffer space at the receiver
+
 ### Sender
 - 收到设置了通告窗口字段Advertised Window field的数据包时：
   - 发送方将 RWND 设置为通告窗口值
@@ -205,12 +223,12 @@ author: # Add name author (optional)
 # User Datagram Protocol 用户数据报协议 (UDP)
 - UDP 是一种不可靠的传输协议
   - Application Multiplexing
-  - ~~Reliability 如果数据包丢失，则不重新传输
-  - ~~Flow Control 允许发送方以任意速率发送
-  - ~~Congestion Control 允许发送方以任意速率发送
+  - ~~Reliability~~ 如果数据包丢失，则不重新传输
+  - ~~Flow Control~~ 允许发送方以任意速率发送
+  - ~~Congestion Control~~ 允许发送方以任意速率发送
 - UDP 是一种无连接协议 connectionless protocol
   - 发送数据前无需建立连接
-    - 发送 方可以立即开始发送数据...
+    - 发送方可以立即开始发送数据...
 - 与 TCP 一样，UDP 流或连接也由 5 元组标识
   - {src addr (IP), dst addr (IP), src port, dst port, protocol: 17 (UDP)}
 
