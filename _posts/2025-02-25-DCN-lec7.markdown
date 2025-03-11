@@ -159,52 +159,67 @@ Two Key Ideas:
 Ethane 与传统网络最大的不同是**控制平面**和**转发平面**分离；控制层实施集中式控制，可编程化，可视化，自动化等策略，转发层通过流表和硬件进行快速转发。
 
 ### How Ethane Works?五项基本活动：
-- Registration
+- Registration/注册
   - **所有用户、主机和交换机都向控制器注册以加入网络**
-    - 因此控制器可以全局查看网络中所有实体！
-  - 注册是一个被动步骤 **passive** step
+    - 在 Ethane 网络中，注册是所有网络设备（如主机、交换机、路由器等）与网络控制器进行的初步通信。每个设备都必须在网络控制器处进行注册，告知控制器其身份和网络资源。因此控制器可以全局查看网络中所有实体！
+  - 注册是一个被动步骤 **passive** step，它仅仅是设备加入网络的过程，设备的策略和行为尚未被定义。
+    - 注册后，网络控制器可以掌握设备的标识信息（如用户名、主机名等）。
     - 不足以通过网络发送/接收数据！
     - 需要进一步的身份验证才能发送/接收数据
-- Bootstrapping
-  - 交换机创建以控制器为根的生成树
-  - 交换机建立到控制器的安全通道
-  - 交换机定期向控制器发送邻居信息
-    - 这样，控制器始终可以查看最新的网络拓扑
-- Authentication
+- Bootstrapping/启动过程
+  - 启动过程是 Ethane 网络中的一项初始化活动，它确保设备能够通过网络正确地与控制器建立通信。这一过程通常会发生在设备首次接入网络时，确保网络中的设备能够通过控制器获取必要的配置和策略。启动过程中，设备将会获取到网络控制器的地址和访问权限，为后续的认证和策略应用做好准备。启动过程通常需要设备与控制器之间建立信任关系，这为后续的认证和安全策略奠定基础。
+    - 交换机创建以控制器为根的生成树
+    - 交换机建立到控制器的安全通道
+    - 交换机定期向控制器发送邻居信息
+      - 这样，控制器始终可以查看最新的网络拓扑
+- Authentication/身份验证
   - **网络实体上线所需**
-    - 以便它们可以发送/接收数据
+    - 在身份验证阶段，网络会验证设备的合法性，确保设备（用户或主机）有权限访问网络资源。只有经过身份验证的设备才能继续进行数据交换, 以便它们可以发送/接收数据。
   - 交换机使用注册期间提交的预配置证书pre-configured certificates进行身份验证
   - 主机通过向控制器发送包含硬件地址的 DHCP 请求(DHCP request)进行身份验证。控制器根据注册地址检查地址，并分配 IP 地址
   - 用户可以使用企业登录凭据enterprise login credentials（例如，Web 登录表单 login form）
   - A **Host → IP → User** binding is created
-- Flow setup
-  - 用户 A 想要向用户 B 发送数据包
-  - 最初，交换机 1 没有转发条目forwarding entry，因此数据包被转发到控制器
-  - 控制器检查网络策略**network policy**是否允许用户 A 与用户 B 通信
-  - 如果允许，控制器会在路由沿线的所有交换机中安装转发规则
-- Forwarding
-  - 如果控制器允许该路径，数据包将被发回交换机 1，然后交换机 1 使用控制器安装的转发规则转发数据包
-  - 从 A 到 B 的所有后续数据包subsequent packets都将由交换机转发；无需再转到控制器
-  - 转发表条目Forwarding table entries通过不活动超时inactivity timeout或由控制器controller清除
+- Flow setup/流量设置
+  - 流量设置是在设备认证通过后，控制器根据策略为网络流量建立的规则和路径。这是网络控制器实际决定如何转发数据包的过程。
+    - 用户 A 想要向用户 B 发送数据包
+    - 最初，交换机 1 没有转发条目forwarding entry，因此数据包被转发到控制器
+    - 控制器检查网络策略**network policy**是否允许用户 A 与用户 B 通信
+    - 如果允许，控制器会在路由沿线的所有交换机中安装转发规则
+
+<figure style="text-align: center;">
+<img src="/assets/img/post-7.png" alt="Flow setup/Forwarding" width="400">
+<figcaption>Flow setup/Forwarding</figcaption>
+</figure>
+
+- Forwarding/转发
+  - 转发是网络中设备根据之前定义的流量设置，按照控制器指定的路径进行数据包的实际转发。它是网络操作中的最终步骤，确保数据能够到达目标设备。
+    - 如果控制器允许该路径，数据包将被发回交换机 1，然后交换机 1 使用控制器安装的转发规则转发数据包
+    - 从 A 到 B 的所有后续数据包subsequent packets都将由交换机转发；无需再转到控制器
+    - 转发表条目Forwarding table entries通过不活动超时inactivity timeout或由控制器controller清除
 
 ### Ethane Controller : Fault Tolerance
 
 控制器是故障的中心点,使用控制器的备份副本backup replicas提供容错能力.
 
-维护备份副本的三个选项：
+维护备份副本的三个选项/备份控制器方案：
 - Cold standby
   - Backups contain registration and policy information but lack the (user, host, address) bindings
-  - 在主控制器发生故障时选择 ID 最低的备份控制器
+    - 备份控制器会存储注册信息和策略信息，即与设备的注册状态和网络策略相关的所有信息。
+    - 但它不包含用户、主机和地址的绑定（(user, host, address) bindings），因此它没有实时的设备状态或动态连接信息。
+  - 当主控制器发生故障时，系统会选择ID最小的备份控制器来接管网络控制任务。在主控制器发生故障时选择 ID 最低的备份控制器
   - **最不复杂，但故障后收敛时间最长**
 - Warm standby
   - Backups contain binding information with weak consistency
-    - 即，不同的备份控制器可能具有不同的绑定元组子集subsets of binding tuples
-    - 但没有不一致的信息
+    - 除了存储注册信息和网络策略外，还包含一定量的绑定信息（即用户、主机和地址的绑定 (user, host, address)）。
+    - 但是，这些绑定信息在不同的备份控制器之间可能存在不一致性。即不同备份控制器可能拥有不同的绑定子集。即，不同的备份控制器可能具有不同的绑定元组子集subsets of binding tuples
+    - 没有冲突或错误的绑定信息。
+  - 当主控制器发生故障时，选择备份控制器接管，由于备份控制器已经持有部分绑定信息，因此其可以比 Cold Standby 更加迅速地恢复服务。
   - **更复杂，但从故障中恢复更快**
 - Fully replicated
-  - 多个活动控制器各自保持相同状态
-  - 交换机将每个请求分发到所有控制器（主控制器和备份控制器primary and backups）
+  - 系统中有多个活动控制器（不仅仅是一个主控制器和备份控制器），这些控制器都在同一时刻保持相同的网络状态。所有控制器（包括主控制器和备份控制器）都实时同步网络状态，确保每个控制器上的数据是一致的。
+  - 网络交换机（Switch）在向控制器发送请求时，会将请求同时发送到所有控制器，即主控制器和备份控制器primary and backups。这意味着每个控制器都能够处理同一个请求，并更新自己的状态。所有控制器都“知道”网络的当前状态，无需等待主控制器处理完请求后再做处理。
   - 使用基于gossip协议gossip-based protocol来保持一致的事件顺序
+  - 如果一个控制器发生故障，其他控制器能够立刻接管任务，因为它们已经拥有相同的状态信息。由于多个控制器已经保持同步，系统的恢复几乎是即时的。
   - **最复杂，但故障恢复速度最快**
 
 **Trade-off: System complexity vs. time to recover**
@@ -233,7 +248,7 @@ Ethane 与传统网络最大的不同是**控制平面**和**转发平面**分�
 <figcaption>A Flow Table</figcaption>
 </figure>
 
-下图比较Ethane Switch和Traditional Switch. 其中画圈部分被移到控制器controller处理.
+下图比较Ethane Switch和Traditional Switch. Ethane Switch只保留转发功能, 其余画圈部分被移到控制器controller处理.
 <figure style="text-align: center;">
 <img src="/assets/img/l7p4.png" alt="Ethane Switch vs. Traditional Switch" width="600">
 <figcaption>Ethane Switch vs. Traditional Switch</figcaption>
@@ -251,7 +266,15 @@ Ethane 与传统网络最大的不同是**控制平面**和**转发平面**分�
 
 # OpenFlow: Communication b/w Controller & Switch
 
-Motivation: Ethane网络需要控制器与交换机通信以填充转发规则。我们需要控制器和交换机之间的通信协议。一开始，每个交换机供应商都设计了自己的协议来安装交换机转发规则, 导致网络运营商需要了解每个交换机供应商的规范,还需要针对不同供应商的不同交换机修改控制平面应用程序。OpenFlow 定义了一种可编程网络协议programmable network protocol, 该协议可以帮助管理路由器和交换机，无论底层路由器或交换机由哪家供应商制造。
+## Motivation
+Ethane网络需要控制器与交换机通信以填充转发规则。我们需要控制器和交换机之间的通信协议。一开始，每个交换机供应商都设计了自己的协议来安装交换机转发规则, 导致网络运营商需要了解每个交换机供应商的规范,还需要针对不同供应商的不同交换机修改控制平面应用程序。
+
+OpenFlow 定义了一种可编程网络协议programmable network protocol, 该协议可以帮助管理路由器和交换机，无论底层路由器或交换机由哪家供应商制造。Ethane 可以利用 OpenFlow 作为底层协议来进行流量的转发和控制，但它在网络管理上具有更高层次的策略定义，特别是在身份管理和访问控制方面。
+
+因此，可以说 Ethane 是 OpenFlow 的一种高层次应用，Ethane 的控制器可能会利用 OpenFlow 协议来管理数据包的流转，同时增加更复杂的身份验证和策略管理。
+
+## OpenFlow 交换机
+OpenFlow 交换机（OpenFlow Switch）一种基于 OpenFlow 协议的网络交换机。它允许外部的控制器（通常是 SDN 控制器）以编程方式控制交换机的数据转发行为。
 
 OpenFlow Switch至少包含三个部分：
 - **A Flow Table/流表**：与每个条目关联的操作
@@ -356,16 +379,18 @@ OpenFlow Switch至少包含三个部分：
 <figcaption>Uses a central controller to achieve both goals</figcaption>
 </figure>
 
-SWAN Workflow
-- 控制器计算每个服务的发送速率
-  - 简化为众所周知的理论问题 - 路径约束Path-constrained, 多商品流问题Multi-commodity Flow Problem
-- 控制器还计算每个流的最佳路径
+### SWAN Workflow
+- **控制器计算每个服务的发送速率**
+  - 简化为众所周知的理论问题
+    - 路径约束Path-constrained, 多商品流问题Multi-commodity Flow Problem
+- **控制器还计算每个流的最佳路径**
   - 例如，不相交路径以避免拥塞
   - 相应地配置每个交换机，例如使用 OpenFlow
   - 随着新流到达，配置会动态更新
     - 可能需要将现有流移动到不同的路径
     - 可能导致暂时拥塞
-  
+
+
 例: 如图, 假设有一些新的流量到达，现在我们必须将绿色流量和蓝色流量移至新路径
 
 <figure style="text-align: center;">
@@ -383,6 +408,8 @@ SWAN Workflow
 同样如果先把蓝色F<sub>A</sub>移到目标位置, 再移动绿色F<sub>B</sub>: 也会造成堵塞.
 
 Idea: 在每个link上保留 **s** 的临时容量: Scratch capacity (s) of 0.5
+
+Scratch Capacity 是一个与网络资源管理和调度有关的概念，通常用于描述在网络中的备用或临时分配的资源容量。具体来说，Scratch Capacity 通常指的是网络系统中预留的一部分资源/备用容量，用于应对临时的、突发的负载或需求。这些资源可以在正常的流量或操作过程中不被直接使用，而是为应急或突发情况准备。当网络负载急剧增加时，Scratch Capacity 可用于快速调度和响应，从而避免性能下降或网络阻塞。
 
 先将蓝色F<sub>A</sub>的一半移动到目标link, 此时蓝色F<sub>A</sub>与绿色F<sub>B</sub>发生少量堵塞; 再将绿色F<sub>B</sub>全部移动到目标link, 此时堵塞发生在上面link; 再将还未移动的一半蓝色F<sub>A</sub>移到目标link; 完成move, 堵塞消失.
 
