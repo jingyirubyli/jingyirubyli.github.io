@@ -182,6 +182,8 @@ Ethane 与传统网络最大的不同是**控制平面**和**转发平面**分�
     - 在身份验证阶段，网络会验证设备的合法性，确保设备（用户或主机）有权限访问网络资源。只有经过身份验证的设备才能继续进行数据交换, 以便它们可以发送/接收数据。
   - 交换机使用注册期间提交的预配置证书pre-configured certificates进行身份验证
   - 主机通过向控制器发送包含硬件地址的 DHCP 请求(DHCP request)进行身份验证。控制器根据注册地址检查地址，并分配 IP 地址. 
+  - 用户可以使用企业登录凭据enterprise login credentials（例如，Web 登录表单 login form）
+  - A **Host → IP → User** binding is created(“Host simply means the machine the user is using to connect to the network. → is just an arrow to show what things are binded together.Authentication for host machine is done when the machine is added to network for the first time. For users, authentication is done everytime user tries to log into the host machine.”)
 
 > DHCP（Dynamic Host Configuration Protocol）请求是指客户端向 DHCP 服务器发送的请求消息，以获取网络配置参数（如 IP 地址、子网掩码、默认网关和 DNS 服务器）的过程。DHCP 是一种用于动态分配 IP 地址的协议，广泛用于局域网（LAN）和数据中心网络中。
 
@@ -204,8 +206,6 @@ Ethane 与传统网络最大的不同是**控制平面**和**转发平面**分�
 
 > 如果 DHCP 服务器拒绝请求（发送 DHCP NAK），则客户端必须重新开始 DHCP 发现流程。
 
-  - 用户可以使用企业登录凭据enterprise login credentials（例如，Web 登录表单 login form）
-  - A **Host → IP → User** binding is created(“Host simply means the machine the user is using to connect to the network. → is just an arrow to show what things are binded together.Authentication for host machine is done when the machine is added to network for the first time. For users, authentication is done everytime user tries to log into the host machine.”)
 - Flow setup/流量设置
   - 流量设置是在设备认证通过后，控制器根据策略为网络流量建立的规则和路径。这是网络控制器实际决定如何转发数据包的过程。
     - 用户 A 想要向用户 B 发送数据包
