@@ -669,6 +669,11 @@ UPS（Utility Proportional Scheduling）调度算法
 - Whenever the link is idle:
   -  Among all elements satisfying the eligibility predicate t<sub>current</sub> ≥ t<sub>eligible</sub> : Schedule the smallest ranked element
 
+<figure style="text-align: center;">
+<img src="/assets/img/l8p34.png" alt="PIEO Scheduler Abstraction" width="600">
+<figcaption>PIEO Scheduler Abstraction</figcaption>
+</figure>
+
 PIEO 调度程序只考虑在任何给定时间调度rank最小的合格元素.
 
 > PIEO scheduler simply schedules the **smallest ranked eligible** element at **any given time**.
