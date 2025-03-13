@@ -61,7 +61,11 @@ author: # Add name author (optional)
 
 ## 4. 五层OSI(Open Syetem Interconnection)模型 Five Layer OSI Model
 
-![图片alt](/assets/img/5osi.png "Five Layer OSI Model")
+  <figure style="text-align: center;">
+    <img src="/assets/img/5osi.png" alt="Five Layer OSI Model" width="500">
+    <figcaption>Five Layer OSI Model</figcaption>
+  </figure>
+
 - 应用层Application (L5): Network service to users or applications
   - Mechanisms: read/write data from applications, encrypt/decrypt, etc.
 - 运输层Transport (L4): (Reliable) end-to-end data delivery/communication
