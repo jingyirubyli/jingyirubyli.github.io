@@ -413,6 +413,11 @@ RMT 将逻辑表映射到两种物理存储结构，分别针对不同的匹配�
     - 依赖关系/Dependency arrow
       - Logical TCP Table 依赖于 Logical IPv4 Table 或 Logical IPv6 Table，即 TCP 匹配发生在 IP 匹配之后。
 
+注意点:
+  - 不同阶段的匹配表不能放在同一阶段的映射
+  - 一个匹配表可以占用有多个阶段
+  - 不同阶段的匹配表之间没有重合
+
 关键结论
   - 管道化匹配过程：
     - 以太网头解析后进行 IPv4/IPv6 查找。
@@ -446,7 +451,7 @@ RMT 将逻辑表映射到两种物理存储结构，分别针对不同的匹配�
      - 加法（Add）
      - 减法（Subtract）
      - 位移运算（Bit Shift Left/Right）
-   - 但不支持复杂运算，如 乘法（Multiply）和除法（Divide）。
+   - 但不支持复杂运算，如乘法（Multiply）和除法（Divide）, 因为保证性能是第一位目标。
 5. ALU(Arithmetic Logic Unit/算术逻辑单元)
    - 负责执行指令操作，对输入数据（Header In 或 SRAM 数据）进行计算，最终输出修改后的数据。
 
