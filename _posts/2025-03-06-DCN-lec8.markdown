@@ -834,9 +834,19 @@ PIEO调度程序包括一个有序列表，该列表支持三个基本操作: en
 <figcaption>PIEO Hardware Architecture</figcaption>
 </figure>
 
+<figure style="text-align: center;">
+<img src="/assets/img/l8p37.png" alt="PIEO调度程序硬件架构。优先级编码器将位向量作为输入，并返回包含1的最小索引" width="600">
+<figcaption>PIEO调度程序硬件架构。优先级编码器将位向量作为输入，并返回包含1的最小索引</figcaption>
+</figure>
+
 **四个时钟周期实施**
 
 **入队（f）**:示例进入大小为16的元素的PIEO排序列表（大小为4的8个子列表）
+
+<figure style="text-align: center;">
+<img src="/assets/img/l8p35.png" alt="入队（f）示例" width="600">
+<figcaption>入队（f）示例</figcaption>
+</figure>
 
 - 周期 1：选择目标子列表
 	-	进行 并行比较操作，确定适合 f 插入的子列表：
@@ -875,6 +885,11 @@ PIEO 入队四个周期总结：
   -	周期 4：执行 入队/出队，写回 SRAM，并更新 Ordered-Sublist-Array 的元数据。
 
 **出队(f)** 操作旨在从 Global-Ordered-List 中返回 “排名最低的合格”元素。
+
+<figure style="text-align: center;">
+<img src="/assets/img/l8p36.png" alt="出队（f）示例" width="600">
+<figcaption>出队（f）示例</figcaption>
+</figure>
 
 - 周期 1：选择包含“最小排名的合格”元素的子列表 S
   - 进行 并行比较：检查 curr_time ≥ Ordered-SublistArray[i].smallest_send_time。
