@@ -86,7 +86,6 @@ author: # Add name author (optional)
 
 解封装：封装的逆过程，数据从比特流还原为数据的过程。从底层往高层依次解封装，将一个封装好的数据按OSI参考模型从下到上依次去除相应的头部，每解封装一层，会将该层的协议报头去掉, 最终将数据传递给应用。数据进入TCP/IP协议栈时的解封装过程如下：
 
-![图片alt](/assets/img/decapsulation.png =600x "Decapsulation")
   <figure style="text-align: center;">
     <img src="/assets/img/decapsulation.png" alt="Decapsulation" width="500">
     <figcaption>Decapsulation</figcaption>
