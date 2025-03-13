@@ -75,7 +75,7 @@ author: # Add name author (optional)
 
 **Layer n interfaces only with layer n-1 and layer n+1**
 
-## 5. 报头封装和解封装 Header Encapsulation & Decapsulation
+## 5. 报头封装和解封装 [Header Encapsulation & Decapsulation][capsulation]
 
 封装：将数据变为比特流的过程中，在参考模型的每一层需要添加上特定的协议报头动作: 从高层往低层依次封装, 在每一层使用特定的协议，对数据进行处理，将上层的应用数据按照OSI参考模型从上到下的依次加入相应的头部, 即在数据前添加特定的协议报头。数据进入TCP/IP协议栈时的封装过程如下：
 
@@ -90,8 +90,6 @@ author: # Add name author (optional)
     <img src="/assets/img/decapsulation.png" alt="Decapsulation" width="500">
     <figcaption>Decapsulation</figcaption>
   </figure>
-
-[参考][capsulation]
 
 [capsulation]: https://juejin.cn/post/7087108890319388709
 
