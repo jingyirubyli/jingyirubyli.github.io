@@ -127,7 +127,7 @@ author: # Add name author (optional)
       - 效率较低，但易于实现
 
   <figure style="text-align: center;">
-    <img src="/assets/img/l3p2.png" alt="Go-Back-N" width="600">
+    <img src="/assets/img/l3p2.png" alt="Go-Back-N" width="400">
     <figcaption>Go-Back-N</figcaption>
   </figure>
 
@@ -231,7 +231,10 @@ author: # Add name author (optional)
     - but only for a short duration because of detected congestion
   - Never drop CWND below 1 MSS
 
-![图片alt](/assets/img/l3p3.png "TCP Slow Start + AIMD Behavior")
+<figure style="text-align: center;">
+<img src="/assets/img/l3p3.png" alt="TCP Slow Start + AIMD Behavior" width="600">
+<figcaption>TCP Slow Start + AIMD Behavior</figcaption>
+</figure>
 
 # User Datagram Protocol 用户数据报协议 (UDP)
 - UDP 是一种不可靠的传输协议
