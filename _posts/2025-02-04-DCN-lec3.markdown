@@ -112,6 +112,14 @@ author: # Add name author (optional)
     - 确认最高的连续接收序列号 ACK the highest contiguous received sequence number
 
   累积 ACK/Cumulative ACK
+
+  示例: 假设序号为 5 的数据包丢失，但是其他数据包没有丢失
+
+  <figure style="text-align: center;">
+    <img src="/assets/img/l3p4.png" alt="Cumulative ACK" width="500">
+    <figcaption>Cumulative ACK</figcaption>
+  </figure>
+
   - Conditions to Retransmit?
     - Duplicate ACKs or the timer expires, whichever first
     - but duplicate ACKs only tell a loss might have occurred, not that it has occurred
@@ -144,7 +152,7 @@ author: # Add name author (optional)
 	-	重新发送 2 号数据包后，接收方终于可以按序接收 2、3、4、5，并返回 ACK = 5，允许发送方继续发送 6、7、8 号数据包。
 
   
-2. 如何设置最佳窗口大小 (W)？
+1. 如何设置最佳窗口大小 (W)？
 
   由流量和拥塞控制机制决定 Flow and Congestion Control mechanisms
   - 窗口大小决定发送方发送数据的速率: Send Rate ~ W/RTT bytes per sec
