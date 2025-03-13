@@ -1,0 +1,12 @@
+---
+layout: post
+title:  DCN Lec9-In-Network Computing
+date:   2025-03-11
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: post-9.png # Add image post (optional)
+tags: [Blog, DCN]
+author: # Add name author (optional)
+---
+# 本讲内容
+
+---
