@@ -113,14 +113,14 @@ Key Observation: 不管树规模的大小, 运行时，每个级别仅访问 1 �
 我们要做的只有两步: 识别常见的子树结构, 然后展平子树(表示为布尔真值表)并多路复用. 如图示例:
 
 <figure style="text-align: center;">
-<img src="/assets/img/l9p7.png" alt="展平子树示例" width="300">
+<img src="/assets/img/l9p7.png" alt="展平子树示例" width="600">
 <figcaption>展平子树示例</figcaption>
 </figure>
 
 由于布尔真值表已经以表的形式展示所有可能的结果, 因此该方法已经与任何dependecec无关. 然后我们再加入A:
 
 <figure style="text-align: center;">
-<img src="/assets/img/l9p8.png" alt="多路复用示例" width="300">
+<img src="/assets/img/l9p8.png" alt="多路复用示例" width="600">
 <figcaption>多路复用示例</figcaption>
 </figure>
 
@@ -136,7 +136,7 @@ Key Observation: 不管树规模的大小, 运行时，每个级别仅访问 1 �
 如果问那种数据结构是最好的, 那就是Key-Value Stores. 因为不管你使用哪个服务器, 背后总有Key-Value Stores在运行, 它是大规模云服务的关键构建块. 顾名思义, 它并不储存整个完整的数据结构在服务器中. 为了支持高查询吞吐量和低延迟, 键值存储通常分布在多个存储服务器上.
 
 <figure style="text-align: center;">
-<img src="/assets/img/l9p9.png" alt="Distributed Key-Value Stores" width="300">
+<img src="/assets/img/l9p9.png" alt="Distributed Key-Value Stores" width="500">
 <figcaption>Distributed Key-Value Stores</figcaption>
 </figure>
 
@@ -158,7 +158,7 @@ Key Observation: 不管树规模的大小, 运行时，每个级别仅访问 1 �
 因此面临的挑战主要来自高度倾斜且动态变化的键流行度, 这个特性导致存储服务器之间的负载不平衡, 使得吞吐量低，延迟高.
 
 <figure style="text-align: center;">
-<img src="/assets/img/l9p10.png" alt="Some servers working over time while others off" width="300">
+<img src="/assets/img/l9p10.png" alt="Some servers working over time while others off" width="500">
 <figcaption>Some servers working over time while others off</figcaption>
 </figure>
 
@@ -190,7 +190,7 @@ Key Observation: 不管树规模的大小, 运行时，每个级别仅访问 1 �
 ### Data Plane Query Handling/数据平面查询处理
 
 <figure style="text-align: center;">
-<img src="/assets/img/l9p14.png" alt="数据平面查询处理" width="500">
+<img src="/assets/img/l9p14.png" alt="数据平面查询处理" width="600">
 <figcaption>数据平面查询处理</figcaption>
 </figure>
 
