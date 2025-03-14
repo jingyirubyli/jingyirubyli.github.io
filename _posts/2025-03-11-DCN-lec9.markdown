@@ -9,4 +9,196 @@ author: # Add name author (optional)
 ---
 # 本讲内容
 
+Recap: 可编程交换机(RMT)架构
+
+<figure style="text-align: center;">
+<img src="/assets/img/l9p1.png" alt="Reconfigurable Match Table Architecture" width="600">
+<figcaption>Reconfigurable Match Table Architecture</figcaption>
+</figure>
+
+那么我们可以使用可编程开关做哪些有趣的事情？
+
+## In-Network Computing/网络内计算
+
+传统分布式计算中, 计算仅发生在端系统（服务器或计算节点）; 网络的作用只是传输数据，不参与计算。新的分布式计算范式(In-Network Computing)让网络设备（如交换机、路由器）不仅仅是数据传输的工具，还可以执行特定计算任务。这样可以减少数据在端系统之间的传输，提高计算效率。
+
+In-Network Computing: 网络内部的自定义计算. 
+- 网络内计算背后的两个关键原理：
+  - 网络具有中心视角（central vantage point）: 由于所有数据包都会经过网络设备，因此网络可以直接观察和处理数据，无需等待端系统处理后再返回。
+  - 网络可以以线速（line rate）和超低延迟（ultra-low latency）处理数据, 处理速度很快: 现代可编程网络设备（如 P4 交换机、SmartNICs）可以直接在数据传输过程中执行计算，避免了额外的通信延迟。
+- 有许多应用，我们将讨论其中两个：
+  - Leo：网络内 ML 分类器
+  - NetCache：用于键值存储的网络内缓存
+  
 ---
+
+## Leo: In-Network ML Classifier
+
+网络内机器学习分类器的应用
+- 交换机上的 ML 数据包分类有多种应用
+  - 网络入侵检测和预防
+    - 例如，检测和预防 DDoS 攻击
+  - 服务质量
+    - 例如，根据不同类型的流量进行分类，将数据包分类为实时和后台流量并优先安排实时流量以进行调度，提高网络性能。
+
+### 工作流程
+
+当收到一个包, 要做的第一件事是从包中提取一些特征. 这些特征可以分为两种: packet-level features, 包括一些简单的包头部字段(比如src IP, dst IP), 还有一种是flow-level features, 比如平均包大小等. 当完成特征提取后, 将它们输入到ML分类器(假定ML分类器已经搭建完成), ML分类器会告诉我们是否有issue, 也就是输出. 这就是它的工作流程. 而我们要做的就是讲这个工作流程应用到可编程交换机上, 那怎么做呢?
+
+<figure style="text-align: center;">
+<img src="/assets/img/l9p2.png" alt="Workflow for ML Classification" width="600">
+<figcaption>Workflow for ML Classification</figcaption>
+</figure>
+
+我们将这个流程进一步分为三部分: 第一, 可编程解析器提取包级别特征, 这一步对于可编程交换机来说很简单; 第二, SRAM registers储存并更新流级别特征, 这是可编程交换机的组成部分之一, 它可以保存流状态信息; 最后就是ML分类器. 我们知道在可编程交换机中ALU来进行动作, 但是事实上stateful ALU的数量极其有限, 可能只有3个或4个状态化ALU , 导致功能有限. 再加上这些ALU只能做加法减法位移之类简单的动作, 因此更加受限. 此外我们可以达到的层数是以阶段数为上界的, 这又是一个限制, 或者上讲中说的dependence. 我们的目标就是克服这些限制, 设计高效的计算利用率和多路复用技术: 这就是即将介绍的LEO.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l9p3.png" alt="ML Classification on Programmable Switch" width="600">
+<figcaption>ML Classification on Programmable Switch</figcaption>
+</figure>
+
+此处我们讨论的ML分类器并不同于平常所讲的DNN之类, 而是关注一种非常特殊的ML分类器: **decision tree based ML classifier**, 因为我们的工作是在网络中, 具体原因有以下几点:
+- 比起黑盒一般的DNN类, 更加易于解释, 深受网络运营商喜爱
+- 与 DNN 相比，专精于入侵检测应用的分类准确率极具竞争力
+- 简单的 ALU 操作（如comparison）— 支持可编程交换机
+
+### Naive Mapping/朴素映射
+
+- 决策树与 Match-Action 机制的自然映射
+  - 由于决策树的结构是 逐层做判断（每个节点根据某个特征的阈值分类），它可以被直接映射到 交换机的 Match-Action（匹配-动作）流水线：
+    - 每一层决策树 ≈ 交换机流水线中的一个 Match-Action 阶段
+    - 例如：
+      - A<0 作为第一层规则
+      - B<0、C<0 作为第二层规则
+      - D<0、E<0、F<0、G<0 作为第三层规则
+      - 叶子节点（H, I, J, K, L, M, N, O）对应最终分类结果
+<figure style="text-align: center;">
+<img src="/assets/img/l9p4.png" alt="Decision tree mapping to Match-Action stages" width="600">
+<figcaption>Decision tree mapping to Match-Action stages</figcaption>
+</figure>
+
+  - 当节点数少的时候可以应用, 但是当节点数更多的时候则不然: 不能规模化. 原因如下:
+    - 有状态的 ALU 很少. 同样上图中的决策树, 可能就需要3-4个状态ALU, 如果树的层数加高到5层甚至更高, 就很难胜任.
+    - 更显然, 阶段数量有限: 树的层数受限于stage的数量, 因为ALU的输入来自SRAM register block, 可能在某个阶段不会有那么多的SRAM.
+  - 因此从根本上**限制了决策树的大小**.
+
+**Idea 1: Node Multiplexing/节点复用**
+
+Key Observation: 不管树规模的大小, 运行时，每个级别仅访问 1 个节点, 即每个阶段只访问一个ALU
+- 每个级别仅分配一个节点的资源
+- 运行时，在每个节点上复用特征比较
+
+这样就提高了计算（ALU）效率.
+
+示例: 右边是树的映射, 可见每层只使用一个ALU, 现在我们尝试在ALU之前加入multiplexer.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l9p5.png" alt="Idea (1): Node Multiplexing示例" width="600">
+<figcaption>Idea (1): Node Multiplexing示例</figcaption>
+</figure>
+
+首先看stage 2, 有两个节点B和C, 依赖于stage 1中1和0的比较输出, MUX的select value(在B和C之间选择)是前一个阶段的输出, 据此进行选择, 完成.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l9p6.png" alt="select value是前一阶段的输出" width="600">
+<figcaption>select value是前一阶段的输出</figcaption>
+</figure>
+
+现在我们就会有这样的疑问: 这种方法确实将每个阶段所利用的ALU都减小到1个, 但是同时引入了一个新的multiplexer, MUX也需要消耗资源. 其实MUX使用消耗更少的SRAM而不是ALU, 所以是合理的.
+
+但是以上所述只解决了ALU有限的问题, 而没有解决阶段数有限, 这就是节点复用的局限性: 决策树的深度受交换机阶段数的限制; 具有 D 个 Match-Action 阶段的交换机可以支持深度最多为 D 的决策树. 那么新问题来了, 如何扩展树的深度?
+
+**Idea 2: Subtree Flattening & Multiplexing/子树扁平化与复用**
+
+我们要做的只有两步: 识别常见的子树结构, 然后展平子树(表示为布尔真值表)并多路复用. 如图示例:
+
+<figure style="text-align: center;">
+<img src="/assets/img/l9p7.png" alt="展平子树示例" width="300">
+<figcaption>展平子树示例</figcaption>
+</figure>
+
+由于布尔真值表已经以表的形式展示所有可能的结果, 因此该方法已经与任何dependecec无关. 然后我们再加入A:
+
+<figure style="text-align: center;">
+<img src="/assets/img/l9p8.png" alt="多路复用示例" width="300">
+<figcaption>多路复用示例</figcaption>
+</figure>
+
+这样仅需 3 个阶段即可支持深度 4 的树（1 个阶段用于实现 A<0，另加图中所示的 2 个阶段）
+
+既然我们都可以想到把树展平的方法, 那为什么不干脆把整个树结构展开, 而是只展开一半的子树呢? 因为每个阶段的状态 ALU 数量较少(只有三四个), 而展开整个树所需要的比较器的数量等于节点的数量; 即使有足够的ALU, 所需要计算的表的大小会随着树的大小而呈指数增长. 这就是LEO必须在此取得非常好的平衡: 最优的子树规模大小给出最好的规模化性质. 在实验中证明, 3/5/7规模的子树具有较好的性质.
+
+
+## NetCache: In-Network Key-Value Cache
+
+### Distributed Key-Value Stores/分布式键值存储
+
+如果问那种数据结构是最好的, 那就是Key-Value Stores. 因为不管你使用哪个服务器, 背后总有Key-Value Stores在运行, 它是大规模云服务的关键构建块. 顾名思义, 它并不储存整个完整的数据结构在服务器中. 为了支持高查询吞吐量和低延迟, 键值存储通常分布在多个存储服务器上.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l9p9.png" alt="Distributed Key-Value Stores" width="300">
+<figcaption>Distributed Key-Value Stores</figcaption>
+</figure>
+
+### NetCache的目标
+
+- 存储、检索、管理键值对象
+  - 需要在极低的延迟（microseconds 级别）和高吞吐量（每秒数百万次请求）下高效存储和检索键值对。
+- 目标工作负载
+  - 小对象（Small Objects）
+    - 存储的数据通常是 小型键值对（例如 JSON 片段、用户会话信息、网页片段等）。
+    - 典型对象大小在 几十字节到几 KB 之间。
+  - 读取密集型（Read Intensive）
+    - 主要是读操作远多于写操作，适用于缓存场景（如数据库查询加速）。
+  - 高度倾斜且动态变化的键流行度(Highly skewed and dynamically changing key popularity)
+    - (即并不是每个对象都有相同的popularity)
+    - 少数键值占大部分访问（Zipf 分布）：大多数读取请求集中在一小部分“热点”键上，而大部分键很少被访问。
+    - “热点”键会随时间变化：受用户行为、实时数据、流行趋势等影响。
+
+因此面临的挑战主要来自高度倾斜且动态变化的键流行度, 这个特性导致存储服务器之间的负载不平衡, 使得吞吐量低，延迟高.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l9p10.png" alt="Some servers working over time while others off" width="300">
+<figcaption>Some servers working over time while others off</figcaption>
+</figure>
+
+我们可能会想到就在热点高的分配资源, 但问题是热点值在不断变化. 如何实现存储服务器间均匀的负载均衡？
+
+### Power Cache
+
+快速且小的cache可以确保均匀的负载平衡: 理想情况下, 只需要存储很少的数据, 比如热点数据, 所以大部分负载都集中在cache, 而在空闲的服务器, 负载分布基本是均衡的. 所以问题就变成: 如何保证存储在cache的数据量是足够小的; 确保cache的吞吐量等于聚合存储服务器的吞吐量, 也就是说cache的速度必须非常快.
+
+> Requirement: cache throughput ≥ aggregate storage servers’ throughput
+
+<figure style="text-align: center;">
+<img src="/assets/img/l9p11.png" alt="Power Cache" width="500">
+<figcaption>Power Cache</figcaption>
+</figure>
+
+解决第一个问题的研究结果: 缓存需保存与存储服务器数量（N）相关的 O(N log N) 个项目。确保随着服务器数量增加，缓存容量按 N log N 增长，既能覆盖热门数据，又避免过度冗余。
+<figure style="text-align: center;">
+<img src="/assets/img/l9p12.png" alt="Result from theory" width="500">
+<figcaption>Result from theory</figcaption>
+</figure>
+
+
+<figure style="text-align: center;">
+<img src="/assets/img/l9p13.png" alt="缓存需要提供存储层的聚合吞吐量" width="500">
+<figcaption>缓存需要提供存储层的聚合吞吐量</figcaption>
+</figure>
+
+### Data Plane Query Handling/数据平面查询处理
+
+<figure style="text-align: center;">
+<img src="/assets/img/l9p14.png" alt="数据平面查询处理" width="500">
+<figcaption>数据平面查询处理</figcaption>
+</figure>
+
+### 在 Switch 中实现键值缓存
+
+使用 Match-Action 表和 Register 数组实现 KV-cache
+
+<figure style="text-align: center;">
+<img src="/assets/img/l9p15.png" alt="在 Switch 中实现键值缓存" width="600">
+<figcaption>在 Switch 中实现键值缓存</figcaption>
+</figure>
