@@ -261,10 +261,10 @@ Key Observation: 不管树规模的大小, 运行时，每个级别仅访问 1 �
 
 ### Challenge : Variable Length Values 处理可变长度值
 
-寄存器数组宽度register array width（和条目数 # of entries）在编译时就被定义. 那么如何处理大于寄存器宽度的值？解决方法是分多个阶段将值跨越多个寄存器
+一个问题是各个数值的长度不可能相等, 而寄存器数组宽度register array width（和条目数 # of entries）在编译时就被定义. 那么如何处理大于寄存器宽度的值？解决方法是分多个阶段将值跨越多个寄存器
 
 <figure style="text-align: center;">
-<img src="/assets/img/l9p16.png" alt="The register array width (and # of entries) is defined at compile time" width="200"><img src="/assets/img/l9p17.png" alt="Span the value across multiple registers in multiple stages" width="400">
+<img src="/assets/img/l9p16.png" alt="The register array width (and # of entries) is defined at compile time" width="200"><img src="/assets/img/l9p17.png" alt="Span the value across multiple registers in multiple stages" width="600">
 <figcaption>处理可变长度值 Variable Length Values</figcaption>
 </figure>
 
