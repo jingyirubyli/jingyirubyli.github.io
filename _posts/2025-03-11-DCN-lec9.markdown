@@ -194,11 +194,109 @@ Key Observation: 不管树规模的大小, 运行时，每个级别仅访问 1 �
 <figcaption>数据平面查询处理</figcaption>
 </figure>
 
+读查询 （Cache Hit） 直接从缓存返回数据，速度快。读查询 （Cache Miss） 需要访问存储，并更新缓存，略慢。写查询需要同步到存储，并更新或失效缓存，保证数据一致性。统计信息（Stats） 帮助优化缓存，提高查询效率。
+
+1. 读查询（Read Query）
+
+（1）缓存命中（Cache Hit）
+
+  如果查询的 key 在 交换机（Switch）缓存中：
+  - 读请求（op: read, key） 发送到交换机。
+  - 交换机直接从 缓存（Cache） 读取 value 并返回，无需访问存储，提高查询速度。
+  - 更新统计信息（Stats） 记录该 key 被访问的次数。
+
+（2）缓存未命中（Cache Miss）
+
+  如果查询的 key 不在缓存中：
+  - 读请求（op: read, key） 发送到交换机。
+  - 交换机检测到缓存未命中（MISS），向后端存储（Storage） 发送查询请求。
+  - 存储返回对应的 value。
+  - 交换机更新缓存并返回 value。
+
+2. 写查询（Write Query）
+
+当有写请求时：
+-	写请求（op: write, key, value） 发送到交换机。
+-	交换机将 key, value 写入存储（Storage）。
+-	如果该 key 已存在于缓存，则需要先使缓存失效（Invalidate），或者执行缓存更新（cache_update）。
+
+注: 统计信息（Stats）
+  -	Stats 记录每个 key 的查询次数，用于定期缓存最常查询的 key，优化缓存命中率。
+  - 统计信息可用于缓存替换策略，如 LRU（最近最少使用） 或 LFU（最少频率使用）。
+
+
 ### 在 Switch 中实现键值缓存
 
-使用 Match-Action 表和 Register 数组实现 KV-cache
+使用 Match-Action（匹配-动作） 表和 Register （寄存器）数组实现 实现键值缓存（Key-Value Cache）
 
 <figure style="text-align: center;">
 <img src="/assets/img/l9p15.png" alt="在 Switch 中实现键值缓存" width="600">
 <figcaption>在 Switch 中实现键值缓存</figcaption>
 </figure>
+
+1. 关键组件
+-	Match-Action Table（匹配-动作表）
+   - 用于匹配数据包中的 key，并触发对应的处理逻辑（即 process_array(idx)）。
+   - 这里示例包含两个键：
+     - pkt.key == A → 调用 process_array(0)
+     - pkt.key == B → 调用 process_array(1)
+- Register Array（寄存器数组）
+  - 用于存储键对应的值，例如：
+    -  A 存储在索引 0
+    -  B 存储在索引 1
+
+2. 处理流程
+
+（1）查询（Read 操作）
+-	匹配 pkt.key：
+   - 如果 pkt.key == A，则 process_array(0) 读取 array[0]，即 A。
+   - 如果 pkt.key == B，则 process_array(1) 读取 array[1]，即 B。
+- 返回 pkt.value。
+
+（2）更新（Cache Update 操作）
+- 匹配 pkt.key：
+- pkt.key == A → process_array(0) 将 pkt.value 写入 array[0]。
+- pkt.key == B → process_array(1) 将 pkt.value 写入 array[1]。
+
+### Challenge : Variable Length Values 处理可变长度值
+
+寄存器数组宽度register array width（和条目数 # of entries）在编译时就被定义. 那么如何处理大于寄存器宽度的值？解决方法是分多个阶段将值跨越多个寄存器
+
+<figure style="text-align: center;">
+<img src="/assets/img/l9p16.png" alt="The register array width (and # of entries) is defined at compile time" width="200"><img src="/assets/img/l9p17.png" alt="Span the value across multiple registers in multiple stages" width="200">
+<figcaption>处理可变长度值 Variable Length Values</figcaption>
+</figure>
+
+在多个流水线阶段(pipeline stages)的多个寄存器数组(multiple register arrays)中存储值
+
+<figure style="text-align: center;">
+<img src="/assets/img/l9p18.png" alt="Handling Variable Length Values" width="600">
+<figcaption>Handling Variable Length Values</figcaption>
+</figure>
+
+1. 关键概念
+	-	Bitmap（位图）：
+    -	指示该键的值存储在哪些寄存器数组中。
+    -	bitmap = 111 表示数据分布在 3 个寄存器数组（Register Array 0, 1, 2）。
+	-	Index（索引）：
+    -	指定该键的值在寄存器数组中的插槽（slot）。
+    -	本例中 index = 0，说明 A0、A1、A2 都存储在索引 0 位置。
+
+2. 处理流程
+
+Stage 1（第一阶段）：初始化查询
+-	匹配 pkt.key == A，获取：
+-	bitmap = 111（表示数据存储在多个寄存器数组中）。
+-	index = 0（数据存储在索引 0 位置）。
+
+Stage 2（第二阶段）：从 Register Array 0 读取 A0
+-	检查 bitmap[0] == 1，调用 process_array_0(index)。
+-	读取 Register Array 0 中索引 0 处的 A0。
+
+Stage 3（第三阶段）：从 Register Array 1 读取 A1
+-	检查 bitmap[1] == 1，调用 process_array_1(index)。
+-	读取 Register Array 1 中索引 0 处的 A1。
+
+Stage 4（第四阶段）：从 Register Array 2 读取 A2
+-	检查 bitmap[2] == 1，调用 process_array_2(index)。
+-	读取 Register Array 2 中索引 0 处的 A2。
