@@ -8,6 +8,7 @@ tags: [Blog]
 author: # Add name author (optional)
 ---
 
+- [ ] [对偶梯度算法, 梯度投影算法]
 - [ ] [openflow][openflow]
 - [ ] [Graph Generation_Random Graph_Erdős–Rényi][Erdős–Rényi]
 - [ ] [Partitioning and Community Detection Problem][Partitioning n Community Detection]
