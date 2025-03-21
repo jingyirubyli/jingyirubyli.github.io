@@ -264,7 +264,7 @@ Key Observation: 不管树规模的大小, 运行时，每个级别仅访问 1 �
 一个问题是各个数值的长度不可能相等, 而寄存器数组宽度register array width（和条目数 # of entries）在编译时就被定义. 那么如何处理大于寄存器宽度的值？解决方法是分多个阶段将值跨越多个寄存器
 
 <figure style="text-align: center;">
-<img src="/assets/img/l9p16.png" alt="The register array width (and # of entries) is defined at compile time" width="200"><img src="/assets/img/l9p17.png" alt="Span the value across multiple registers in multiple stages" width="600">
+<img src="/assets/img/l9p16.png" alt="The register array width (and # of entries) is defined at compile time" width="200"><img src="/assets/img/l9p17.png" alt="Span the value across multiple registers in multiple stages" width="420">
 <figcaption>处理可变长度值 Variable Length Values</figcaption>
 </figure>
 
@@ -277,13 +277,13 @@ Key Observation: 不管树规模的大小, 运行时，每个级别仅访问 1 �
 
 1. 关键概念
 	-	Bitmap（位图）：
-    -	指示该键的值存储在哪些寄存器数组中。
-    -	bitmap = 111 表示数据分布在 3 个寄存器数组（Register Array 0, 1, 2）。
+    -	指示该键的值存储在哪些寄存器数组中, 使用 1/0 声明。
+    -	bitmap = 111 表示数据分布在 3 个寄存器数组（Register Array 0, 1, 2）, 每个都为真(1)。
 	-	Index（索引）：
     -	指定该键的值在寄存器数组中的插槽（slot）。
     -	本例中 index = 0，说明 A0、A1、A2 都存储在索引 0 位置。
 
-2. 处理流程
+2. 处理流程(以上面长度占用三个stages的值为例)
 
 Stage 1（第一阶段）：初始化查询
 -	匹配 pkt.key == A，获取：
@@ -306,4 +306,4 @@ Stage 4（第四阶段）：从 Register Array 2 读取 A2
 
 - Stage 2 存储 A0 到 Register Array 0。
 - Stage 3 存储 A1 到 Register Array 1。
-- Stage 4 跳过（因 bittmap[2]=0）。
+- Stage 4 跳过（因 bittmap[2]=0）,也就是该值长度只占用2 stages。
