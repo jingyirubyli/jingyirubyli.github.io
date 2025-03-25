@@ -102,6 +102,13 @@ author: # Add name author (optional)
 <figcaption>bad X server connection</figcaption>
 </figure>
 
+参考下面项目文件夹结构, /build 里面的 calibration(标定程序), mapping(建图程序), fitline(参数拟合器)是运行生成的. /data中需要自己放基准点云、待配准点云; parameters.txt应该是,init_Matrix.txt就是粗配准外参矩阵; H-Lidar-Map-Data是上面提到出现问题的地方, 这里是我自己新建的, 事实上应该自动生成.
+
+<figure style="text-align: center;">
+<img src="/assets/img/lidar_folder.png" alt="文件夹" width="600">
+<figcaption>文件夹</figcaption>
+</figure>
+
 下面是官方的运行结果:
 <figure style="text-align: center;">
 <img src="/assets/img/livox_cali.png" alt="样例数据的自动标定结果输出" width="600">
