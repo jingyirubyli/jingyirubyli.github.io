@@ -84,7 +84,6 @@ author: # Add name author (optional)
 
   注: 我运行到这里报错, 因为没有生成 H_LiDAR_Map data.pcd 文件, 暂时未知原因.(2025-03-01)
 
-  因为报错原因是没有 H_LiDAR_Map data.pcd, 
 <figure style="text-align: center;">
 <img src="/assets/img/lidar-error1.png" alt="Couldn't read H_LiDAR_Map" width="600">
 <figcaption>Couldn't read H_LiDAR_Map</figcaption>
@@ -96,11 +95,17 @@ author: # Add name author (optional)
 </figure>
 
 除了没有生成 H_LiDAR_Map data.pcd, 新生成一个 T_Matrix.txt, 我理解如果成功配准, 这个就是最终的转移矩阵. 因为目前没有成功配准, 所以里面是空的. 我又自己新建了一个 H_LiDAR_Map 文件夹, 放了一个pcd文件, 测试下这样能不能跑通, 毕竟理论上有pcd就行. 再次运行后报错是 X Server没有配置. 因为我之前自己配ros的时候也出现过类似问题, ros测试的turtle窗口出不来, 查了下发现应该是MAC系统的关系, 于是在另一个容器里配置了一个 X Quarter, 就能成功显示了. 不知道这里是否是相同的问题. (2025-03-10)
+
 <figure style="text-align: center;">
 <img src="/assets/img/lidar-error2.png" alt="bad X server connection" width="600">
 <figcaption>bad X server connection</figcaption>
 </figure>
 
+下面是官方的运行结果:
+<figure style="text-align: center;">
+<img src="/assets/img/livox_cali.png" alt="样例数据的自动标定结果输出" width="600">
+<figcaption>样例数据的自动标定结果输出</figcaption>
+</figure>
 ### 一些注意点
   - 必须保证双雷达数据同步
   - 基准雷达建图必须尽可能准确
