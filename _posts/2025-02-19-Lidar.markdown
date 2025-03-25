@@ -18,7 +18,10 @@ author: # Add name author (optional)
 
 首先用Livox Viewer采集一帧较长积分时间的A点云数据，然后观察各个激光雷达在其FOV里所形成的A点云，微调Livox Views标定工具里的滚轮控件（调节6个变量[x,y,z,roll,pitch,yaw]），使得各FOV里A点云能完美重叠在一起为佳，此时得到的参数即为所需外参。按此方法标定的精度误差可小于0.1度。
 
-![图片alt](/assets/img/lidar1.png "手动外参标定")
+<figure style="text-align: center;">
+<img src="/assets/img/lidar1.png" alt="手动外参标定" width="300">
+<figcaption>手动外参标定</figcaption>
+</figure>
 
 不难看出，此方法依赖于多雷达的共视区域，精度和效率与使用者的熟练度正相关，存在一定的局限性。
 
@@ -30,15 +33,15 @@ author: # Add name author (optional)
 
 [TFAC-Livox]: https://github.com/Livox-SDK/Livox_automatic_calibration
 
-1. 适用硬件
+### 适用硬件
 - 根据官方文档, 适用于Mid，Horizon系列激光雷达。
 
-2. 编译准备
+### 编译
 - 依赖库: Cmake, PCL1.7, Eigen. 建议直接安装ROS，包含了以上的库
-    
    ```
    sudo apt-get install ros-kinetic-cv-bridge ros-kinetic-tf ros-kinetic-message-filters ros-kinetic-image-transport
    ```
+
 - 编译
    ```
    mkdir build
@@ -46,24 +49,23 @@ author: # Add name author (optional)
    cmake ..
    make
    ```
+
 编译完成后，在build目录下会生成生成三个文件，分别是mapping, calibration, fitline
   - mapping: 可视化建图工具　
   - calibration:  可视化自动标定工具
   - fitline: 拟合标定参数，计算最终参数矩阵
 
-3. 运行准备
+### 运行
    - 数据准备: 准备双雷达标定pcd数据:
       - 基准雷达数据放在 'data/Base_LiDAR_Frames/.pcd' (以 100000.pcd 作为第一帧文件名，后续帧往上累加)
       - 待标定雷达数据放在 'data/Target_LiDAR_Frames/.pcd' (以 100000.pcd 作为第一帧文件名，后续帧往上累加)
       - 粗配准外参矩阵放在 'data/Init_Matrix.txt'
 
-    注意：基准雷达数据和待标定雷达数据需要尽可能在时间上同步，文件名和时间戳为同步对应。(这句是官方文档说法, 但是根据我的理解应该是需要先做[时间同步][Time Synchronization].)
+   注意：基准雷达数据和待标定雷达数据需要尽可能在时间上同步，文件名和时间戳为同步对应。(这句是官方文档说法, 但是根据我的理解应该是需要先做[时间同步][Time Synchronization], 链接是官方的一套非常完整的步骤.)
 
-    示例数据下载: 
-
-    [待标定][target]
-
-    [基准][base]
+   示例数据下载: 
+   [待标定][target]
+   [基准][base]
 
 [Time Synchronization]: https://livox-wiki-cn.readthedocs.io/zh-cn/latest/tutorials/other_product/timestamp_sychronization.html
 [target]: https://terra-1-g.djicdn.com/65c028cd298f4669a7f0e40e50ba1131/Showcase/Target-LiDAR-Frames.tar.gz
@@ -78,21 +80,23 @@ author: # Add name author (optional)
     sh run.sh
     ```
 
-    脚本首先启动可视化建图程序mapping，用基准雷达建立子地图，自动生成待匹配地图数据H-LiDAR-Map-data.pcd文件。建立完成后启动标定程序calibration，完成标定参数估计工作，最后启动 参数拟合器fitline，完成最终参数矩阵计算。
+   脚本首先启动可视化建图程序mapping，用基准雷达建立子地图，自动生成待匹配地图数据H-LiDAR-Map-data.pcd文件。建立完成后启动标定程序calibration，完成标定参数估计工作，最后启动参数拟合器fitline，完成最终参数矩阵计算。
+
+  注: 我运行到这里报错, 因为没有生成H_LiDAR_Map data.pcd 文件, 暂时未知原因.(2025-03-01)
+<figure style="text-align: center;">
+<img src="/assets/img/lidar-error1.png" alt="Couldn't read H_LiDAR_Map" width="600">
+<figcaption>Couldn't read H_LiDAR_Map</figcaption>
+</figure>
 
 
-  注: 我运行到这里报错,因为没有生成H_LiDAR_Map data.pcd 文件, 暂时未知原因.(2025-03-01)
-
- ![图片alt](/assets/img/lidar-error1.png "Couldn't read H_LiDAR_Map")
-
-4. 一些注意点
+### 一些注意点
     - 必须保证双雷达数据同步
     - 基准雷达建图必须尽可能准确
     - 采集车、平台运动必须尽可能缓慢，数据建议进行运动畸变修正以保证最终的精度
     - 粗配准外参数矩阵不必要很精准，但需要大致能够对齐，尽可能保证最终的精度。
     - 对于Mid-40, Horizon型号，转换的PCD文件参照100ms为一帧。
 
-5. 采集自己的标定数据
+### 采集自己的标定数据
    - 在移动采集数据期间，需要保证基准雷达LiDAR0在移动的时间段t内扫描的区域（重建的地图）能够被其余雷达所探测，需要保证最小的探测盲区。建议采用原地旋转或者”0”字形轨迹运动进行完全的场景扫描。
 
    - 采集数据的环境，尽量选用宽敞的室内或者地下车库，能够保证有较好的地图重建精度，地图完整度与特征丰富度（需注意Livox的探测盲区问题）。避免选用室外空旷，无明显几何结构特征且移动目标（车辆行人）较多的场景。采集数据时候避免四周有移动物体（注意切勿有人在围观或者跟随运动）。否则容易导致建图失败或者建图误差过大，影响后续的配准标定。
@@ -105,7 +109,7 @@ author: # Add name author (optional)
 
    - 采集格式无要求，可以是rosbag或者lvx，只需要能够按每帧100ms转换为多帧pcd文件即可。
 
-6. 总结: 自动标定过程
+## 总结: 自动标定过程
 
    - 找到合适的场地，确定标定的路线，软硬件的准备。因为我们需要提供一个外参的初值（重要！），有两种方式，第一是直接把外参初值写在雷达中然后采数据，这样获得的点云数据直接是带有外参初值的，程序中使用的初值提供单位矩阵即可；第二是把雷达中的外参清空后采数据，这样点云数据是雷达自身坐标系下的，然后在程序中对应的地方提供初值外参矩阵即可，这里外参初值获取可以用机械设计参考值或者手工测量值。
 
@@ -115,6 +119,6 @@ author: # Add name author (optional)
 
    - 编译，运行代码，输出最终标定结果。
   
-7. 标定结果验证
+2. 标定结果验证
    - 方法一: 两雷达存在重叠区域（overlap）情况，可以在标定结束，参数写入后，用livox viewer观察overlap区域是否存在错层，如果错层较大，说明标定结果错误，建议修改外参初值，确认地图建立的精度以后，重新进行标定和验证。
    - 方法二: 两雷达无overlap情况，将target雷达的点云使用标定结果外参旋转后，融合到base雷达点云（merge操作）。将融合后的点云存为pcd，运行mapping节点进行建图，观察建图结果。如果建图结果存在错层，说明标定结果错误，建议修改外参初值，确认地图建立的精度以后，重新进行标定和验证。
