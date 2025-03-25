@@ -99,7 +99,7 @@ author: # Add name author (optional)
 <figcaption>Couldn't read H_LiDAR_Map</figcaption>
 </figure>
 
-除了没有生成 H_LiDAR_Map data.pcd, 新生成一个 T_Matrix.txt, 我理解如果成功配准, 这个就是最终的转移矩阵. 因为目前没有成功配准, 所以里面是空的. 我又自己新建了一个 H_LiDAR_Map 文件夹, 放了一个pcd文件, 测试下这样能不能跑通, 毕竟理论上有pcd就行. 再次运行后报错是 X Server没有配置. 因为我之前自己配ros的时候也出现过类似问题, ros测试的turtle窗口出不来, 查了下发现应该是MAC系统的关系, 于是在另一个容器里配置了一个 X Quarter, 就能成功显示了. 不知道这里是否是相同的问题. (2025-03-10)
+除了没有生成 H_LiDAR_Map data.pcd, 新生成一个 T_Matrix.txt, 我理解如果成功配准, 这个就是最终的转移矩阵. 因为目前没有成功配准, 所以里面是空的. 我又自己新建了一个 H_LiDAR_Map 文件夹, 放了一个pcd文件, 测试下这样能不能跑通, 毕竟理论上有pcd就行. 再次运行后报错是 X Server没有配置. 因为我之前自己配ros的时候也出现过类似问题, ros测试的turtle窗口出不来, 查了下发现应该是MAC系统的关系, 于是在另一个容器里配置了一个 XQuartz, 就能成功显示了. 不知道这里是否是相同的问题. (2025-03-10)
 
 <figure style="text-align: center;">
 <img src="/assets/img/lidar_error2.png" alt="bad X server connection" width="600">
@@ -113,13 +113,19 @@ author: # Add name author (optional)
 <figcaption>文件夹</figcaption>
 </figure>
 
+为了测试是不是XQuartz的问题, 在该容器中配置XQuartz. 这个容器开了5个端口映射, 一一试过都不对, 直接连接主机地址同样不行. 考虑到应该跟容器关系不大, 所以很大可能是我的系统问题. (2025-03-23)
+
+<figure style="text-align: center;">
+<img src="/assets/img/lidar_port.png" alt="在本容器中配置x server, 报错" width="600">
+<figcaption>在本容器中配置x server, 报错</figcaption>
+</figure>
+
 下面是官方的运行结果:
 <figure style="text-align: center;">
 <img src="/assets/img/livox_cali.png" alt="样例数据的自动标定结果输出" width="600">
 <figcaption>样例数据的自动标定结果输出</figcaption>
 </figure>
 
-考虑到应该跟容器关系不大, 所以很大可能是我的系统问题.
 
 ### 一些注意点
   - 必须保证双雷达数据同步
