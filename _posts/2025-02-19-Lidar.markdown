@@ -9,8 +9,11 @@ author: # Add name author (optional)
 ---
 
 [全文参考][Livox-cali]
+[官方Github][github]
 
 [Livox-cali]: https://github.com/Livox-SDK/Livox_automatic_calibration/blob/master/doc/readme-CN.md
+[github]: https://www.livoxtech.com/cn/showcase/8
+
 
 无人驾驶中感知模块负责获取和理解其周围的场景信息，其性能和可靠性是整个无人驾驶系统的关键环节之一，直接影响下游的定位、路线规划和决策等控制链。通过融合多种感知传感器的数据，提高系统在复杂场景下的感知能力是无人驾驶发展的主要方向。然而无论是摄像头、毫米波雷达还是激光雷达，都有自己的坐标系，即传感器产生的数据都是基于自身坐标系的。将各传感器转换到统一坐标系的过程便是传感器的外参标定。
 
