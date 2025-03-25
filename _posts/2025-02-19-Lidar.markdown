@@ -118,6 +118,8 @@ author: # Add name author (optional)
 
 为了测试是不是XQuartz的问题, 在该容器中配置XQuartz. 这个容器开了5个端口映射, 一一试过都不对, 直接连接主机地址同样不行. 考虑到应该跟容器关系不大, 所以很大可能是我的系统问题. (2025-03-23)
 
+也有可能是ros版本问题, 之前我用的是noetic, 这里是kinetic, 也是服了.
+
 <figure style="text-align: center;">
 <img src="/assets/img/lidar_port.png" alt="在本容器中配置x server, 报错" width="600">
 <figcaption>在本容器中配置x server, 报错</figcaption>
