@@ -1,0 +1,128 @@
+---
+layout: post
+title:  DCN Lec9-Multi-tenancy in the Cloud
+date:   2025-03-25
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: post-10.png # Add image post (optional)
+tags: [Blog, DCN]
+author: # Add name author (optional)
+---
+# 本讲内容
+
+
+---
+
+## 云计算的发展脉络
+
+### 前云时代（Pre-Cloud）
+
+在云出现之前, 每个服务需要其专用基础设施, 即自有的独立部署专用硬件; 它的性能可预测（延迟、吞吐量等）,但是基础设施部署成本高昂, 资源利用率低（因无法共享）.
+
+
+### 云环境下的性能不可预测性
+
+云计算时代的到来使得其核心承诺成为降低成本, 即通过资源共享减少租户（tenant）的支出. 该资源共享模式指: 多个租户共享同一物理硬件; 每个租户通过虚拟机（VMs）运行服务. 但是带来的新挑战是性能不可预测性: 租户A的性能受其他租户资源使用情况的影响; 共享导致资源竞争（如CPU、存储、网络带宽）.
+
+基于图表数据（Memcached 服务响应延迟）的关键观察：
+- 延迟波动范围大: 
+  - 极端差异：从 0 毫秒（理想情况）到 250 毫秒（高延迟）
+  - 尾部延迟（90th percentile）显著高于均值与中位数，表明服务可能频繁遭遇突发性高延迟。
+- 延迟波动的时间相关性
+  - 峰值延迟出现在 周三 4/3 下午 6 点至周四 4/4 凌晨（可能对应业务高峰期）。
+  - 低延迟集中在 周四 4/4 早晨 6 点后（可能为低负载时段）。
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p1.png" alt="Memcached service response latencies" width="600">
+<figcaption>Memcached service response latencies</figcaption>
+</figure>
+
+导致云计算环境中性能不可预测性的根源有以下几点: 
+- 网络共享（Network Sharing）
+  - 问题本质：所有租户共享同一数据中心网络（交换机、链路）。
+  - 具体表现：
+    - 链路拥塞：多个租户同时发送数据时，物理链路带宽被争抢，导致延迟增加。
+    - 交换机过载：共享交换机的队列缓冲区被占满时，数据包被丢弃或重传（如TCP重传），影响吞吐量。
+    - 例：租户A的突发流量可能挤占租户B的网络带宽，导致B的服务延迟飙升。
+- CPU 共享（CPU Sharing）
+  - 问题本质：物理CPU核心被多个虚拟机（VMs）分时复用。
+  - 具体表现：
+    - 时间片争抢：若某租户的VM长时间占用CPU（如计算密集型任务），其他VM的请求处理会被延迟。
+    - 超线程干扰：共享同一物理核心的超线程可能因缓存争用降低效率。
+    - 例：租户A运行大数据分析任务时，租户B的Web服务响应时间显著延长。
+- 内存共享（Memory Sharing）
+  - 问题本质：物理机有一个“虚拟”交换机，用于在机器和网络上运行的虚拟机之间转发数据包. 因此，来自不同租户的虚拟机在虚拟交换机内竞争 CPU 周期和数据包缓冲内存。
+  - 具体表现：
+    - 内存带宽争用：高内存占用的租户（如内存数据库）会降低其他VM的内存访问速度。
+    - 缓存污染：不同VM的缓存数据竞争同一CPU缓存空间，增加缓存未命中率。
+    - 例：租户A频繁读写内存时，租户B的应用程序因内存延迟增加而变慢。
+
+以下部分介绍针对这些原因的解决方法.
+
+---
+## EyeQ Design: 云环境下的带宽可预测性解决方案
+
+### EyeQ 机制
+
+EyeQ 核心目标：在共享基础设施中，为多租户提供可预测的带宽保障，缓解性能不可预测性问题, 即使各租户的网络基础设施是共享的. 假设我是一个租户, 如果我想在某数据中心运行我的VMs, 通常需要签订一个协议:
+
+基于SLO的带宽保证: 租户与云服务商签订服务等级目标 Service Level
+Objective（SLO），明确约定每个VM的最低带宽保障, 就像签合同. 然后服务商的工作就是确保我们达成的协议带宽是永远真. SLO 指定（除其他事项外）每个租户虚拟机的最低带宽保证.
+
+带宽仅仅是一个例子, SLO还可以指定其他如 latency 等等. 我们所讨论的 EyeQ 只关注带宽.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p2.png" alt="Physically tenant VMs share same infrastructure" width="300">
+<figcaption>Physically tenant VMs share same infrastructure</figcaption>
+</figure>
+
+某个租户的所有虚拟机都使用单个专用交换机连接，每个交换机的链路带宽不小于 SLO 中指定的最低带宽保证. 
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p3.png" alt="Abstraction provided by EyeQ
+to each tenant" width="400">
+<figcaption>Abstraction provided by EyeQ to each tenant</figcaption>
+</figure>
+
+我们可以看到上图中蓝色和绿色分别代表连接于不同交换机的若干虚拟机, 那么问题来了: EyeQ 的抽象在实践中是如何实现的？
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p4.png" alt="物理共享，逻辑隔离" width="600">
+<figcaption>物理共享，逻辑隔离</figcaption>
+</figure>
+
+如上图, 左边是真实的网络结构, 右边是处理逻辑抽象.
+
+### EyeQ 见解
+
+在带宽共享中使用传统TCP方法或许可以解决: TCP 旨在在流之间共享网络带宽. 但是事实上可行性不好:
+- 云提供商不能强制租户虚拟机运行 TCP
+  - 每个租户都可以在其虚拟机内运行自己选择的 CC
+- 此外，TCP 以每流(per-flow)而不是每租户/虚拟机(per-tenant/VM)粒度运行
+  - 例如，拥有更多流的租户将获得更多带宽份额
+- 此外，TCP 在流之间公平共享带宽
+  - 例如，带宽为 B 的瓶颈链路上的 N 个流每个都获得 B/N 吞吐量
+  - TCP 并不能为流提供指定的最小带宽保证
+
+EyeQ 的见解：带宽争用发生在哪里？因为发生带宽争用的地方就是我们需要关注的地方, 如果某处带宽足够, 就不会出现争用, 可以为所有人提供所要求的最小带宽. 如下图, 争用可能发生在 leaf switch ,也可能是在 spine switch, 如果有 core 的话还可能是在 core switch, 以此类推, 争用可能发生在任何地方.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p5.png" alt="Windows Azure 上的拥塞研究" width="600">
+<figcaption>Windows Azure 上的拥塞研究</figcaption>
+</figure>
+
+根据相关研究, 带宽争用通常发生在 Edge (link between ToR and host) . 这是一个非常关键的点, 在此基础上研究解决方法. 所以只考虑边缘处的协议拓扑使问题变得简单: 分散式、端到端带宽分配; 网络核心无需了解租户.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p6.png" alt="带宽争用通常发生在 edge" width="600">
+<figcaption>带宽争用通常发生在 edge</figcaption>
+</figure>
+
+### EyeQ 架构
+
+下图是抽象后的 EyeQ 架构(因为它不关心物理结构如何).
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p7.png" alt="EyeQ’s Architecture" width="600">
+<figcaption>EyeQ’s Architecture</figcaption>
+</figure>
+
