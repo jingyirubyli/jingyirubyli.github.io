@@ -126,3 +126,38 @@ EyeQ 的见解：带宽争用发生在哪里？因为发生带宽争用的地方
 <figcaption>EyeQ’s Architecture</figcaption>
 </figure>
 
+**At Destination**
+
+- 速率反馈计算器(Rate Feedback Calculator)
+  - 计算目标主机托管的每个租户 *i* 的理想接收速率 *R<sub>i</sub>*
+  - 向租户 *i* 的 *N* 个发送方主机中的每一个发送 *R<sub>i</sub>/N* 的反馈
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p8.png" alt="Calculating Rate Feedback" width="200">
+<figcaption></figcaption>
+</figure>
+
+*C*: 目标主机的链路容量
+
+*B<sub>i</sub>*: 租户i的最小带宽保证
+
+*n*: 目标主机上租户i的虚拟机数量
+
+*A*: 目标主机上的活动虚拟机集
+
+- 速率计(Rate Meter): 
+  - 每个目标主机都会跟踪其托管的每个租户每秒接收的字节数
+  - 为什么需要目标主机速率计（每个租户）？
+    - 上述等式假设每个发送方都可以以速率 *R<sub>i</sub>/N* 发送, 但实际上，由于发送方的其他瓶颈，某些发送方可能无法以该速率发送
+    - 速率计*y<sub>i</sub>*跟踪每个租户i的接收速率
+      - 如果*y<sub>i</sub>* < *R<sub>i</sub>/N*，EyeQ 会迭代增加*R<sub>i</sub>/N*，以允许非瓶颈发送方利用备用带宽
+      - 如果*y<sub>i</sub>* > *R<sub>i</sub>/N*，EyeQ 使用上述等式发送反馈*R<sub>i</sub>/N*
+
+**At Sender**
+
+- 速率限制器(Rate Limiters)
+  - 每个发送方都为每个 <tenant, dest> 对维护一个速率限制器
+  - 在从目标主机*d*接收到对租户i的速率反馈*r<sub>i</sub>*时，它会对i → d ri 的数据包进行速率限制
+- 循环调度程序(Round Robin Scheduler)
+  - 它以循环方式调度来自不同速率限制器的数据包
+  - 确保没有租户处于饥饿状态
