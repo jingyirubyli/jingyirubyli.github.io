@@ -141,7 +141,7 @@ EyeQ 的见解：带宽争用发生在哪里？因为发生带宽争用的地方
 
 *B<sub>i</sub>*: 租户i的最小带宽保证
 
-*n*: 目标主机上租户i的虚拟机数量
+*n*: 目标主机上租户 i 的虚拟机数量
 
 *A*: 目标主机上的活动虚拟机集
 
@@ -149,15 +149,124 @@ EyeQ 的见解：带宽争用发生在哪里？因为发生带宽争用的地方
   - 每个目标主机都会跟踪其托管的每个租户每秒接收的字节数
   - 为什么需要目标主机速率计（每个租户）？
     - 上述等式假设每个发送方都可以以速率 *R<sub>i</sub>/N* 发送, 但实际上，由于发送方的其他瓶颈，某些发送方可能无法以该速率发送
-    - 速率计*y<sub>i</sub>*跟踪每个租户i的接收速率
-      - 如果*y<sub>i</sub>* < *R<sub>i</sub>/N*，EyeQ 会迭代增加*R<sub>i</sub>/N*，以允许非瓶颈发送方利用备用带宽
-      - 如果*y<sub>i</sub>* > *R<sub>i</sub>/N*，EyeQ 使用上述等式发送反馈*R<sub>i</sub>/N*
+    - 速率计 *y<sub>i</sub>* 跟踪每个租户i的接收速率
+      - 如果 *y<sub>i</sub>* < *R<sub>i</sub>/N*，EyeQ 会迭代增加 *R<sub>i</sub>/N*，以允许非瓶颈发送方利用备用带宽
+      - 如果 *y<sub>i</sub>* > *R<sub>i</sub>/N*，EyeQ 使用上述等式发送反馈 *R<sub>i</sub>/N*
 
 **At Sender**
 
 - 速率限制器(Rate Limiters)
-  - 每个发送方都为每个 <tenant, dest> 对维护一个速率限制器
-  - 在从目标主机*d*接收到对租户i的速率反馈*r<sub>i</sub>*时，它会对i → d ri 的数据包进行速率限制
-- 循环调度程序(Round Robin Scheduler)
-  - 它以循环方式调度来自不同速率限制器的数据包
+  - 每个发送方都为每个 <tenant, dest> 对维护一个速率限制器, 控制每个租户（tenant）和目标（destination）的速率。
+  - 在从目标主机 *d* 接收到对租户i的速率反馈 *r<sub>i</sub>* 时，它会对i → d 的数据包的速率限制到 *r<sub>i</sub>*
+- 轮询调度器(Round Robin Scheduler)
+  - 它以循环方式调度来自不同速率限制器的数据包, 负责公平地分配带宽给不同的流量流。
   - 确保没有租户处于饥饿状态
+
+**EyeQ Shim Layer**：
+-	位于发送端和接收端之间，负责管理流量速率调整。
+-	网络反馈机制 (Rate Feedback) 使接收端能够向发送端提供速率调整信息，形成闭环控制。
+
+### EyeQ 流程示例
+
+考虑下面三个流的结构:
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p9.png" alt="初始状态" width="600">
+<figcaption>初始状态</figcaption>
+</figure>
+
+首先计算 *R<sub>i</sub>*, 不考虑不在线的红色VMs, 只需要计算蓝色: 流容量为 10 Gbps, 最小限制为 2 Gbps, 也就是说可以保证最小限制, 也可以比 2 Gbps 多, C = 10 Gbps, B<sub>i</sub> = 2 Gbps; 共有两台发送方主机, n = 2; 根据公式计算得 R<sub>i</sub> = 10. 向两个发送方主机发送feedback, 每台的feedback分别为 5 Gbps.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p10.png" alt="计算feedback" width="600">
+<figcaption>计算feedback</figcaption>
+</figure>
+
+由计算结果知这两条蓝色流都可以以 5 Gbps 的速率发送, 但是事实不是如此. 上方的蓝色流可以以 5 Gbps 的速率发送, 而下方的蓝色流的发送速率仍然是 2 Gbps. 原因是有一个红色VMs与它共享流容量, 该红色流占用了 8 Gbps, 导致蓝色流只剩下 2 Gbps 可用.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p11.png" alt="瓶颈影响" width="600">
+<figcaption>瓶颈影响</figcaption>
+</figure>
+
+蓝色的目标主机只收到 7 Gbps, 小于 R<sub>blue</sub>, 因此 EyeQ 对 R<sub>blue</sub> 迭代增加. 可能是通过发送一个新的feedback使得上方的蓝色流容量增加到 6 Gbps, 同时下方蓝色流保持 2 Gbps(因为瓶颈仍然存在), 总和为 8 Gbps.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p12.png" alt="迭代增加" width="600">
+<figcaption>迭代增加</figcaption>
+</figure>
+
+通过迭代增加, 上方蓝色流容量增大到 8 Gbps, 实现稳态速率收敛.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p13.png" alt="速率收敛" width="600">
+<figcaption>速率收敛</figcaption>
+</figure>
+
+现在加入一条新红色流, 重新计算 R<sub>blue</sub>: B<sub>i</sub> 之和已经增大为 10 Gbps, 其他参数不变, 因此 R<sub>i</sub> = 2.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p14.png" alt="加入新流" width="600">
+<figcaption>加入新流</figcaption>
+</figure>
+
+此时向每个发送机发送的feedback为 1 Gbps.
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p15.png" alt="发送feedback" width="600">
+<figcaption>发送feedback</figcaption>
+</figure>
+
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p16.png" alt="速率收敛" width="600">
+<figcaption>速率收敛</figcaption>
+</figure>
+
+## PicNIC: 解决 CPU 共享和内存共享引发的问题
+
+上个部分中展示的 EyeQ 架构只是简单的抽象, 事实上VMs发送的包应该通过虚拟交换机, 完整的结构如下:
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p17.png" alt="Virtual Switch (vSwitch)" width="600">
+<figcaption>Virtual Switch (vSwitch)</figcaption>
+</figure>
+
+### 虚拟交换机与网络交换机
+
+- 网络交换机将主机连接到其他主机或交换机
+- 虚拟交换机将主机中运行的虚拟机连接到其他虚拟机、主机或交换机
+- 虚拟交换机的功能类似于网络交换机:
+  - 即，它处理数据包头并在虚拟机和网络之间转发数据包
+  - 有自己​​的转发表，就像网络交换机一样
+  - 不同之处在于，虚拟交换机是在主机内部实现的: 在主机操作系统（虚拟机管理程序）或 NIC 中
+
+### vSwitch Architecture
+
+虚拟交换机的结构如图,
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p19.png" alt="vSwitch 共享 CPU" width="600">
+<figcaption>vSwitch 共享 CPU</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p18.png" alt="vSwitch 共享队列" width="600">
+<figcaption>vSwitch 共享队列</figcaption>
+</figure>
+
+性能隔离可能会在 vSwitch 内部中断！
+
+### PicNIC 背后的关键理念
+- 根据租户的 SLO 比例在租户之间共享服务器资源
+- SLO 为每个租户指定带宽和延迟保证
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p20.png" alt="PicNIC Design Idea (1)" width="600">
+<figcaption>PicNIC Design Idea (1)</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+<img src="/assets/img/l10p21.png" alt="PicNIC Design Idea (2)" width="600">
+<figcaption>PicNIC Design Idea (2)</figcaption>
+</figure>
