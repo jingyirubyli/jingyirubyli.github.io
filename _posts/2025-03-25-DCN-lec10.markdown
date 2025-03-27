@@ -257,7 +257,7 @@ EyeQ 的见解：带宽争用发生在哪里？因为发生带宽争用的地方
 <figcaption>vSwitch 共享队列</figcaption>
 </figure>
 
-性能隔离可能会在 vSwitch 内部中断！
+> 性能隔离可能会在 vSwitch 内部中断！
 
 ### PicNIC 背后的关键理念
 - 根据租户的 SLO 比例在租户之间共享服务器资源
