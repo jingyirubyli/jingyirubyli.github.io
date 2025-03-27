@@ -37,4 +37,6 @@ author: # Add name author (optional)
 
 特征（feature）：指的是样本中输入部分，比如2个单特征的样本 (x<sup>(0)</sup>, y<sup>(0)</sup>), (x<sup>(1)</sup>, y<sup>(1)</sup>),则第一个样本特征为 x<sup>(0)</sup>, 第一个样本输出为 y<sup>(0)</sup>.
 
-假设函数（hypothesis function）：在监督学习中，为了拟合输入样本，而使用的假设函数，记为 h<sub>θ</sup>(x). 比如对于单个特征的m个样本,可以采用拟合函数如下：h<sub>θ</sup>(x) = θ<sub>0</sup> + θ<sub>1</sup>x.
+假设函数（hypothesis function）：在监督学习中，为了拟合输入样本，而使用的假设函数，记为 h<sub>θ</sub>(x). 比如对于单个特征的m个样本 (x<sup>(i)</sup>, y<sup>(i)</sup>), (i=1,2,...m), 可以采用拟合函数如下：h<sub>θ</sub>(x) = θ<sub>0</sub> + θ<sub>1</sub>x.
+
+损失函数（loss function）：为了评估模型拟合的好坏，通常用损失函数来度量拟合的程度。损失函数极小化，意味着拟合程度最好，对应的模型参数即为最优参数。在线性回归中，损失函数通常为样本输出和假设函数的差取平方。比如对于m个样本 (x<sup>(i)</sup>, y<sup>(i)</sup>), (i=1,2,...m),, 采用线性回归，损失函数为：
