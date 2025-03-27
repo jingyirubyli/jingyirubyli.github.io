@@ -22,7 +22,7 @@ author: # Add name author (optional)
 
 <figure style="text-align: center;">
 <img src="/assets/img/cvx1.png" alt="梯度公式" width="300">
-<figcaption>梯度公式</figcaption>
+<figcaption></figcaption>
 </figure>
 
 ## 梯度下降与机器学习
