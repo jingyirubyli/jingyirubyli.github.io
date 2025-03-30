@@ -40,3 +40,65 @@ author: # Add name author (optional)
 假设函数（hypothesis function）：在监督学习中，为了拟合输入样本，而使用的假设函数，记为 h<sub>θ</sub>(x). 比如对于单个特征的m个样本 (x<sup>(i)</sup>, y<sup>(i)</sup>), (i=1,2,...m), 可以采用拟合函数如下：h<sub>θ</sub>(x) = θ<sub>0</sub> + θ<sub>1</sub>x.
 
 损失函数（loss function）：为了评估模型拟合的好坏，通常用损失函数来度量拟合的程度。损失函数极小化，意味着拟合程度最好，对应的模型参数即为最优参数。在线性回归中，损失函数通常为样本输出和假设函数的差取平方。比如对于m个样本 (x<sup>(i)</sup>, y<sup>(i)</sup>), (i=1,2,...m),, 采用线性回归，损失函数为：
+
+## 梯度下降的表示
+
+梯度下降法的算法可以有代数法和矩阵法（也称向量法）两种表示，如果对矩阵分析不熟悉，则代数法更加容易理解。不过矩阵法更加的简洁，且由于使用了矩阵，实现逻辑更加的一目了然。这里先介绍代数法，后介绍矩阵法。
+
+### 代数方式
+
+**先决条件**: 确认优化模型的假设函数和损失函数。
+
+比如对于线性回归，假设函数表示为 
+
+<figure style="text-align: center;">
+<img src="/assets/img/cvx1_1.png" alt="" width="300">
+<figcaption></figcaption>
+</figure>
+
+其中 θ<sub>i</sub>(i = 0,1,...,n) 为模型参数; x<sub>i</sub>(i = 0,1,...,n) 为每个样本的n个特征值。这个表示可以简化，我们增加一个特征 x<sub>0</sub> = 1, 这样就得到:
+
+<figure style="text-align: center;">
+<img src="/assets/img/cvx1_2.png" alt="" width="300">
+<figcaption></figcaption>
+</figure>
+
+同样是线性回归，对应于上面的假设函数，损失函数为：
+
+<figure style="text-align: center;">
+<img src="/assets/img/cvx1_3.png" alt="" width="300">
+<figcaption></figcaption>
+</figure>
+
+**算法相关参数初始化**：主要是初始化 θ<sub>i</sub>,算法终止距离
+ε以及步长α。
+
+**算法过程**：
+1. 确定当前位置的损失函数的梯度，对于 θ<sub>i</sub> ,其梯度表达式如下：
+
+<figure style="text-align: center;">
+<img src="/assets/img/cvx1_4.png" alt="" width="300">
+<figcaption></figcaption>
+</figure>
+
+2. 用步长乘以损失函数的梯度，得到当前位置下降的距离，即
+
+<figure style="text-align: center;">
+<img src="/assets/img/cvx1_5.png" alt="" width="300">
+<figcaption></figcaption>
+</figure>
+
+3. 确定是否所有的 θ<sub>i</sub>,梯度下降的距离都小于ε，如果小于ε则算法终止，当前所有的 θ<sub>i</sub>(i=0,1,...n)即为最终结果。否则进入步骤4.
+4. 更新所有的θ，对于 θ<sub>i</sub>，其更新表达式如下。更新完毕后继续转入步骤1.
+
+<figure style="text-align: center;">
+<img src="/assets/img/cvx1_6.png" alt="" width="300">
+<figcaption></figcaption>
+</figure>
+
+
+
+
+
+
+### 矩阵方式
