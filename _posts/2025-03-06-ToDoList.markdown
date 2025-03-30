@@ -15,7 +15,7 @@ author: # Add name author (optional)
 - [ ] [cs224w-图机器学习][图机器学习]
 
 
-[梯度下降]: https://www.cnblogs.com/pinard/p/5970503.html
+[梯度下降]: https://www.cnblogs.com/pinard/p/5970503.html,https://www.bilibili.com/video/BV18g4y1C7PJ/?spm_id_from=333.337.search-card.all.click&vd_source=569a11fcd7c28ff3a6a10ea6d33ccb89
 [openflow]: https://github.com/mininet/openflow-tutorial/wiki
 [Erdős–Rényi]: https://wenku.csdn.net/column/3gijantwp0
 [Partitioning n Community Detection]: https://blog.csdn.net/PolarisRisingWar/article/details/119277189
