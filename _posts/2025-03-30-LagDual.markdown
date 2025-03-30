@@ -67,7 +67,7 @@ author: # Add name author (optional)
 根据对偶函数的第二条重要性质，对任意λ≥0和任意v, 对偶函数g是原问题最优解的一个下界. 那么最好的下界就是最大化对偶函数, 因此构造原问题的对偶问题：
 
 <figure style="text-align: center;">
-<img src="/assets/img/cvx3-5.png" alt="" width="200">
+<img src="/assets/img/cvx3-5.png" alt="" width="150">
 <figcaption></figcaption>
 </figure>
 
@@ -88,14 +88,14 @@ author: # Add name author (optional)
 Slater 条件用于判断什么情况下强对偶是成立的。在原问题是凸问题的情况下，若:
 
 <figure style="text-align: center;">
-<img src="/assets/img/cvx3-6.png" alt="" width="100">
+<img src="/assets/img/cvx3-6.png" alt="" width="150">
 <figcaption></figcaption>
 </figure>
 
 使得约束条件满足：
 
 <figure style="text-align: center;">
-<img src="/assets/img/cvx3-7.png" alt="" width="300">
+<img src="/assets/img/cvx3-7.png" alt="" width="400">
 <figcaption></figcaption>
 </figure>
 
