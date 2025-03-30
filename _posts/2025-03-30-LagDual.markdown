@@ -1,0 +1,74 @@
+---
+layout: post
+title: Lagrange Duality (拉格朗日对偶)
+date: 2025-03-30
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: post-cvx-3.png # Add image post (optional)
+tags: [Blog, Convex Optimization]
+author: # Add name author (optional)
+
+---
+# 本讲内容
+
+在一个优化问题中，原始问题通常会带有很多约束条件，这样直接求解原始问题往往是很困难的，于是考虑将原始问题转化为它的对偶问题，通过求解它的对偶问题来得到原始问题的解。对偶性（Duality）是凸优化问题的核心内容。
+
+
+
+
+
+
+---
+
+## 原始问题和对偶问题
+
+### 原始问题（Primal problem）
+
+将一个原始最优化问题写成如下形式：
+
+<figure style="text-align: center;">
+<img src="/assets/img/cvx3-1.png" alt="" width="300">
+<figcaption></figcaption>
+</figure>
+
+事实上，在求解原问题的对偶问题时，并不要求原始问题一定是凸问题，f 和 h 可以是一般函数而不一定非得是凸函数。
+
+### 拉格朗日函数（Lagrangian function）
+
+将原始问题的拉格朗日函数定义为：
+
+<figure style="text-align: center;">
+<img src="/assets/img/cvx3-2.png" alt="" width="300"><img src="/assets/img/cvx3-2.png" alt="" width="200">
+<figcaption></figcaption>
+</figure>
+
+可以看到，拉格朗日函数 L 相对于原始问题引入了两个新变量（向量）λ 和 v ，称为拉格朗日乘子。
+
+> 拉格朗日函数 L 如果看成是关于 x 的函数，那它其实就是对原始问题中目标函数与约束条件进行线性加权，目标函数的权系数是 1 ，约束条件的权系数是 λ<sub>i</sub> 或 v<sub>i</sub> ；
+> 如果 L 看成是关于 λ<sub>i</sub> 或 v<sub>i</sub> 的函数，则其余部分可看成常数， L 就可看作是一个关于 λ 或 v 的仿射函数（即最高次幂为1的多项式函数）。
+
+### 拉格朗日对偶函数（ Lagrange dual function）
+
+拉格朗日对偶函数（简称对偶函数）通过对拉格朗日函数关于 x 取下确界得到，即：
+
+<figure style="text-align: center;">
+<img src="/assets/img/cvx3-4.png" alt="" width="200">
+<figcaption></figcaption>
+</figure>
+
+对偶函数具有如下两条重要性质：
+
+- 对偶函数一定是凹函数，其凹性与原目标函数和约束函数凹凸与否无关。
+- 对任意 λ≥0和任意v（泛指向量中的每个分量），如果原问题最优解对应的目标函数值为 p<sup>*</sup> ,则 g(λ,v) ≤ p<sup>*</sup>。
+
+
+## 拉格朗日对偶问题（Lagrange dual problem）
+
+根据对偶函数的第二条重要性质，对任意λ≥0和任意v, 对偶函数g是原问题最优解的一个下界. 那么最好的下界就是最大化对偶函数, 因此构造原问题的对偶问题：
+
+<figure style="text-align: center;">
+<img src="/assets/img/cvx3-5.png" alt="" width="100">
+<figcaption></figcaption>
+</figure>
+
+由于对偶函数是凹函数，故拉格朗日对偶问题一定是凸优化问题，其对应的最优解为 λ<sup>*</sup>, v<sup>*</sup>（最优拉格朗日乘子），记对应的最优值为 d<sup>*</sup>, 则总有 d<sup>*</sup> ≤ p<sup>*</sup>。
+
