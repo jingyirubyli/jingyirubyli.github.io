@@ -52,7 +52,7 @@ author: # Add name author (optional)
 比如对于线性回归，假设函数表示为 
 
 <figure style="text-align: center;">
-<img src="/assets/img/cvx1_1.png" alt="" width="300">
+<img src="/assets/img/cvx1_1.png" alt="" width="400">
 <figcaption></figcaption>
 </figure>
 
@@ -66,7 +66,7 @@ author: # Add name author (optional)
 同样是线性回归，对应于上面的假设函数，损失函数为：
 
 <figure style="text-align: center;">
-<img src="/assets/img/cvx1_3.png" alt="" width="300">
+<img src="/assets/img/cvx1_3.png" alt="" width="400">
 <figcaption></figcaption>
 </figure>
 
@@ -77,14 +77,14 @@ author: # Add name author (optional)
 1. 确定当前位置的损失函数的梯度，对于 θ<sub>i</sub> ,其梯度表达式如下：
 
 <figure style="text-align: center;">
-<img src="/assets/img/cvx1_4.png" alt="" width="300">
+<img src="/assets/img/cvx1_4.png" alt="" width="200">
 <figcaption></figcaption>
 </figure>
 
 2. 用步长乘以损失函数的梯度，得到当前位置下降的距离，即
 
 <figure style="text-align: center;">
-<img src="/assets/img/cvx1_5.png" alt="" width="300">
+<img src="/assets/img/cvx1_5.png" alt="" width="200">
 <figcaption></figcaption>
 </figure>
 

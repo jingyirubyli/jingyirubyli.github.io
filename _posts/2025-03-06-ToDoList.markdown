@@ -8,12 +8,14 @@ tags: [Blog]
 author: # Add name author (optional)
 ---
 
-- [ ] [对偶梯度算法, 梯度投影算法]
+- [ ] [梯度下降][梯度下降], [对偶梯度算法][对偶梯度], [梯度投影算法][梯度投影]
 - [ ] [openflow][openflow]
 - [ ] [Graph Generation_Random Graph_Erdős–Rényi][Erdős–Rényi]
 - [ ] [Partitioning and Community Detection Problem][Partitioning n Community Detection]
 - [ ] [cs224w-图机器学习][图机器学习]
 
+
+[梯度下降]: https://www.cnblogs.com/pinard/p/5970503.html
 [openflow]: https://github.com/mininet/openflow-tutorial/wiki
 [Erdős–Rényi]: https://wenku.csdn.net/column/3gijantwp0
 [Partitioning n Community Detection]: https://blog.csdn.net/PolarisRisingWar/article/details/119277189
