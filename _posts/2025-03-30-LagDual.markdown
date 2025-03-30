@@ -37,7 +37,7 @@ author: # Add name author (optional)
 将原始问题的拉格朗日函数定义为：
 
 <figure style="text-align: center;">
-<img src="/assets/img/cvx3-2.png" alt="" width="300"><img src="/assets/img/cvx3-2.png" alt="" width="200">
+<img src="/assets/img/cvx3-2.png" alt="" width="300"><img src="/assets/img/cvx3-3.png" alt="" width="200">
 <figcaption></figcaption>
 </figure>
 
@@ -51,7 +51,7 @@ author: # Add name author (optional)
 拉格朗日对偶函数（简称对偶函数）通过对拉格朗日函数关于 x 取下确界得到，即：
 
 <figure style="text-align: center;">
-<img src="/assets/img/cvx3-4.png" alt="" width="200">
+<img src="/assets/img/cvx3-4.png" alt="" width="250">
 <figcaption></figcaption>
 </figure>
 
@@ -66,7 +66,7 @@ author: # Add name author (optional)
 根据对偶函数的第二条重要性质，对任意λ≥0和任意v, 对偶函数g是原问题最优解的一个下界. 那么最好的下界就是最大化对偶函数, 因此构造原问题的对偶问题：
 
 <figure style="text-align: center;">
-<img src="/assets/img/cvx3-5.png" alt="" width="100">
+<img src="/assets/img/cvx3-5.png" alt="" width="200">
 <figcaption></figcaption>
 </figure>
 
