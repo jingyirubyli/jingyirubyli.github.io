@@ -87,14 +87,14 @@ author: # Add name author (optional)
 Slater 条件用于判断什么情况下强对偶是成立的。在原问题是凸问题的情况下，若:
 
 <figure style="text-align: center;">
-<img src="/assets/img/cvx3-6.png" alt="" width="50">
+<img src="/assets/img/cvx3-6.png" alt="" width="100">
 <figcaption></figcaption>
 </figure>
 
 使得约束条件满足：
 
 <figure style="text-align: center;">
-<img src="/assets/img/cvx3-7.png" alt="" width="30">
+<img src="/assets/img/cvx3-7.png" alt="" width="100">
 <figcaption></figcaption>
 </figure>
 
@@ -110,7 +110,7 @@ Slater 条件用于判断什么情况下强对偶是成立的。在原问题是�
 在对偶间隙为 0（强对偶），且 L 对 x 可微的前提下，设 x<sup>*</sup>; λ<sup>*</sup>,v<sup>*</sup> 分别是原问题和对偶问题的最优解，则以下四组条件称为 KKT 条件：
 
 <figure style="text-align: center;">
-<img src="/assets/img/cvx3-8.png" alt="" width="30">
+<img src="/assets/img/cvx3-8.png" alt="" width="300">
 <figcaption></figcaption>
 </figure>
 
