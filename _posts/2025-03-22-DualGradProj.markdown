@@ -27,10 +27,14 @@ author: # Add name author (optional)
 <figcaption></figcaption>
 </figure>
 
-称 π<sub>C</sub>(x) 是 x 到 C 上的投影.
+称 π<sub>C</sub>(x) 是 x 到 C 上的投影. 即 π<sub>C</sub>(x) 是x到C的距离最小的点.
 
 
-2. 对 ∀x ∈ ℝ<sup>n</sup>, 则点 z= π<sub>C</sub>(x) 是 x 到 C 的投影, 当且仅当 ∀y∈C 有 ⟨x−z,y−z⟩≤0.
+2. 对 ∀x ∈ ℝ<sup>n</sup>, 则点 z= π<sub>C</sub>(x) 是 x 到 C 的投影, 当且仅当 ∀y∈C 有 ⟨x−z,y−z⟩≤0. 即点z是x到C的最小距离点的充要条件是:
+<figure style="text-align: center;">
+<img src="/assets/img/cvx2-3.png" alt="" width="300">
+<figcaption></figcaption>
+</figure>
 
 3. 将 π<sub>C</sub> 看成映射 π<sub>C</sub>:ℝn→C，则 π<sub>C</sub> 是连续且非扩张的，即 ‖π<sub>C</sub>(x)−π<sub>C</sub>(y)‖≤‖x−y‖,   ∀x,y ∈ ℝ<sup>n</sup>.
 
