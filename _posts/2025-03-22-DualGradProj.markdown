@@ -9,3 +9,4 @@ author: # Add name author (optional)
 ---
 
 Dual Gradient Projection Algorithm
+Lagrange duality
