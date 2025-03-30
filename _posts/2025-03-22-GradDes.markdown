@@ -74,22 +74,22 @@ author: # Add name author (optional)
 ε以及步长α。
 
 **算法过程**：
-1. 确定当前位置的损失函数的梯度，对于 θ<sub>i</sub> ,其梯度表达式如下：
+- 确定当前位置的损失函数的梯度，对于 θ<sub>i</sub> ,其梯度表达式如下：
 
 <figure style="text-align: center;">
 <img src="/assets/img/cvx1_4.png" alt="" width="200">
 <figcaption></figcaption>
 </figure>
 
-2. 用步长乘以损失函数的梯度，得到当前位置下降的距离，即
+- 用步长乘以损失函数的梯度，得到当前位置下降的距离，即
 
 <figure style="text-align: center;">
 <img src="/assets/img/cvx1_5.png" alt="" width="200">
 <figcaption></figcaption>
 </figure>
 
-3. 确定是否所有的 θ<sub>i</sub>,梯度下降的距离都小于ε，如果小于ε则算法终止，当前所有的 θ<sub>i</sub>(i=0,1,...n)即为最终结果。否则进入步骤4.
-4. 更新所有的θ，对于 θ<sub>i</sub>，其更新表达式如下。更新完毕后继续转入步骤1.
+- 确定是否所有的 θ<sub>i</sub>,梯度下降的距离都小于ε，如果小于ε则算法终止，当前所有的 θ<sub>i</sub>(i=0,1,...n)即为最终结果。否则进入步骤4.
+- 更新所有的θ，对于 θ<sub>i</sub>，其更新表达式如下。更新完毕后继续转入步骤1.
 
 <figure style="text-align: center;">
 <img src="/assets/img/cvx1_6.png" alt="" width="300">
