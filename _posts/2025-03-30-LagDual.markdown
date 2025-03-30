@@ -72,3 +72,63 @@ author: # Add name author (optional)
 
 由于对偶函数是凹函数，故拉格朗日对偶问题一定是凸优化问题，其对应的最优解为 λ<sup>*</sup>, v<sup>*</sup>（最优拉格朗日乘子），记对应的最优值为 d<sup>*</sup>, 则总有 d<sup>*</sup> ≤ p<sup>*</sup>。
 
+当 d<sup>*</sup> ≤ p<sup>*</sup>, 称为弱对偶（weak duality）。
+
+当 d<sup>*</sup> = p<sup>*</sup>, 称为强对偶（strong duality）。
+
+将 p<sup>*</sup> - d<sup>*</sup> 称为对偶间隙（duality gap）。
+
+> 在解存在的情况下，弱对偶总是成立的。满足强对偶时，可以通过求解对偶问题来得到原始问题的解。
+
+
+
+### Slater 条件(Slater's condition)
+
+Slater 条件用于判断什么情况下强对偶是成立的。在原问题是凸问题的情况下，若:
+
+<figure style="text-align: center;">
+<img src="/assets/img/cvx3-6.png" alt="" width="50">
+<figcaption></figcaption>
+</figure>
+
+使得约束条件满足：
+
+<figure style="text-align: center;">
+<img src="/assets/img/cvx3-7.png" alt="" width="30">
+<figcaption></figcaption>
+</figure>
+
+则强对偶成立。
+
+>  relint(D) 表示原始凸问题定义域的相对内部，即在定义域上除了边界点以外的所有点。只要能找到一个这样的点使原凸问题等式约束依然成立且不等式约束都严格小于 0 即可。幸运的是，对大多数一般的原凸问题，强对偶都是成立的。
+
+若满足 Slater 条件，则强对偶一定成立，不满足 Slater 条件，强对偶也可能成立，它是一个充分不必要条件。
+
+
+### KKT 条件（KKT conditions）
+
+在对偶间隙为 0（强对偶），且 L 对 x 可微的前提下，设 x<sup>*</sup>; λ<sup>*</sup>,v<sup>*</sup> 分别是原问题和对偶问题的最优解，则以下四组条件称为 KKT 条件：
+
+<figure style="text-align: center;">
+<img src="/assets/img/cvx3-8.png" alt="" width="30">
+<figcaption></figcaption>
+</figure>
+
+- 稳定性条件（stationarity）
+
+若 x<sup>*</sup> 是原问题的最优解（极值点），则 L(x, λ<sup>*</sup>,v<sup>*</sup>) 在 x = x<sup>*</sup> 处的微分等于 0 。
+
+- 互补松弛条件（complementary slackness）
+
+当 λ<sup>*</sup><sub>i</sub> >0 时, f<sub>i</sub>(x<sup>*</sup>) = 0;
+
+当 f<sub>i</sub>(x<sup>*</sup>) < 0时, λ<sup>*</sup><sub>i</sub> = 0 .
+
+- 原问题的可行性（primal feasibility）
+
+原问题的最优解必然满足原问题的约束条件。
+
+- 对偶问题的可行性（dual feasibility）
+
+对偶问题的最优解必然满足对偶问题的约束条件。
+
