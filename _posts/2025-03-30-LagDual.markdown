@@ -60,6 +60,7 @@ author: # Add name author (optional)
 - 对偶函数一定是凹函数，其凹性与原目标函数和约束函数凹凸与否无关。
 - 对任意 λ≥0和任意v（泛指向量中的每个分量），如果原问题最优解对应的目标函数值为 p<sup>*</sup> ,则 g(λ,v) ≤ p<sup>*</sup>。
 
+---
 
 ## 拉格朗日对偶问题（Lagrange dual problem）
 
@@ -94,7 +95,7 @@ Slater 条件用于判断什么情况下强对偶是成立的。在原问题是�
 使得约束条件满足：
 
 <figure style="text-align: center;">
-<img src="/assets/img/cvx3-7.png" alt="" width="100">
+<img src="/assets/img/cvx3-7.png" alt="" width="300">
 <figcaption></figcaption>
 </figure>
 
@@ -110,7 +111,7 @@ Slater 条件用于判断什么情况下强对偶是成立的。在原问题是�
 在对偶间隙为 0（强对偶），且 L 对 x 可微的前提下，设 x<sup>*</sup>; λ<sup>*</sup>,v<sup>*</sup> 分别是原问题和对偶问题的最优解，则以下四组条件称为 KKT 条件：
 
 <figure style="text-align: center;">
-<img src="/assets/img/cvx3-8.png" alt="" width="300">
+<img src="/assets/img/cvx3-8.png" alt="" width="500">
 <figcaption></figcaption>
 </figure>
 
