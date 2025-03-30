@@ -47,3 +47,6 @@ author: # Add name author (optional)
 
 
 ## 梯度投影算法
+
+梯度投影法的基本思想是：当迭代点x<sub>k</sub>是可行域 C 的内点时，取 d = -▽f（x<sub>k</sub>）作为搜索方向；否则，当x<sub>k</sub>是可行域 C 的边界点时，取
+-▽f（x<sub>k</sub>）在这些边界面交集上的投影作为搜索方向. 这也是“梯度投影法”名称的由来.
