@@ -1,0 +1,32 @@
+---
+layout: post
+title:  DCN Lec11-Datacenter Network for RDMA
+date:   2025-04-01
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: post-11.png # Add image post (optional)
+tags: [Blog, DCN]
+author: # Add name author (optional)
+---
+# 本讲内容
+
+## Direct Memory Access 直接内存访问(DMA)
+
+直接内存访问（DMA）是一种允许外部设备（如网卡NIC）直接与主机内存交换数据而无需CPU参与的机制。
+它有利于节省CPU资源(数据复制的 CPU 周期)：数据传输过程中，CPU仅负责初始化和完成后的处理，无需参与实际的数据搬运，在数据被复制进/出内存时，CPU 可以做其他有用的工作; 适用于高吞吐量场景（如网络传输、磁盘I/O），减少数据复制的延迟。
+
+**DMA工作流程**
+
+- 初始化: CPU 启动数据传输，例如，告诉 NIC 从哪个地址读取数据
+- DMA接管数据传输: 数据复制在 DRAM 和 NIC 之间开始，无需 CPU 参与
+- 传输完成
+
+<figure style="text-align: center;">
+<img src="/assets/img/l11p1.png" alt="Direct Memory Access (DMA)" width="600">
+<figcaption>Direct Memory Access (DMA)</figcaption>
+</figure>
+
+---
+
+## 
+
+
