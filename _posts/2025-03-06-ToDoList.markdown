@@ -8,6 +8,7 @@ tags: [Blog]
 author: # Add name author (optional)
 ---
 
+- [ ] random graph model
 - [ ] [梯度下降][梯度下降], [对偶梯度算法][对偶梯度], [梯度投影算法][梯度投影]
 - [ ] [openflow][openflow]
 - [ ] [Graph Generation_Random Graph_Erdős–Rényi][Erdős–Rényi]
