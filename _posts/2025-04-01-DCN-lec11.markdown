@@ -25,8 +25,152 @@ author: # Add name author (optional)
 <figcaption>Direct Memory Access (DMA)</figcaption>
 </figure>
 
+**RDMA(Remote Direct Memory Access)**
+
+一种允许主机访问远程主机内存的机制，无需远程主机 CPU 参与
+
+<figure style="text-align: center;">
+<img src="/assets/img/l11p2.png" alt="Remote Direct Memory Access (RDMA)" width="600">
+<figcaption>Remote Direct Memory Access (RDMA)</figcaption>
+</figure>
+
+**RDMA 的奇特之处**
+- RDMA 绕过主机 CPU/OS
+-  性能优势——数据复制速度更快！
+-  ……但也意味着它绕过了主机网络堆栈
+-  ……也就是说，可靠性不足！
+   -  如何处理丢包？
+      - 想法：构建无损网络结构，也就是说，交换机上不会出现丢包！
+        - 优先级流量控制 (PFC, Priority Flow Control)
+
+<figure style="text-align: center;">
+<img src="/assets/img/l11p3.png" alt="Priority Flow Control (PFC)" width="400">
+<figcaption>Priority Flow Control (PFC)</figcaption>
+</figure>
+
 ---
 
-## 
+## Priority Flow Control (PFC)
+
+- 每个交换机为每个输出队列维护一个阈值
+- 如果输出队列 (Q) 的大小超过阈值，
+  - … 交换机向所有发送至 Q 的输入链路发送一个暂停数据包(Pause packet)
+  - … 输入链路另一端的实体（交换机/主机）停止发送数据
+- 一旦输出队列 Q 耗尽，
+  - … 交换机向先前暂停的输入链路发送一个恢复数据包(Resume packet)
+  - … 输入链路另一端的实体（交换机/主机）恢复发送数据
+
+**设置队列大小和阈值**
+- 为确保尾部队列不被丢弃，
+  - 输出队列大小 - 阈值 > 最大传输中数据量
+- 如何计算自队列阈值超出以来的最大传输中数据量（以字节为单位）？
+  - B*D + B*(T1 + D + T2)
+
+<figure style="text-align: center;">
+<img src="/assets/img/l11p4.png" alt="Calculate max in-flight data" width="600">
+<figcaption>Calculate max in-flight data</figcaption>
+</figure>
+
+下面介绍PFC工作流程:
+
+- 如果队列大小低于阈值，则不采取任何措施
+
+<figure style="text-align: center;">
+<img src="/assets/img/l11p5.png" alt="PFC in Action : Step 1" width="600">
+<figcaption>PFC in Action : Step 1</figcaption>
+</figure>
+
+- 在所有向拥塞的输出队列发送数据包的输入链路上发送暂停数据包
+
+<figure style="text-align: center;">
+<img src="/assets/img/l11p6.png" alt="PFC in Action : Step 2" width="600">
+<figcaption>PFC in Action : Step 2</figcaption>
+</figure>
+
+- 一旦拥塞的输出队列清空，就向输入链路发送恢复数据包
+
+<figure style="text-align: center;">
+<img src="/assets/img/l11p7.png" alt="PFC in Action : Step 3" width="600">
+<figcaption>PFC in Action : Step 3</figcaption>
+</figure>
+
+- 数据包传输恢复
+ 
+<figure style="text-align: center;">
+<img src="/assets/img/l11p8.png" alt="PFC in Action : Step 4" width="600">
+<figcaption>PFC in Action : Step 4</figcaption>
+</figure>
+
+**PFC 的问题**
+- PFC 的粒度是链路而非流量
+  - 例如，当检测到输出队列 Q 的拥塞时……
+    - …它会暂停所有发送至 Q 的输入链路
+      - …以及这些链路上的所有流量！
+    - …而不是只暂停行为异常的流量
+  - 最终可能会损害行为正常的流量！
+
+<figure style="text-align: center;">
+<img src="/assets/img/l11p9.png" alt="Issue with PFC : An Example" width="600">
+<figcaption>Issue with PFC : An Example</figcaption>
+</figure>
 
 
+**（部分）使用 PFC 解决问题**
+- PFC 以链路而非流为粒度进行操作
+  - 最终可能会损害行为正常的流！
+- 可以通过维护每个流的输出队列来解决问题
+  - … 仅暂停相应输出队列超过阈值的流
+  - 但是，在交换机中维护每个流的队列并不实际
+    - 数百万个流 — 交换机内存不足！
+- 相反，PFC 采取了折中方案
+  - 每个输出端口维护少量队列（优先级类别）
+  - … 仅暂停优先级类别超过阈值的流
+
+处理 PFC 问题的替代方法: 确保 PFC 触发频率低！将 PFC 用作防止数据包丢失的保险策略，而不是作为避免数据包丢失的常态. 相反，应使用基于流的拥塞控制作为避免数据包丢失的常态——确保在正常情况下队列较小，同时确保每条流获得公平的带宽份额；没有受害流……并且仅在拥塞控制可能无法避免数据包丢失的极端情况下（例如，在出现大量 incast 的情况下）才依赖 PFC. 我们能否直接使用现有的拥塞控制协议来实现此目的？遗憾的是，RDMA 对基于 RDMA 的网络拥塞控制协议的设计施加了一些限制:
+
+**RDMA 拥塞控制要求**
+- RDMA 绕过主机网络堆栈
+  - 因此，必须在网卡上实现拥塞控制
+    - 由于网卡的计算能力和内存有限，因此拥塞控制具有挑战性
+- 此外，在无损 RDMA 网络中无需发送 ACK
+  - 节省大量处理资源
+    - 生成每个数据包的 ACK 处理成本非常高
+  - … 但是，如何提高速率？
+  - … 此外，如何将拥塞信息传递给发送方？
+
+
+---
+
+## DCQCN Congestion Control
+
+- 与 DCTCP 类似
+  - 即使用 ECN 作为拥塞信号
+  - … 并根据拥塞程度做出反应
+- 不同之处在于，DCQCN 是基于速率的协议，而 DCTCP 是基于窗口的协议
+  - DCTCP 在发送方为每个流维护一个拥塞窗口 (cwnd)，用于指示每个流的发送速率
+  - 相反，DCQCN 在发送方为每个流维护一个明确的发送速率值
+  - … 其原因是在 NIC 上实现基于速率的协议更容易
+
+<figure style="text-align: center;">
+<img src="/assets/img/l11p10.png" alt="DCQCN Algorithm : Switch" width="600">
+<figcaption>DCQCN Algorithm : Switch</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+<img src="/assets/img/l11p11.png" alt="DCQCN Algorithm : Receiver" width="600">
+<figcaption>DCQCN Algorithm : Receiver</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+<img src="/assets/img/l11p12.png" alt="DCQCN Algorithm : Sender" width="600"><img src="/assets/img/l11p13.png" alt="DCQCN Algorithm : Sender" width="600"><img src="/assets/img/l11p14.png" alt="DCQCN Algorithm : Sender" width="600"><img src="/assets/img/l11p15.png" alt="DCQCN Algorithm : Sender" width="600">
+<figcaption>DCQCN Algorithm : Sender</figcaption>
+</figure>
+
+---
+
+综上所述
+- RDMA 通过绕过主机 CPU 和内核（网络堆栈）为联网应用提供极高的性能
+  - … 但这意味着它不可靠，即无法处理数据包丢失
+- PFC 被提议与 RDMA 协同工作，以确保交换机不会丢包，即构建无损网络结构
+  - … 但 PFC 可能会导致受害流、死锁等问题
+- DCQCN 被提议通过确保仅在极端情况下触发 PFC 来解决 PFC 的问题
