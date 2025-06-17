@@ -9,13 +9,6 @@ author: # Add name author (optional)
 ---
 # 本讲内容
 
-
-
-<figure style="text-align: center;">
-<img src="/assets/img/.png" alt="Direct Memory Access (DMA)" width="600">
-<figcaption>Direct Memory Access (DMA)</figcaption>
-</figure>
-
 ---
 
 ## 1. 搭建目标
