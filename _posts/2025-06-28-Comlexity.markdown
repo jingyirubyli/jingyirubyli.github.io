@@ -67,4 +67,33 @@ b =[i*i for i < 3 else i for i in a]
 - b=[1,4,3,4,5]
 
 
+
 ### 元组 tuple
+
+list有增删改查操作, tuple只能查,无法修改
+
+a=("apple","airbnb","amazon")
+
+- len(a) = 3
+- max(a)
+- min(a)
+
+
+in 操作
+a = [1,2,3,4,5]
+b = (1,2,3,4,5)
+- 3 in a: true
+- 3 in b: true
+- 0 in a: false
+
+slice 操作
+a = [1,2,3,4,5]
+b = (1,2,3,4,5)
+- a[0:3]=[1,2,3]
+- b[0;3]=(1,2,3)
+
+注意初始化一个单元素元组要加逗号, 否则默认为int
+<figure style="text-align: center;">
+<img src="/assets/img/628_1.png" alt="tuple" width="200">
+<figcaption>tuple</figcaption>
+</figure>
