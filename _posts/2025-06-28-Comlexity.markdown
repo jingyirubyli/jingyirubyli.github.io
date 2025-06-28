@@ -97,3 +97,9 @@ b = (1,2,3,4,5)
 <img src="/assets/img/628_1.png" alt="tuple" width="200">
 <figcaption>tuple</figcaption>
 </figure>
+
+list和tuple转换
+<figure style="text-align: center;">
+<img src="/assets/img/628_2.png" alt="tuple to list" width="200">
+<figcaption>tuple to list</figcaption>
+</figure>
