@@ -20,4 +20,51 @@ author: # Add name author (optional)
 在表达式中，只要高阶项，不要低阶项，也不要高阶项的系数，剩下的部分如果为f（N），那么时间复杂度为O（f（N））。
 评价一个算法流程的好坏，先看时间复杂度的指标，如果时间复杂度相同,再分析不同数据样本下的实际运行时间(因为理论常数项不能很容易确定)，也就是“常数项时间”。
 
-## 
+## 数据结构
+
+### 数字 number
+
+### 列表 list
+
+a = [1,2,3,4,5]
+
+- 查找: a[0]
+- 增加: a.append(6)
+- 更新: a[0]=9
+- 删除: a.pop(0), 会返回被删除的值(9)
+  - a.pop()默认删除最后一个值(6): [2,3,4,5]
+
+常用函数:
+
+a = [2,3,4,5]
+- len(a) = 4
+- max(a) = 5
+- min(a) = 2
+- a.reverse() = [5,4,3,2]
+- a.clear() =[]
+
+迭代和遍历:
+a = [1,2,3,4]
+- 
+```
+for x in a:
+    print(x)
+```
+- 
+```
+for i in range(len(a)):
+    print(a[i])
+```
+
+生成器 list comprehension
+
+a = [1,2,3,4,5]
+[expression for element in iteration]
+b =[i*i for i in a]
+- b=[1,4,9,16,25] 
+[expression if condition else station for element in iteration]
+b =[i*i for i < 3 else i for i in a]
+- b=[1,4,3,4,5]
+
+
+### 元组 tuple
