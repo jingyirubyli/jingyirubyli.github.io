@@ -173,3 +173,77 @@ for k,v in dict.items():
 <img src="/assets/img/628_4.png" alt="dictionary" width="300">
 <figcaption>dictionary</figcaption>
 </figure>
+
+
+### String 字符串
+
+s = "Hello world"
+
+- 查
+  - s[0]: 'H'
+  - s[-1]: 'd'
+  - s[:]:'Hello world'
+  - s[0:4]:'Hell'
+- len()
+  - len(s): 11
+- max()
+  - max(s): 'w'
+- min()
+  - min(s): ' '
+- count()
+  - s.count("H"): 1
+  - s.count("l"): 3
+- isupper()
+  - s.isupper(): False
+- islower()
+  - s.islower(): False
+- isdigit()
+  - s.isdigit(): False
+- lower()
+  - s.lower(): 'hello world'
+- upper()
+  - s.upper(): 'HELLO WORLD'
+- strip() 去掉前后空格
+  - s.strip(): 'Hello world'
+  - ' abc '.strip(): 'abc'
+- lstrip()
+  - s.strip(): 'Hello world'
+  - ' abc '.lstrip(): 'abc '
+- rstrip()
+  - s.strip(): 'Hello world'
+  - ' abc '.rstrip(): ' abc'
+- swapcase()
+  - s.swapcase(): 'hELLO WORLD'
+- replace(old,new)
+  - s.replace('l','E'):'HeEEo worEd'
+- split() 返回一个list
+  - s.split(' '): ['Hello', 'world']
+
+
+
+
+### array 数组
+
+数组在内存中是连续的. 
+
+使用list表示数组: a = [1,2,3,4,5]
+
+优点是读取(索引:a[0])很快, 缺点是查询,插入,删除很慢.
+
+
+
+### linked list 链表
+
+```python
+class ListNode
+    def __init__(self, x):
+        self.val = x
+        self.next = None 
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/628_5.png" alt="linked list" width="300">
+<figcaption>linked list</figcaption>
+</figure>
+
+
