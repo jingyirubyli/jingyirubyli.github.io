@@ -24,7 +24,7 @@ author: # Add name author (optional)
 
 ### 数字 number
 
-### 列表 list
+### 列表 list []
 
 a = [1,2,3,4,5]
 
@@ -68,7 +68,7 @@ b =[i*i for i < 3 else i for i in a]
 
 
 
-### 元组 tuple
+### 元组 tuple ()
 
 list有增删改查操作, tuple只能查,无法修改
 
@@ -102,4 +102,74 @@ list和tuple转换
 <figure style="text-align: center;">
 <img src="/assets/img/628_2.png" alt="tuple to list" width="200">
 <figcaption>tuple to list</figcaption>
+</figure>
+
+
+### set 集合 {}
+
+所有的元素都是唯一的. 因为元素是无序的,所以不容易查找.
+
+a = {1, 1.5, "abc"}
+
+- in 操作 
+  - “abc” in a: true
+- 增: 
+  - a.add(1): {1, 1.5,"abc"}
+  - a.add(2): {1, 2, 1.5, "abc"}
+- 改 (update只能是iterable元素)
+  - a.update(1): {1,1.5,"abc"}
+  - a.update(4,5): {1,1.5,"abc",4,5}
+- 删
+  - a.pop() pop随机元素,不常用
+  - a.remove()
+
+常用函数
+- len
+- max
+- min
+- a-b: a有b没有
+- a|b: a或b有
+- a&b: a,b都有
+- a^b: a,b中不同时有的元素(a有b没有/a没有b有)
+
+
+### dictionary 字典 {}
+
+key: value 键值对
+
+dict = {"name": “xxx”, "age": 18}
+
+- 查: 
+  - dict[“name”]:“xxx”
+  - dict[“age”]:18
+- 增:
+  - dict[“platform”]=“youtube”: dict = {"name": “xxx”, "age": 18, “platform”:“youtube”}
+- 改
+  - dict[“platform”]=“bilibili”: dict = {"name": “xxx”, "age": 18, “platform”:“bilibili”}
+- 删
+  - dict.pop(“platform”): dict = {"name": “xxx”, "age": 18}
+- in
+  - “name” in dictionary: true
+
+<figure style="text-align: center;">
+<img src="/assets/img/628_3.png" alt="dictionary" width="400">
+<figcaption>dictionary</figcaption>
+</figure>
+
+- 遍历
+
+```
+for key in dict:
+    print(key)
+
+for value in dict.values():
+    print(value)
+
+for k,v in dict.items():
+    print(k,v)
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/628_4.png" alt="dictionary" width="300">
+<figcaption>dictionary</figcaption>
 </figure>
