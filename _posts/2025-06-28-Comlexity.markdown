@@ -246,4 +246,22 @@ class ListNode
 <figcaption>linked list</figcaption>
 </figure>
 
+数组和链表的区别: 
 
+数组access快, search,insert,delete慢; 链表insert,delete快, search,access慢.
+
+
+### hash table 哈希表
+
+使用字典.
+
+dict = {"name": “zhs”, "age": 18}
+
+数组中: 按索引index查询是acccess访问(快), 按元素来查询是search(慢).
+
+key的search,insert,delete很快. 不可以用index访问,因为顺序不固定.
+
+函数同字典.
+
+
+### 
