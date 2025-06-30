@@ -329,3 +329,14 @@ heapify(a)
 <img src="/assets/img/628_6.png" alt="tree" width="600">
 <figcaption>tree</figcaption>
 </figure>
+
+二叉树的遍历
+
+- 前序遍历: 当前节点,左节点,右节点
+- 中序遍历: 左节点,当前节点,右节点
+- 后序遍历: 左节点,右节点,当前节点
+
+<figure style="text-align: center;">
+<img src="/assets/img/628_7.png" alt="tree" width="600">
+<figcaption>tree</figcaption>
+</figure>
