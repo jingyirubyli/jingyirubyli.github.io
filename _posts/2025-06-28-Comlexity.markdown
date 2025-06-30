@@ -264,4 +264,50 @@ key的search,insert,delete很快. 不可以用index访问,因为顺序不固定.
 函数同字典.
 
 
-### 
+### queue 队列
+
+FIFO先入先出. 单端和双端.
+
+list表示单端. deque表示双端(from collections import deque)
+
+q = deque([1,2,3])
+
+- append()
+- pop()
+- appendleft()
+- popleft()
+- max()
+- min()
+- len()
+
+搭配先入先出规则: append搭配popleft, appendleft搭配pop.
+
+
+### stack 栈
+
+FILO先入后出.
+
+deque表示: append搭配pop, appendleft搭配popleft.
+list表示: append搭配pop.
+
+- append()
+- pop()
+- len()
+- max()
+- min()
+
+
+### heap 堆
+
+from heapq import heapify, heappush, heappop, nlargest
+
+a = [1,2,3]
+heapify(a)
+
+- heapify() 默认小堆 
+    - heappush(a,x) 插入值x 
+    - heappop(a) 删除最小值
+    - nlargest(n,a) 前n个最大值
+    - nsmallest(n,a) 前n个最小值
+
+- 大堆: heapify(-a)
