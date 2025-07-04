@@ -34,7 +34,10 @@ Docker 容器是命令行的形式，本身不支持图形界面显示，希望 
 
 实现容器和 Mac 主机 GUI 的通信
 
-![图](./socat.png "连接成功")
+<figure style="text-align: center;">
+<img src="/assets/img/docker5.png" alt="socat" width="600">
+<figcaption>socat</figcaption>
+</figure>
 
 `brew install socat`
 
@@ -76,7 +79,10 @@ Docker 容器是命令行的形式，本身不支持图形界面显示，希望 
 
 `ifconfig en0`
 
-![图](./ip.png "连接成功")
+<figure style="text-align: center;">
+<img src="/assets/img/docker6.png" alt="ip" width="600">
+<figcaption>ip</figcaption>
+</figure>
 
 然后在容器内设置环境变量指向这个 IP 地址（由于退出容器后不会保存环境变量，因此每次进入容器都要执行这个命令）：
 
@@ -102,19 +108,19 @@ Docker 容器是命令行的形式，本身不支持图形界面显示，希望 
 
 #### 2.3.1 创建ros容器
 
-(base) jingyili@JingyiLIdeMacBook-Pro ~ % docker run -itd --net=host \
--v "Users/jingyili:/home" \
--v "/tmp/.X11-unix:/tmp/.X11-unix" \
--e DISPLAY=10.0.0.49 \
--e GDK_SCALE \
--e GDK_DPI_SCALE \
--e LIBGL_ALWAYS_INDIRECT=1 \
--e ROS_DOMAIN_ID=55 \
---name ros2_humble \
---privileged=true \
--w /home \
-jiaxiaofeng/ros2_humble_mac_m1:1.0 \
-/bin/bash
+    (base) jingyili@JingyiLIdeMacBook-Pro ~ % docker run -itd --net=host \
+    -v "Users/jingyili:/home" \
+    -v "/tmp/.X11-unix:/tmp/.X11-unix" \
+    -e DISPLAY=10.0.0.49 \
+    -e GDK_SCALE \
+    -e GDK_DPI_SCALE \
+    -e LIBGL_ALWAYS_INDIRECT=1 \
+    -e ROS_DOMAIN_ID=55 \
+    --name ros2_humble \
+    --privileged=true \
+    -w /home \
+    jiaxiaofeng/ros2_humble_mac_m1:1.0 \
+    /bin/bash
 
 - 第2行-v “/Users/jingyili”:左边的地址是自己主机需要被docker容器挂载的地址，右边的地址是对应容器内ubuntu系统的地址。挂载之后，:左边（主机地址内的文件）和右边（docker容器内ubuntu的文件）相对应，即在docker容器里的操作也能影响到主机。
 - 第4行-e DISPLAY=xxx \要改成自己主机的IP地址。
@@ -149,19 +155,22 @@ run命令运行即可。
 
 前面提到在这一步出现问题,输入`ros2 run turtlesim turtlesim_node`并没有出现小乌龟,而是报错: 
 
-qt.qpa.xcb: could not connect to display 10.0.0.49
-qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "" even though it was found.
-This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
+    qt.qpa.xcb: could not connect to display 10.0.0.49
+    qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "" even though it was found.
+    This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
 
-Available platform plugins are: eglfs, linuxfb, minimal, minimalegl, offscreen, vnc, xcb.
+    Available platform plugins are: eglfs, linuxfb, minimal, minimalegl, offscreen, vnc, xcb.
 
-[ros2run]: Aborted
+    [ros2run]: Aborted
 
-![图](./e5.png "连接成功")
+<figure style="text-align: center;">
+<img src="/assets/img/docker7.png" alt="error3" width="600">
+<figcaption>error3</figcaption>
+</figure>
 
 然后我又安装xarclock测试,也没有出现钟表:
 
-Error: Can't open display: 10.0.0.49
+    Error: Can't open display: 10.0.0.49
 
 解决:
 
