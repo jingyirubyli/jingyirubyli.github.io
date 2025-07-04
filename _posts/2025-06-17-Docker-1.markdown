@@ -62,26 +62,29 @@ author: # Add name author (optional)
 
 成功则得到如下输出
 
-(base) jingyili@JingyiLIdeMacBook-Pro ~ % docker images 
+> (base) jingyili@JingyiLIdeMacBook-Pro ~ % docker images 
 
-REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
+> REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
 
-ubuntu       20.04     8e5c4f0285ec   3 months ago   101MB
+> ubuntu       20.04     8e5c4f0285ec   3 months ago   101MB
 
 ### 2.3 创建 ubuntu 容器
 
 #### 2.3.1 运行一个可以使用终端交互的ubuntu容器
 
-使用命令: docker run -i -t --name 指定名称 ubuntu(选择版本) bash
-我使用:
+使用命令: 
+
+`docker run -i -t --name 指定名称 ubuntu(选择版本) bash`
+
+我的版本使用:
 
  `docker run -i -t --name neo ubuntu:20.04 bash`
 
 执行后，就会登陆 ubuntu 容器的 bash 中
 
-(base) jingyili@JingyiLIdeMacBook-Pro ~ % docker run -i -t --name neo ubuntu:20.04 bash
+> (base) jingyili@JingyiLIdeMacBook-Pro ~ % docker run -i -t --name neo ubuntu:20.04 bash
 
-root@f206ec4c5f5a:/# cat /etc/issue
+> root@f206ec4c5f5a:/# cat /etc/issue
 
 此时也可以查看安装的ubuntu版本,使用命令:
 
@@ -95,11 +98,11 @@ root@f206ec4c5f5a:/# cat /etc/issue
 
 输入命令`docker ps -a`,可以看到容器信息
 
-(base) jingyili@JingyiLIdeMacBook-Pro ~ % docker ps -a
+> (base) jingyili@JingyiLIdeMacBook-Pro ~ % docker ps -a
 
-CONTAINER ID   IMAGE          COMMAND               CREATED          STATUS          PORTS                                          NAMES
+> CONTAINER ID   IMAGE          COMMAND               CREATED          STATUS          PORTS                                          NAMES
 
-e3993df7534f   702080c8fd5a   "/usr/sbin/sshd -D"   53 minutes ago   Up 53 minutes   0.0.0.0:3333->3333/tcp, 0.0.0.0:2222->22/tcp   neo
+> e3993df7534f   702080c8fd5a   "/usr/sbin/sshd -D"   53 minutes ago   Up 53 minutes   0.0.0.0:3333->3333/tcp, 0.0.0.0:2222->22/tcp   neo
 
 #### 2.3.2 以交互的形式启动容器
 
