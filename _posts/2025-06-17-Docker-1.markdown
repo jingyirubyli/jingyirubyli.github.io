@@ -248,10 +248,9 @@ vi /etc/ssh/sshd_config
 
 - 删除掉原来的容器
 
-`& docker stop <容器id>
+`& docker stop <容器id>`
+`& docker rm <容器id>`
 
-   & docker rm <容器id>
-`
 - 使用刚提交的镜像运行一个新容器
 
 `docker run --name <容器名称> -i -t -p 2222:22 -p 3333:3333 <镜像ID> /usr/sbin/sshd -D`
