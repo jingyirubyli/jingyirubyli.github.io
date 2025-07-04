@@ -25,30 +25,30 @@ PC: Alienware (Linux)按照livox官方要求,安装Ubuntu22.04(适配官方的li
 ### 实验setup
 <div align = "center"> 
 <img src="/assets/img/readimg/setup1.png"  width="300" />
-<img src="readimg/setup2.png"  width="300" />
+<img src="/assets/img/readimg/setup2.png"  width="300" />
 </div>
 <div align = "center"> 
-<img src="readimg/setup3.png"  width="600" />
+<img src="/assets/img/readimg/setup3.png"  width="600" />
 </div>
 
 ### 结构设计
 (使用omni graffle)
 <div align = "center"> 
-<img src="readimg/diagram.png"  width="600" />
+<img src="/assets/img/readimg/diagram.png"  width="600" />
 </div>
 
 
 ## 算法结构
 ### Flowchart 
 <div align = "center"> 
-<img src="readimg/flow.png"  width="600" />
+<img src="/assets/img/readimg/flow.png"  width="600" />
 </div>
 
 ### 具体流程
 
 我们从目标检测部分拿到检测结果(输出数据), 下一步需要利用这些数据定义一个我们需要的安全区,然后在工人的位置变动时实时判断工人是否迈出安全区,并将结果打印出来以实现安全监测.
 <div align = "center"> 
-<img src="readimg/safezone1.png"  width="300" />
+<img src="/assets/img/readimg/safezone1.png"  width="300" />
 </div>
 
 检测的结果是包含8个点位置坐标的3D结构:
@@ -64,29 +64,29 @@ box = {
 }
 ```
 <div align = "center"> 
-<img src="readimg/safezone2.png"  width="300" />
-<img src="readimg/safezone3.png"  width="300" />
+<img src="/assets/img/readimg/safezone2.png"  width="300" />
+<img src="/assets/img/readimg/safezone3.png"  width="300" />
 </div>
 
 **输入处理**
 这部分的输入是上一步(检测)的输出, 是3D点云坐标(组成一个bounding box). 我们定义安全区的思路是选择标签为traffic cone的对象,使用cones将安全区在地面上圈出来. 此时需要处理的问题是, 每个object都包含8个点坐标, 如何使用这些坐标来确定各个cone的位置? 选取每个bounding box的底面中心来代表cone的位置,这个操作很简单,只需要中心点位置公式一步计算.然后就是将这些计算所得的点连成一个封闭的多边形,代表安全区.我们首先想到简单按照位置关系,比如比较其中两点横坐标,哪个横坐标大,哪个就在左边,以此类推比较出横坐标最大的点在左边,用这个方法选出最左、最上、最右和最下四个点,再连接.这里出现两个问题:一是这样判断得出的最上最左最下最右四个点不一定能覆盖整个安全区,很容易想象;二是连接的顺序可能导致所得的图形交叉.
 
 <div align = "center"> 
-<img src="readimg/safezone4.png"  width="400" />
+<img src="/assets/img/readimg/safezone4.png"  width="400" />
 </div>
 
 首先解决连接顺序的问题: 由上图可以看出要想连接出一个不交叉的封闭图形需要采用正确的顺序,这里通过比较极角来确定顺序.任意选一个参考点(这里选右下点举例),依次计算其他点相对于它的极角,再将这些点按照极角大小排序,从参考点开始依次连接,这样就可以保证连接出一个不交叉的封闭多边形.
 <div align = "center"> 
-<img src="readimg/polar.png"  width="300" />
+<img src="/assets/img/readimg/polar.png"  width="300" />
 </div>
 <div align = "center"> 
-<img src="readimg/safezone5.png"  width="300" />
+<img src="/assets/img/readimg/safezone5.png"  width="300" />
 </div>
 
 那么问题又来了,上面的例子中只有4个点,4个点无论如何都是好处理的,甚至可以直接做更多次判断. 那么路上设置的cones更多怎么办? 我们想到convex hull(凸包),它可以万无一失地圈出不交叉的封闭图形,而且可以保证区域全覆盖(上面提到的第一个问题也迎刃而解了).而且使用代码的操作也不复杂.
 
 <div align = "center"> 
-<img src="readimg/safezone6.png"  width="300" />
+<img src="/assets/img/readimg/safezone6.png"  width="300" />
 </div>
 
 **安全性判断**
@@ -95,7 +95,7 @@ box = {
 
 从被判断点向右(或向左,但是同一组判断方向要保持一致)绘制一条射线；计算该射线与多边形边界的交点数；如果交点数为奇数，则该点位于多边形内部，否则位于多边形外部。
 <div align = "center"> 
-<img src="readimg/safezone7.png"  width="400" />
+<img src="/assets/img/readimg/safezone7.png"  width="400" />
 </div>
 
 
@@ -103,11 +103,11 @@ box = {
 
 下面展示简单的脚本模拟:
 <div align = "center"> 
-<img src="readimg/safezone8.png"  width="300" />
-<img src="readimg/safezone9.png"  width="300" />
+<img src="/assets/img/readimg/safezone8.png"  width="300" />
+<img src="/assets/img/readimg/safezone9.png"  width="300" />
 </div>
 <div align = "center"> 
-<img src="demo/demo4.gif"  width="600" />
+<img src="/assets/img/demo/demo4.gif"  width="600" />
 </div>
 ---
 
@@ -222,16 +222,16 @@ box = {
 1. 工人踏入安全区时: 有人触碰边界, 指示变红色表示危险; 安全区内的工人数增加, 指示不变表示安全.
    
 <div align = "center"> 
-<img src="demo/demo1.gif"  width="300" />
+<img src="/assets/img/demo/demo1.gif"  width="300" />
 </div>
 
 2. 工人在安全局内移动,无踏入或踏出:指示颜色不变.
 <div align = "center"> 
-<img src="demo/demo2.gif"  width="600" />
+<img src="/assets/img/demo/demo2.gif"  width="600" />
 </div>
 
 3. 工人踏出安全区时: 有人触碰边界, 指示变红色表示危险; 安全区内的工人数减少, 指示变红色表示危险.
 
 <div align = "center"> 
-<img src="demo/demo3.gif"  width="600" />
+<img src="/assets/img/demo/demo3.gif"  width="600" />
 </div>
