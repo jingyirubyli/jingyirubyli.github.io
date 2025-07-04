@@ -16,6 +16,7 @@ author: # Add name author (optional)
 - 宿主机器操作系统：MacOS:15.3
 - 容器环境：Docker for Mac
 - 镜像版本：Ubuntu22.04(正文中出现20.04是因为我刚开始选错版本,读者根据自己情况选择即可)
+
 ## 2. 详细步骤
 ### 2.1 安装 Docker for Mac
 #### 方法一
@@ -36,7 +37,7 @@ author: # Add name author (optional)
 
 如果成功安装应输出:
 
-Docker version xxx
+> Docker version xxx
 
 尝试查看已拉取镜像:
 
@@ -44,15 +45,16 @@ Docker version xxx
 
 显示没有镜像,下一步将拉取ubuntu镜像
 
-REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+> REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+
 
 ### 2.2 拉取Ubuntu镜像
 
-我使用ubuntu20.04,所以输入:
+我使用 ubuntu20.04 ,所以输入:
 
 `$ docker pull ubuntu:20.04`
 
-注意:大家可以根据自己的需求选择版本.如果不指定版本,将下载最新版(latest).
+注意: 大家可以根据自己的需求选择版本.如果不指定版本,将下载最新版(latest).
 
 拉取完成后再次检查镜像:
 
