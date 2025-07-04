@@ -134,19 +134,17 @@ author: # Add name author (optional)
 
 1. 通过ssh 连接 ubuntu 容器
 
-安装 openssh-server 用于开启 ssh 服务供外部连接:
+  安装 openssh-server 用于开启 ssh 服务供外部连接:
 
-`apt-get install openssh-server openssh-client`
+  `apt-get install openssh-server openssh-client`
 
-安装时需要选择地区
+  安装时需要选择地区, 我好像选择的是 US central, 不知道具体有什么影响.
 
-配置 ssh
+2. 配置 ssh
 
-安装完毕后我们需要修改 sshd_config 的配置：PermitRootLogin 来允许使用 root 权限登入
+  安装完毕后我们需要修改 sshd_config 的配置：PermitRootLogin 来允许使用 root 权限登入
 
-首先启动 ssh 服务，并查看是否启动成功
-
-2. 更改一下 sshd 的默认配置，编辑文件 /etc/ssh/sshd_config:
+  首先启动 ssh 服务，并查看是否启动成功: 更改一下 sshd 的默认配置，编辑文件 /etc/ssh/sshd_config:
    
    `vim ~/etc/ssh/sshd_config`
  
@@ -157,18 +155,18 @@ vi /etc/ssh/sshd_config
 
 
  注意: 此处涉及vim命令来编辑,可自行搜索. 这里列出一些常见命令:
-    按下i键: 切换为insert模式,可以在终端中对文件进行编辑.
-    按下esc键:退出insert模式,回到命令行模式(). 
-    按下:键,在文件末尾显示的冒号后继续输入w(保存)并回车实现保存,p(退出)并回车.
-    依次按下:wp为保存并推出.   
+   - 按下i键: 切换为insert模式,可以在终端中对文件进行编辑.
+   - 按下esc键:退出insert模式,回到命令行模式(). 
+   - 按下:键,在文件末尾显示的冒号后继续输入w(保存)并回车实现保存,p(退出)并回车.
+   - 依次按下:wp为保存并推出.   
 
     &PermitRootLogin yes # 可以登录 root 用户
     &PubkeyAuthentication yes # 可以使用 ssh 公钥许可
     &AuthorizedKeysFile  .ssh/authorized_keys # 公钥信息保存到文件 .ssh/authorized_keys 中
 
-使用命令 /etc/init.d/ssh restart 进行重启，配置生效。
+使用命令 `/etc/init.d/ssh restart` 进行重启，配置生效。
 
-1. 添加主机(MacOS)的 ssh 公钥
+3. 添加主机(MacOS)的 ssh 公钥
    
 保证此时还是在 ubuntu 容器中。
 
@@ -177,20 +175,23 @@ vi /etc/ssh/sshd_config
 - 新开一个 macOS 下的终端窗口，执行命令 `cat ~/.ssh/id_rsa.pub`，复制打印的一行公钥信息
   注意: 此时可能报错如下:
 
-  (base) jingyili@JingyiLIdeMacBook-Pro ~ % cat ~/.ssh/id_rsa.pub
+>  (base) jingyili@JingyiLIdeMacBook-Pro ~ % cat ~/.ssh/id_rsa.pub
 
-    cat: /Users/jingyili/.ssh/id_rsa.pub: No such file or directory
+>    cat: /Users/jingyili/.ssh/id_rsa.pub: No such file or directory
+
 而且我搜索该报错,发现可以使用`% ssh-keygen`命令创建密钥,但是仍然报错:
 
-![图](./e1.png "报错")
-
+<figure style="text-align: center;">
+<img src="/assets/img/docker1.png" alt="error1" width="600">
+<figcaption>error1</figcaption>
+</figure>
 
     解决方法: `% ssh-keygen -t ed25519 -f ~/.ssh/id_rsa -q -N "" `
     即可成功得到输出
 
     (base) jingyili@JingyiLIdeMacBook-Pro ~ % ssh-keygen -t ed25519 -f ~/.ssh/id_rsa -q -N "" 
-(base) jingyili@JingyiLIdeMacBook-Pro ~ % cat ~/.ssh/id_rsa.pub
-ssh-ed25519AAAAC3NzaC1lZDI1NTE5AAAAIEcDeRQs6qMkYlUAO4m4V0zVfyb1CobKfYz8cNfuOTD8 jingyili@JingyiLIdeMacBook-Pro.local
+    (base) jingyili@JingyiLIdeMacBook-Pro ~ % cat ~/.ssh/id_rsa.pub
+    ssh-ed25519AAAAC3NzaC1lZDI1NTE5AAAAIEcDeRQs6qMkYlUAO4m4V0zVfyb1CobKfYz8cNfuOTD8 jingyili@JingyiLIdeMacBook-Pro.local
 
 
 - 回到 ubuntu 容器中，将第 3 步复制的公钥粘贴到 ~/.ssh/authorized_keys 中保存: `vim ~/.ssh/authorized_keys`, 退出容器.
@@ -208,10 +209,10 @@ ssh-ed25519AAAAC3NzaC1lZDI1NTE5AAAAIEcDeRQs6qMkYlUAO4m4V0zVfyb1CobKfYz8cNfuOTD8 
 
 - 删除掉原来的容器
 
-   & docker stop <容器id>
+`& docker stop <容器id>
 
    & docker rm <容器id>
-
+`
 - 使用刚提交的镜像运行一个新容器
 
 `docker run --name <容器名称> -i -t -p 2222:22 -p 3333:3333 <镜像ID> /usr/sbin/sshd -D`
@@ -222,13 +223,20 @@ ssh-ed25519AAAAC3NzaC1lZDI1NTE5AAAAIEcDeRQs6qMkYlUAO4m4V0zVfyb1CobKfYz8cNfuOTD8 
 
 在 macOS 的终端中执行命令 `ssh -p 2222 root@localhost` 即可连接已经启动的 ubuntu 容器 neo
 
-![图](./e2.png "连接成功")
+
+<figure style="text-align: center;">
+<img src="/assets/img/docker2.png" alt="连接成功" width="600">
+<figcaption>连接成功</figcaption>
+</figure>
 
 或者通过命令`ifconfig -a`获取ip地址,并使用命令:
 
 `ssh root@xxx.xxx.x.xxx -p 2222` 键入yes回车
 
-![图](./e3.png "连接成功")
+<figure style="text-align: center;">
+<img src="/assets/img/docker3.png" alt="连接成功" width="600">
+<figcaption>连接成功</figcaption>
+</figure>
 
 均可以访问虚拟机
 
@@ -236,7 +244,10 @@ ps:解决报错
 
 `rm ~/.ssh/known_hosts`
 
-![图](./e4.png "报错")
+<figure style="text-align: center;">
+<img src="/assets/img/docker4.png" alt="error2" width="600">
+<figcaption>error2</figcaption>
+</figure>
 
 ## 3. 连接VScode
 
