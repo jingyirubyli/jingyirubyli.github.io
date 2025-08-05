@@ -1,11 +1,16 @@
 ---
 layout: post
-title:  Point Cloud Data Registration 点云配准
-date:   2025-07-04
+title:  IP
+date:   2025-08-05
 description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
-img: registration.png # Add image post (optional)
-tags: [Blog, LiDAR]
+img: nat.png # Add image post (optional)
+tags: [Blog, Computer Network]
 author: # Add name author (optional)
 ---
 # 本讲内容
 
+NAT(NPAT): 当局域网内的一台电脑想要与互联网中的电脑通信时, 因为局域网内的电脑只有私网ip(不能出现在互联网上), 所以上层路由器将其ip改为公网ip, 同时重新为该连接随机分配一个端口及其与地址的映射关系. 起转发作用.
+
+端口映射: 上面所说连接一旦断开, 中介端口就不再使用. 所以内网电脑只能向外访问, 但是不能接受数据, 因为路由器不会处理. 所以需要在上面基础上分配一个永久的端口, 这样就可以一直连接通信了.
+
+内网穿透: 两个局域网中的两台电脑要连接, 需要一个中介服务器. 中介服务器的带宽会影响信息通信速度. 比起来端口映射就相当于直连.
