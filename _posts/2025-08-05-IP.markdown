@@ -287,7 +287,7 @@ DynamicForward tunnel-host:local-port
 之所以没有使用这种方式是因为，这种端口映射的方案，最终访问的是本地的端口，并不能做到内外俱为一体的效果，而且在移动端设备上似乎也没有比较好的免费客户端来满足需求。
 
 
-### ZeroTier
+### ZeroTier/WireGuard
 
 
 
