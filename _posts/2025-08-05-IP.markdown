@@ -27,4 +27,12 @@ NAT 全称 Network Address Translation，即网络地址转换，可以理解为
 一个常见的网络数据从网络流量角度来看可以分为五部分：源IP、源端口、协议、目的IP、目的端口；这就是常说的五元组，如果不算协议的话就是四元组，IP通信能正常运行的关键就是这五元组。
 
 > SrcAddr; SrcPort; Protocol; 
+
 NAT 通常是个路由器，且最早是作为 iPv4 地址短缺的一种解决方案而流行起来的。由于公网IPv4地址早已经耗尽，以现在的大众上网的终端数量来看IP地址已经不够用，但现在看起来好像也没受什么影响，这个就得益于一种NAT技术--NAPT也称为PAT，即端口转换。NAPT是一种IP地址复用技术，由于大多数网络流量都基于TCP和UDP，这种传输层协议的寻址使用端口，端口号为1~65535，端口号是充裕的，“复用IP地址”+“改写端口号”是PAT技术的理论基础。
+
+以常见的基于地址和端口转换的 NAPT 为例。如下图所示，假设有台路由器的公网地址为 172.217.194.113 ；此时内网有台地址为 10.0.0.1 的设备想要访问公网服务器，则：
+
+<figure style="text-align: center;">
+<img src="/assets/img/nat1.png" alt="NAPT" width="500">
+<figcaption>NAPT</figcaption>
+</figure>
