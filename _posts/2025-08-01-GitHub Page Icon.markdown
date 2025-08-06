@@ -3,7 +3,7 @@ layout: post
 title:  GitHub Page Icon 修改
 date:   2025-08-01
 description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
-img: 1.png # Add image post (optional)
+img: zhang1.png # Add image post (optional)
 tags: [Blog]
 author: # Add name author (optional)
 ---
