@@ -19,7 +19,9 @@ author: # Add name author (optional)
 sudo brew install wireguard-tools
 ```
 
-参考官网 https://www.wireguard.com/install/
+参考[官网][wireguard]
+
+[wireguard]:https://www.wireguard.com/install/
 
 ## 配置
 
