@@ -1,0 +1,18 @@
+---
+layout: post
+title:  ngrok
+date:   2025-08-06
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: ngrok.png # Add image post (optional)
+tags: [Blog]
+author: # Add name author (optional)
+---
+# 本讲内容
+
+
+Ngrok 是一个用于实现 内网穿透 的工具，可以让你把运行在本地设备（如你自己的电脑或开发服务器）上的服务，映射成一个 公网可访问的地址（URL），即使你的设备处于 NAT 或防火墙之后。Ngrok 的工作原理:
+
+1.	你在本地运行一个服务，例如：localhost:5000
+2.	你启动 Ngrok：ngrok http 5000
+3.	Ngrok 将创建一个到 Ngrok 云服务器的隧道，并生成一个公网 URL（如 https://abc123.ngrok.io）
+4.	外部用户访问这个 URL，Ngrok 就会把流量转发到你本地的 5000 端口。
