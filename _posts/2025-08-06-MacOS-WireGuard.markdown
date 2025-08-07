@@ -3,7 +3,7 @@ layout: post
 title:  MacOS(M3) 配置 WireGuard
 date:   2025-08-06
 description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
-img: .png # Add image post (optional)
+img: wireguard.png # Add image post (optional)
 tags: [Blog]
 author: # Add name author (optional)
 ---
@@ -59,7 +59,7 @@ PersistentKeepalive = 21
 
 ```
 
-我卡在这一步,因为公网ip要买...
+我卡在这一步,因为公网ip要买...(但是他家的标蛮好看的是条龙...)
 
 ## 服务器参数配置
 
