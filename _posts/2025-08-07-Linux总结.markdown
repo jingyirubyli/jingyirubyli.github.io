@@ -1,0 +1,21 @@
+---
+layout: post
+title:  Linux总结
+date:   2025-08-07
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: linux.png # Add image post (optional)
+tags: [Blog]
+author: # Add name author (optional)
+---
+# 本讲内容
+
+Linux: 一套开源的C语言文件, 支持多用户同时操作, 多任务, 支持多CPU, 多线程的操作系统, 类Unix(Unix使用收费,商业化). 主要用在服务器端、 无人机/物流机器人等嵌入式开发、 个人PC桌面等.
+
+指令(人发明的) --> shell/bash解释器 --> 计算机可以理解的机器码 --> 计算机硬件识别机器码并执行动作 --> 输出结果,用户看到结果 
+
+Unix技术成熟,可靠性高, 可伸缩性强, 支持很多CPU架构包括intel/amd/hp等. 强大的网络功能: TCP/IP协议就是基于Unix开发. 强大的数据库能力: Oracle/DB2/mysql等. 强大的开发能力: C/java等
+
+<figure style="text-align: center;">
+<img src="/assets/img/linux1.png" alt="" width="500">
+<figcaption>Unix-Linux-iOS-Andorid-鸿蒙</figcaption>
+</figure>
