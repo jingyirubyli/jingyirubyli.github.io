@@ -19,3 +19,29 @@ Unix技术成熟,可靠性高, 可伸缩性强, 支持很多CPU架构包括intel
 <img src="/assets/img/linux1.png" alt="" width="500">
 <figcaption>Unix-Linux-iOS-Andorid-鸿蒙</figcaption>
 </figure>
+
+自由软件: 没有商业化的版权制约, 源代码自由开放, 可以自由传播. 比如redhat linux自由传播,但不免费完全使用. centos linux是自由传播且完全免费.
+
+自由软件基金会FSF(free software foundation) 发起 [GNU][gnu] 活动: 建立一套完全自由可移植的类Unix操作系统. gnu的组件迁移到了linux, 如gcc编译器, bash解释器, gawk命令等.
+
+[gnu]: https://www.gnu.org
+
+GPL(General Public License) 通用公共许可
+
+---
+
+## Linux
+
+### 命令
+
+-a: all, 列出所有文件包括隐藏文件
+-l: 列出详细信息
+whoami: 显示当前登录的用户
+hostname: 显示当前机器的主机名
+pwd: 显示当前的工作目录绝对路径
+
+### 目录结构
+
+第一个/表示根目录, 后面的/表示分割.
+
+
