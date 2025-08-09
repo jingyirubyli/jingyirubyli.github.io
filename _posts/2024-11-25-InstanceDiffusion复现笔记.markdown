@@ -100,8 +100,7 @@ ScaleULayer 是 UNetModel 中一个特定函数的一部分，用于实现一种
 此外，该模型在输出分支中注册了多个缩放参数（scaleu b 和 scaleu s），用于控制特征的缩放和过滤。在前向函数的输出阶段，UNet 通过检查 enable scaleu 是否已启用来决定是否在特定层上应用 ScaleU 机制。每个输出块在前向传播过程中会通过 scaleu b 和 scaleu s 调整其特征图。scaleu b 用于缩放每个特征的幅度，从而控制特征的强度；而 scaleu s 用于通过傅里叶滤波操作调整特征的频率和层级。这种调整方法使网络能够更精细地控制不同特征尺度下的特征图。
 
 <figure style="text-align: center;">
-<img src="/assets/inst4.png" alt="" width="400">
-<img src="/assets/inst5.png" alt="" width="400">
+<img src="/assets/inst4.png" alt="" width="400"><img src="/assets/inst5.png" alt="" width="400">
 <figcaption>ScaleU</figcaption>
 </figure>
 
