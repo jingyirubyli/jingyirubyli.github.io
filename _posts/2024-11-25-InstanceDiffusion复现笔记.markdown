@@ -72,3 +72,38 @@ InstanceDiffusion（Wang 等人，2024）的目标是允许在图像生成过程
 <figcaption>数据生成</figcaption>
 </figure>
 
+### 模型结构
+
+只写两个关键创新模块.
+
+**UniFusion Block:**
+UniFusion 类的核心功能是将不同类型的“实例信息”融合到生成模型的输入中。这里的“实例信息”指的是图像中某些特定对象或区域的描述信息（例如框、点、涂鸦、蒙版等）。
+利用这些信息，我们可以控制图像生成模型生成的细节，并让模型“知道”需要关注哪些特定对象或区域。
+通过使用傅里叶嵌入、条件卷积和可选的独立线性处理器，UniFusion 模块可以灵活地嵌入各种实例条件（例如框、点和蒙版）。在训练过程中，模型会随机“丢弃”一些输入以增强鲁棒性；而在测试过程中，模型可以根据条件选择是否使用这些输入。这种设计提高了实例控制的准确性，并允许多种输入组合，为细粒度图像生成提供了更强大的控制能力。
+
+
+<figure style="text-align: center;">
+<img src="/assets/img/inst3.png" alt="" width="400">
+<figcaption>UniFusion</figcaption>
+</figure>
+
+此代码定义了用于实例控制图像生成任务的 InstanceDiffusion 模型的一些超参数：将涂鸦的点数设置为
+20，以表示涂鸦的形状和位置；将
+多边形（即蒙版边缘）的点数设置为
+256，以细化蒙版形状；将傅里叶嵌入的频率设置为对边界、点等的位置坐标进行傅里叶嵌入，以增强位置编码；布尔值决定模型是否在训练期间添加框、点、涂鸦和蒙版作为额外的控制输入，以生成针对特定实例的条件控制；当
+use-separate-tokenizer 设置为 True 时，每种输入类型将使用单独的编码器或线性层进行处理，以保留其自身特性，帮助模型更好地融合和区分不同类型的控制信号。初始化超参数，以便在后续处理中能够根据不同类型的输入控制信号调整生成过程。
+
+**ScaleU block:**
+基于 UNet（Ronneberger、Fischer 和 Brox，2015），
+对 UNet 的主要特征和跳跃特征进行处理和加权。主要特征和跳跃特征都设计了一个参数来控制其权重。
+ScaleULayer 是 UNetModel 中一个特定函数的一部分，用于实现一种名为“ScaleU”的特征调整机制。在 UNetModel 中，它使用 ScaleU 来控制输出分支（即输出块）中某些层的特征图的缩放和调整。在 UNetModel 的初始化方法中，将 enable scaleu 设置为 True，表示启用 ScaleU 机制。
+此外，该模型在输出分支中注册了多个缩放参数（scaleu b 和 scaleu s），用于控制特征的缩放和过滤。在前向函数的输出阶段，UNet 通过检查 enable scaleu 是否已启用来决定是否在特定层上应用 ScaleU 机制。每个输出块在前向传播过程中会通过 scaleu b 和 scaleu s 调整其特征图。scaleu b 用于缩放每个特征的幅度，从而控制特征的强度；而 scaleu s 用于通过傅里叶滤波操作调整特征的频率和层级。这种调整方法使网络能够更精细地控制不同特征尺度下的特征图。
+
+<figure style="text-align: center;">
+<img src="/assets/inst4.png" alt="" width="400">
+<img src="/assets/inst5.png" alt="" width="400">
+<figcaption>ScaleU</figcaption>
+</figure>
+
+### 实验过程
+
