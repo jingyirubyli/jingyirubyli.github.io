@@ -184,9 +184,70 @@ sysfs 文件系统集成了下面3种文件系统的信息：针对进程信息�
 
 
 
-
 在 Linux 系统中，有几个目录是比较重要的，平时需要注意不要误删除或者随意更改内部文件。
 /etc： 上边也提到了，这个是系统中的配置文件，如果你更改了该目录下的某个文件可能会导致系统不能启动。
 /bin, /sbin, /usr/bin, /usr/sbin: 这是系统预设的执行文件的放置目录，比如 ls 就是在 /bin/ls 目录下的。
 值得提出的是 /bin、/usr/bin 是给系统用户使用的指令（除 root 外的通用用户），而/sbin, /usr/sbin 则是给 root 使用的指令。
 /var： 这是一个非常重要的目录，系统上跑了很多程序，那么每个程序都会有相应的日志产生，而这些日志就被记录到这个目录下，具体在 /var/log 目录下，另外 mail 的预设放置也是在这里。
+
+### 一些重要的配置文件(etc中)
+
+在 macOS 上，找不到 /etc/sysconfig 这个目录，是因为它是 Linux（尤其是 Red Hat/CentOS 系列） 特有的配置目录，macOS 并没有这个路径。
+
+macOS 基于 BSD（Darwin 内核），系统配置文件的位置和结构与 Linux 不同，所以对应的配置通常在这些地方：
+
+|      **Linux /etc/sysconfig 的作用**     |                 **macOS 对应位置/文件**                 |
+|:----------------------------------------:|:-------------------------------------------------------:|
+| 网络配置 /etc/sysconfig/network-scripts/ |  /etc/hosts、/etc/resolv.conf，或用 系统偏好设置 → 网络 |
+|               系统服务配置               | /Library/LaunchDaemons/、/System/Library/LaunchDaemons/ |
+|               环境变量设置               |              ~/.zshrc（或 ~/.bash_profile）             |
+
+如果将 /etc/resolv.conf中的nameserver注释掉,那么他就没有域名解析功能了, 此时ping baidu.com 会报错: 未知的名称或服务. 但是他仍然可以上网, 因为可以ping公网ip
+
+<figure style="text-align: center;">
+<img src="/assets/img/linux3.png" alt="" width="500">
+<figcaption>ping baidu.com</figcaption>
+</figure>
+
+Linux直接用 cat /etc/hostname 读取主机名称. MacOS 会在 /etc/hosts 和 /etc/hostname 里保存信息，不过很多时候 /etc/hostname 并不存在，因为主机名是动态从系统设置里读的。可以用 scutil 命令（macOS 专用）:
+
+```
+scutil --get HostName      # 系统自定义的主机名
+scutil --get LocalHostName # Bonjour 名称
+scutil --get ComputerName  # 在“共享”里显示的名字
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/linux4.png" alt="" width="500">
+<figcaption>hostname</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+<img src="/assets/img/linux5.png" alt="" width="500">
+<figcaption>cat hosts</figcaption>
+</figure>
+
+Linux中的motd文件会显示welcome, 在 macOS 上，/etc/motd（Message of the Day）文件确实存在，不过默认是空的或不存在，因为 macOS 登录时不会像传统 Linux 一样自动显示 MOTD，需要你用 ssh localhost 登录本机才会看到。总之如果你是想找 Linux 教程里那种 SSH 登录显示 MOTD 的效果，macOS 上要么改 /etc/motd 并通过 SSH 登录，要么在 shell 启动文件里自己加显示逻辑。那个喜闻乐见的佛祖保佑就是这么做的.
+
+cat /etc/os-release输出当前机器版本信息. MacOS使用命令: 
+
+```
+sw_vers     # 简略信息
+system_profiler SPSoftwareDataType # 详细信息
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/linux6.png" alt="" width="500">
+<figcaption>MacOS 查看版本信息</figcaption>
+</figure>
+
+Linux中/proc/cpuinfo保存CPU相关信息, /proc/meminfo保存内存相关信息. 在 macOS 上找不到 /proc 目录，因为那是 Linux 内核提供的 procfs（proc 文件系统），用来以文件形式暴露内核和进程信息。macOS 基于 BSD/Darwin 内核，没有挂载 /proc，所以：
+
+| **Linux /proc 内容** |      **macOS 替代方法**      |
+|:--------------------:|:----------------------------:|
+|     /proc/cpuinfo    |          `sysctl -a          |
+|     /proc/meminfo    |        vm_stat 或 top        |
+| /proc/[pid] 进程信息 | ps -p <PID> -o pid,ppid,comm |
+|     /proc/mounts     |             mount            |
+|     /proc/uptime     |            uptime            |
+|     /proc/version    |           uname -a           |
