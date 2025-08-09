@@ -68,9 +68,10 @@ InstanceDiffusion（Wang 等人，2024）的目标是允许在图像生成过程
 我们应该有一个包含图片路径和图片标题的“train data.json”文件。经过一些处理后，将获得所需的json文件（名为output\output.json），其中包含每张图片的文本描述和文件地址，并与以下内容对齐。
 
 <figure style="text-align: center;">
-<img src="/assets/img/inst2.png" alt="" width="400">
+<img src="/assets/img/inst6.png" alt="" width="400"><img src="/assets/img/inst2.png" alt="" width="400">
 <figcaption>数据生成</figcaption>
 </figure>
+
 
 ### 模型结构
 
@@ -105,4 +106,51 @@ ScaleULayer 是 UNetModel 中一个特定函数的一部分，用于实现一种
 </figure>
 
 ### 实验过程
+
+**版本要求**
+- MacOS with Python ≥3.8
+- PyTorch ≥2.0 and torchvision that matches the PyTorch installation
+- OpenCV ≥4.6
+
+**部署**
+
+- Python: 3.8.20
+- PyTorch: 2.4.1
+- opencv-python: 4.10.0.84
+
+此处debug: 已完成系统和硬件不兼容问题的调试。
+- 已通过 PyPI 和 sudo 安装并配置依赖项。
+- 已将无法启用的手动配置依赖项: 通过 PyPI 或 sudo 直接安装到相应路径。
+
+已生成训练数据。
+- 如果您的硬件支持该项目，您可以直接运行脚本并获取数据。但很可能您需要手动执行此操作。
+- 查找数据集并处理其格式，以获取符合要求的训练数据。
+- 示例如下
+
+<figure style="text-align: center;">
+<img src="/assets/img/inst7.png" alt="" width="400">
+<figcaption>生成训练数据对象</figcaption>
+</figure>
+
+**可视化**
+
+获得可用于图像参考的样本：位于指定位置的多个方块，每个方块都有相应的文字描述，如图。
+
+<figure style="text-align: center;">
+<img src="/assets/img/inst8.png" alt="" width="400">
+<figcaption>文本块</figcaption>
+</figure>
+
+模型训练脚本已成功运行，并获取了相应的权重文件以及运行时的网络预设和配置。然而，由于硬件设备的限制，无法获取训练结束时的权重。此外，运行过程中经常出现崩溃，因此这些权重无法用于实际任务和性能测试。为了解决训练过程中出现的问题，我咨询了论文原作者关于训练部署的问题，这也会影响代码的运行。
+他在项目论坛中回复道：“Submitt 是一个在 Slurm 集群中提交 Python 函数进行计算的工具。如果您没有使用 Slurm 集群，则可能需要直接运行主程序 submitit.py（可能需要进行一些小修改）才能在本地启动实验。我们使用 64 块 A100-80G GPU 进行模型训练。我们从未尝试过使用 3090 GPU 进行模型训练，我认为如果您使用两块 24G 的 3090 GPU，可能会遇到 OOM 错误。” 由此可见，该项目的实施也高度依赖于设备。
+
+### 总结
+
+运行模型训练脚本，稍等片刻，即可在当前路径的输出文件夹中找到生成的日志文件。在相应的子文件夹中，您可以看到训练预设信息和执行过程信息，以及在同一子文件夹中生成的权重文件。由于训练尚未完成，我认为该权重文件是初始输出，即训练过程中用于阶段评估的检查点，而不是完美训练的最终权重。
+
+<figure style="text-align: center;">
+<img src="/assets/img/inst9.png" alt="" width="400">
+<figcaption>输出模型</figcaption>
+</figure>
+
 
