@@ -389,3 +389,79 @@ chmod a-x [文件名]
 ---
 
 ## Linux 文件与目录管理
+
+Linux 的目录结构为树状结构，最顶级的目录为根目录 /。
+其他目录通过挂载可以将它们添加到树中，通过解除挂载可以移除它们。首先介绍绝对路径与相对路径。
+- 绝对路径：由根目录 / 写起，例如： /usr/share/doc 这个目录。
+- 相对路径：不是由 / 写起，例如由 /usr/share/doc 要到 /usr/share/man 底下时，可以写成： cd ../man 这就是相对路径的写法。
+
+几个常见的处理目录的命令：
+- ls（list files）: 列出目录及文件名
+- cd（change directory）：切换目录
+- pwd（print work directory）：显示目前的目录
+- mkdir（make directory）：创建一个新的目录
+- rmdir（remove directory）：删除一个空的目录
+- cp（copy file）: 复制文件或目录
+- rm（remove）: 删除文件或目录
+- mv（move file）: 移动文件与目录，或修改文件与目录的名称
+
+使用 man [命令] 来查看各个命令的使用文档，如 ：man cp。
+
+### ls
+
+```
+[root@www ~]# ls [-aAdfFhilnrRSt] 目录名称  ## 可选参数
+[root@www ~]# ls [--color={never,auto,always}] 目录名称  ## 控制 ls 输出时是否使用颜色高亮文件类型
+[root@www ~]# ls [-T] 目录名称  ## 时间. linux命令: ls [--full-time] 目录名称
+```
+
+**-aAdfFhilnrRSt**
+> -a 显示所有文件（包括隐藏文件）
+> -A 类似 -a，但不显示 . 和 ..
+> -d 只显示目录本身，不显示目录内容
+> -f 不排序，直接输出结果
+> -F 在文件名后加标识符（如 / 表示目录，* 表示可执行文件）
+> -h 人类可读的文件大小（KB、MB、GB）
+> -i 显示 inode 号码
+> -l 长列表格式显示
+> -n 用数字显示用户和组 ID（而不是名字）
+> -r 反向排序
+> -R 递归列出子目录
+> -S 按文件大小排序
+> -t 按时间排序
+
+<figure style="text-align: center;">
+<img src="/assets/img/linux12.png" alt="" width="500">
+<figcaption>ls可选参数</figcaption>
+</figure>
+
+**--color**
+
+> never 从不显示颜色
+> auto 默认自动显示（通常是终端才显示颜色，重定向到文件时不显示）
+> always 始终显示颜色
+
+<figure style="text-align: center;">
+<img src="/assets/img/linux12.png" alt="" width="500">
+<figcaption>强制显示颜色</figcaption>
+</figure>
+
+**-T**
+在长格式 (-l) 显示时，输出完整的时间信息（包含秒和时区），而不是精确到分钟。
+
+<figure style="text-align: center;">
+<img src="/assets/img/linux13.png" alt="" width="500">
+<figcaption>精确到秒的时间</figcaption>
+</figure>
+
+选项与参数：
+- -a ：全部的文件，连同隐藏文件( 开头为 . 的文件) 一起列出来(常用)
+- -d ：仅列出目录本身，而不是列出目录内的文件数据(常用)
+- -l ：长数据串列出，包含文件的属性与权限等等数据；(常用)
+
+如:将目录下的所有文件列出来(含属性与隐藏档)
+
+```
+[root@www ~]# ls -al ~
+```
+
