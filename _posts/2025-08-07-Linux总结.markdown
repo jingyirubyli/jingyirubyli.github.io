@@ -30,7 +30,32 @@ GPL(General Public License) 通用公共许可
 
 这篇内容在MacOS上介绍, 用 VM Ware 装一个Linux也很简单, 我之前装了一个, 觉得那个紫红色界面太丑了就删了(绿色青蛙五个字...).
 
-[TOC]
+- [本讲内容](#本讲内容)
+  - [Linux 的一些基础](#linux-的一些基础)
+    - [几个基础命令](#几个基础命令)
+    - [目录结构](#目录结构)
+    - [一些重要的配置文件(etc中)](#一些重要的配置文件etc中)
+  - [Linux 用户权限](#linux-用户权限)
+    - [文件的属性以及文件属主和属组](#文件的属性以及文件属主和属组)
+    - [更改文件属性](#更改文件属性)
+  - [Linux 文件与目录管理](#linux-文件与目录管理)
+    - [ls](#ls)
+    - [cd](#cd)
+    - [pwd](#pwd)
+    - [mkdir](#mkdir)
+    - [rmdir](#rmdir)
+    - [rm](#rm)
+    - [mv](#mv)
+    - [cp](#cp)
+  - [Linux 文件内容查看](#linux-文件内容查看)
+    - [cat/tac](#cattac)
+    - [nl](#nl)
+    - [more](#more)
+    - [less](#less)
+    - [head/tail](#headtail)
+  - [Linux 用户和用户组管理](#linux-用户和用户组管理)
+  - [Linux 磁盘管理](#linux-磁盘管理)
+  - [](#)
 
 ---
 
