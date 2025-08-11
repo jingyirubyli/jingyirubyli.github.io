@@ -10,3 +10,20 @@ author: # Add name author (optional)
 # 本讲内容
 
 测试
+
+8-11:
+
+我服了, 今天上午编辑我的blog, 不知道为什么左下角突然出现一个多余的注释符右半部分, 查遍了地方也不知道为什么. 刚刚试着注释另一条, 发现在它的左下角又多了一个. 合着这是带 {% 符的不能直接注释吗??如图
+
+<figure style="text-align: center;">
+<img src="/assets/img/testbug1.png" alt="" width="400">
+<figcaption>被 {% ...%}括起来的直接注释会多-->, 我还是觉得是编译错误了, 不应该啊</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+<img src="/assets/img/testbug2.png" alt="" width="500">
+<figcaption>多的右半边注释符</figcaption>
+</figure>
+
+
+
