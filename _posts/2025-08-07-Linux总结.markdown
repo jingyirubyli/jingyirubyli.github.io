@@ -46,6 +46,7 @@ GPL(General Public License) 通用公共许可
     - [rmdir](#rmdir)
     - [rm](#rm)
     - [mv](#mv)
+    - [touch](#touch)
     - [cp](#cp)
   - [Linux 文件内容查看](#linux-文件内容查看)
     - [cat/tac](#cattac)
@@ -583,7 +584,9 @@ rm [-fir] 文件或目录
 
 如果将文件a更名为b: mv a b
 
+### touch
 
+语法类似mkdir. 有两个作用: 1. 创建普通文件, 2. 修改文件的时间(相当于覆盖一下吧). 不存在的文件就会被创建为空文件.
 
 ### cp
 
