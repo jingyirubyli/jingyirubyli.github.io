@@ -9,6 +9,13 @@ author: # Add name author (optional)
 ---
 # 本讲内容
 
+<script src="https://unpkg.com/vanilla-back-to-top@7.2.1/dist/vanilla-back-to-top.min.js"></script>
+<script>addBackToTop({
+  diameter: 56,
+  backgroundColor: 'rgb(255, 82, 82)',
+  textColor: '#fff'
+})</script>
+
 Linux: 一套开源的C语言文件, 支持多用户同时操作, 多任务, 支持多CPU, 多线程的操作系统, 类Unix(Unix使用收费,商业化). 主要用在服务器端、 无人机/物流机器人等嵌入式开发、 个人PC桌面等.
 
 指令(人发明的) --> shell/bash解释器 --> 计算机可以理解的机器码 --> 计算机硬件识别机器码并执行动作 --> 输出结果,用户看到结果 
