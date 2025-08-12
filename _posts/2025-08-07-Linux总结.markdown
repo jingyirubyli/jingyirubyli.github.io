@@ -4,7 +4,7 @@ title:  Linux总结
 date:   2025-08-07
 description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
 img: linux.png # Add image post (optional)
-tags: [Blog]
+tags: [Blog, Linux]
 author: # Add name author (optional)
 ---
 # 本讲内容
@@ -62,13 +62,15 @@ GPL(General Public License) 通用公共许可
   - [vi/vim](#vivim)
   - [yum](#yum)
   - [apt](#apt)
+  - [shutdown](#shutdown)
 
 ---
 
 ## Linux 的一些基础
 
-### 几个基础命令
+### 几个基础命令和快捷键
 
+**基础命令**
 -a: all, 列出所有文件包括隐藏文件
 
 -l: 列出详细信息
@@ -78,6 +80,28 @@ whoami: 显示当前登录的用户
 hostname: 显示当前机器的主机名
 
 pwd: 显示当前的工作目录绝对路径
+
+which xx: 查看xx路径目录
+
+**快捷键**
+
+ctrl + c: 取消当前操作
+ctrl + l: 清空屏幕内容
+ctrl + d: 退出当前用户
+ctrl + a: 光标移到行首
+ctrl + e: 光标移到行尾
+ctrl + u: 删除光标到行首的内容
+
+**查看环境变量**
+
+```
+echo $PATH
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/linux18.png" alt="" width="500">
+<figcaption>查看环境变量</figcaption>
+</figure>
 
 
 ### 目录结构
@@ -982,6 +1006,12 @@ Linux 磁盘管理常用三个命令为 df、du 和 fdisk。
 - gf : 跳转到路径指示的文档中
 - ctrl + o ： 返回原文档
 
+<figure style="text-align: center;">
+<img src="/assets/img/linux19.png" alt="" width="500">
+<figcaption>vim</figcaption>
+</figure>
+
+**swp:**
 
 
 ---
@@ -1012,3 +1042,9 @@ apt 命令执行需要超级管理员权限(root), 也就是sudo apt ...
 ```
 apt [options] [command] [package ...]
 ```
+
+
+
+## Linux 重启或关机
+
+shutdown, logout, reboot等很多命令
