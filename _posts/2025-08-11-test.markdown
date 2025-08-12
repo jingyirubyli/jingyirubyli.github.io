@@ -17,7 +17,7 @@ author: # Add name author (optional)
 
 <figure style="text-align: center;">
 <img src="/assets/img/testbug1.png" alt="" width="400">
-<figcaption>被 {% ...%}括起来的直接注释会多-->, 我还是觉得是编译错误了, 不应该啊</figcaption>
+<figcaption>被 括起来的直接注释会多-->, 我还是觉得是编译错误了, 不应该啊</figcaption>
 </figure>
 
 <figure style="text-align: center;">
