@@ -1,0 +1,12 @@
+---
+layout: post
+title:  云计算
+date:   2025-08-13
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: cloud.png # Add image post (optional)
+tags: [Blog, Cloud Computing]
+author: # Add name author (optional)
+---
+# 本讲内容
+
+
