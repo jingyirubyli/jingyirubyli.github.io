@@ -1071,7 +1071,10 @@ yum [options] [command] [package ...]
 
 看了一下yum --version, 我这个系统里面没装. 应该是之前的linux里装的.
 
-
+> wget 是一种下载工具是通过HTTP、HTTPS、FTP三个最常见的TCP/IP协议下载，并可以使用HTTP代理，而且wget可以在用户退出系统的之后在后台执行。名字是World Wide Web”与“get”的结合。
+> 而 yum 是redhat, centos 系统下的软件安装方式，基于Linux，是一个在Fedora和RedHat以及CentOS中的Shell前端软件包管理器。是基于RPM包管理，能够从指定的服务器自动下载RPM包并且安装，可以自动处理依赖性关系，并且一次安装所有依赖的软件包。
+> rpm: 软件管理; redhat的软件格式 rpm r=redhat p=package m=management. 用于安装 卸载 .rpm软件
+将他们两个 比较呢 就好比 wget是迅雷下载中心，yum 呢就像是应用商店 里面有很多软件当然也有没有的
 
 ---
 
