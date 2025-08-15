@@ -9,7 +9,13 @@ author: # Add name author (optional)
 ---
 # 本讲内容
 
+Web 网络服务是一种被动访问的服务程序，即只有接收到互联网中其他主机发出的 请求后才会响应，最终用于提供服务程序的Web 服务器会通过 HTTP（超文本传输协议））或 HTTPS（安全超文本传输协议）把请求的内容传送给用户。
+目前能够提供 Web 网络服务的程序有 II5、Nginx 和 Apache 等。其中，IIS（Iinternet Information Services，互联网信息服务）是Windows 系统中默认的Web 服务程序. 
+2004年10月4日，为俄罗斯知名门户站点而开发的 Web 服务程序 Nginx 横空出世。Nginx 程序作为一款轻量级的网站服务软件，因其稳定性和丰富的功能而快速占领服务器市 场，但 Nginx 最被认可的还当是系统资源消耗低且并发能力强，因此得到了国内诸如新浪、网易、腾讯等门户站的青睐。
 
+web服务器(nginx): 接受http请求并返回数据
+
+web框架(django, flask): 开发web应用程序, 处理接收到的数据.
 
 ## nginx
 
