@@ -1,0 +1,90 @@
+---
+layout: post
+title:  nginx和钓鱼网站
+date:   2025-08-15
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: nginx.png # Add image post (optional)
+tags: [Blog]
+author: # Add name author (optional)
+---
+# 本讲内容
+
+
+
+## nginx
+
+### Homebrew 安装 nginx
+
+- brew搜索软件命令： brew search nginx  
+-  brew安装软件命令： brew install nginx
+-   brew卸载软件命令:  brew uninstall nginx
+
+**nginx -v**  验证 nginx 是否安装成功， 若显示版本信息则证明安装成功。
+
+### Homebrew 启动 nginx
+
+```
+% brew services start nginx  # 启动
+% brew services stop nginx   # 停止
+% brew services list    # 查看状态
+```
+==> Successfully started `nginx` (label: homebrew.mxcl.nginx)
+
+验证nginx是否正常启动, 检查机器的进程信息和端口信息:
+
+```
+% ps -ef  # 查看所有进程信息
+% ps -ef | grep "nginx"  # grep过滤命令, 只查看nginx 
+% netstat -tunlp | grep "nginx"  # 查看端口信息, nginx默认80端口
+```
+
+**MacOS查看端口:**
+
+```
+% cat /opt/homebrew/etc/nginx/nginx.conf | grep listen
+% sudo lsof -i -P | grep nginx
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/nginx1.png" alt="" width="400">
+<figcaption>MacOS查看nginx进程和端口</figcaption>
+</figure>
+
+
+### 访问nginx服务页面
+
+浏览器访问: http://[自己机器的ip地址]:8080
+
+如果修改这个网站的显示内容, 甚至仿冒真实网站界面，就能导致欺骗消费者或者窃取访问者提交的账号和密码信息。钓鱼网站一般只有一个或几个页面，和真实网站差别细微。
+
+首先尝试利用curl命令, 发起http网络请求并且验证对方网站的信息:
+
+```
+curl https://www.taobao.com
+curl -I https://www.taobao.com  # 可以看到web服务器信息(https://tengine.taobao.org)
+
+curl -I 10.0.0.94:8080    
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/nginx3.png" alt="" width="500">
+<figcaption>查看淘宝网进程和端口</figcaption>
+</figure>
+
+
+<figure style="text-align: center;">
+<img src="/assets/img/nginx2.png" alt="" width="400">
+<figcaption>查看自己机器nginx进程和端口</figcaption>
+</figure>
+
+
+<figure style="text-align: center;">
+<img src="/assets/img/nginx4.png" alt="" width="400">
+<figcaption>查看nginx安装文件和路径信息</figcaption>
+</figure>
+
+```
+% rpm -ql nginx | grep "index"  
+```
+
+如果使用某些方法修改index.html的内容, 如vim, 就可以仿冒网站内容.
