@@ -84,7 +84,7 @@ curl -I 10.0.0.94:8080
 </figure>
 
 ```
-% rpm -ql nginx | grep "index"  
+% rpm -ql nginx | grep "index"  # Linux系统
 ```
 
 如果使用某些方法修改index.html的内容, 如vim, 就可以仿冒网站内容.
