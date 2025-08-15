@@ -17,7 +17,7 @@ web服务器(nginx): 接受http请求并返回数据
 
 web框架(django, flask): 开发web应用程序, 处理接收到的数据.
 
-## nginx
+## nginx 安装与简单熟悉
 
 ### Homebrew 安装 nginx
 
@@ -94,3 +94,74 @@ curl -I 10.0.0.94:8080
 ```
 
 如果使用某些方法修改index.html的内容, 如vim, 就可以仿冒网站内容.
+
+
+---
+
+## nginx 使用
+
+### 静态网站配置
+
+MacOS路径: /opt/homebrew/Cellar/nginx/1.27.5/html/index.html
+
+没有找到nginx.conf
+
+### 基于端口的多虚拟主机
+
+在一个nginx下基于多个端口可以处理多个网站的内容: 修改配置文件,重启即可, 仍然是nginx.conf. 当然路径里面要有东西.
+
+nginx.conf中一个虚拟主机(server块)就代表支持一个网站
+
+### 访问日志
+
+nginx能记录用户的每一次访问请求, 可以掌握服务器的动态信息; 可以对用户行为进行监测分析, 如访问时间/次数/频率.
+
+仍然是修改配置nginx.conf:
+
+```
+# 如果只有一个虚拟主机, 只需要在server块中把 access_log 打开.
+# 如果有多个虚拟主机, 要关注nginx.conf的层级关系
+
+http{
+
+    # 日志功能写在这里, 对以下所有网站都适用
+
+    # 虚拟主机1
+    server{
+
+    }
+
+    # 虚拟主机2
+    server{
+
+
+    }
+
+    # 日志功能的具体配置如下
+
+    include mime.types;
+    default_type application/octet-stream;
+    
+    log_format main '$remote_addr - $remote_user [$time_local] "$request"
+                    '$status $body_bytes_sent "$http_referer" '
+                    '"Shttp_user_agent" "$http_X_forwarded_for"*;
+    access_log logs/access.log main;
+
+    # -t 检查修改后的配置语法是否正确
+    # -s reload 重启nginx
+    # tail -f 监测
+}
+```
+
+
+### 代理与中介
+
+修改nginx.conf
+
+编辑server块中location部分: 
+
+```
+location / {
+    proxy_pass 代理网址;
+}
+```
