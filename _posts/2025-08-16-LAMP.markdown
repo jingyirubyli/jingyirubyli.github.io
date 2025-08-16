@@ -45,3 +45,24 @@ brew install php
 php -v
 # 浏览器可以访问 http://localhost
 ```
+
+### apache适配php
+
+在 macOS Monterey 之后，Apple 已经移除了系统自带的 PHP, 如果 是 macOS Catalina 或更早版本, macOS 自带了 PHP，只是默认没有启用, 需要在 /etc/apache2/httpd.conf 中找到下面这行（大概在 170 行附近）：
+
+```
+#LoadModule php7_module libexec/apache2/libphp7.so 
+# 取消上行注释
+sudo apachectl restart  # 重启
+```
+
+如果是 macOS Monterey (12) 或之后, Apple 已经彻底移除了 PHP, 所以 /etc/apache2/httpd.conf 里面 不会有任何 PHP 配置。
+
+我查了好久方法, 发现不需要多做操作, 直接在httpd.conf中确认好DocumentIndex路径, 在对应路径中写.php就可以, 比如我写了一个index.php, 浏览器访问http://localhost/index.php:
+
+
+<figure style="text-align: center;">
+<img src="/assets/img/lamp3.png" alt="" width="400">
+<figcaption>php配置</figcaption>
+</figure>
+
