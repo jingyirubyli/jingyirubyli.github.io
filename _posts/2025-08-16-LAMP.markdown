@@ -1,0 +1,47 @@
+---
+layout: post
+title:  LAMP 架构
+date:   2025-08-16
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: lamp.png # Add image post (optional)
+tags: [Blog]
+author: # Add name author (optional)
+---
+# 本讲内容
+
+LAMP: Linux + Apache(nginx) + Mysql + 后端程序(Php)
+
+浏览器发出请求, web服务器apache有两个作用(提供静态资源展示, 转发请求给后端程序), 服务器进行动静分离判断, 如果是动态请求, php就向数据库查找.
+<figure style="text-align: center;">
+<img src="/assets/img/lamp1.png" alt="" width="400">
+<figcaption>LAMP 架构</figcaption>
+</figure>
+
+Web服务器的作用: 将http请求从前端转发到后端应用上.
+
+Php: 一种服务器脚本语言, 主要用于web开发, 常用php脚本嵌入html源码中执行.
+
+
+## MacOS 配置
+
+### Apache
+
+Mac原生自带apache, 检查命令:
+
+```
+httpd -v
+sudo apachectl -k start # 启动apache
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/lamp2.png" alt="" width="400">
+<figcaption>apache</figcaption>
+</figure>
+
+### Php
+
+```
+brew install php
+php -v
+# 浏览器可以访问 http://localhost
+```
