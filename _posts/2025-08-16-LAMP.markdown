@@ -169,3 +169,47 @@ sudo kill -9 22524
 现在测试网址已经变成了我们设置的 http://mydomain.tld
 
 ## 我服了,一配第三方,我原先配好的本地网址都乱了, 一下午了都没找到解决办法. 现在一打开localhost是空白, 改一下httpd.conf再访问就自动下载位置文件. 真服了. 
+
+插一句, 刚刚检查的时候发现homebrew的镜像源被指定成了阿里云, 可能导致某些错误.
+
+1. 先检查homebrew 核心仓库 url:
+
+```
+git -C "$(brew --repo homebrew/core)" remote -v
+```
+
+如果输出类似:
+
+origin  https://mirrors.aliyun.com/homebrew/homebrew-core.git (fetch)
+origin  https://mirrors.aliyun.com/homebrew/homebrew-core.git (push)
+
+如果是第三方源, 切换回官方源:
+
+```
+git -C "$(brew --repo)" remote set-url origin https://github.com/Homebrew/brew.git
+git -C "$(brew --repo homebrew/core)" remote set-url origin https://github.com/Homebrew/homebrew-core.git
+```
+
+说明你当前走的是 阿里云镜像。如果输出是：
+origin  https://github.com/Homebrew/homebrew-core.git (fetch)
+origin  https://github.com/Homebrew/homebrew-core.git (push)
+
+说明你已经在使用官方源。
+
+2. 检查Bottle (二进制包) 下载源
+
+```
+echo $HOMEBREW_BOTTLE_DOMAIN
+```
+
+如果输出是 https://mirrors.aliyun.com/...，说明安装 nginx 时会从阿里云下载二进制包。如果输出为空或未设置，则使用默认官方源。
+
+如果是第三方镜像, 切换回官方并更新:
+
+```
+unset HOMEBREW_BOTTLE_DOMAIN
+brew update
+```
+
+
+总结: 一句话, 服了.
