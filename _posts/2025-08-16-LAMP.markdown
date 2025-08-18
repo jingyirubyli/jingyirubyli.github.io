@@ -116,6 +116,18 @@ LoadModule php_module /opt/homebrew/opt/php/lib/httpd/modules/libphp.so
 
 464行添加: AddType application/x-httpd-php .php
 
+467-470添加:
+
+```
+<IfModule php_module>
+    AddType application/x-httpd-php .php
+    AddType application/x-httpd-php-source .phps
+</IfModule>
+```
+
+*试过不行*
+
+
 如果没有用sudo打开vim, 可以在vim编辑后使用强制命令:w !sudo tee % >/dev/null
 
 **mysql**
