@@ -22,7 +22,7 @@ Web服务器的作用: 将http请求从前端转发到后端应用上.
 Php: 一种服务器脚本语言, 主要用于web开发, 常用php脚本嵌入html源码中执行.
 
 
-## MacOS 配置
+## MacOS 配置 LAMP
 
 ### Apache
 
@@ -64,5 +64,75 @@ sudo apachectl restart  # 重启
 <figure style="text-align: center;">
 <img src="/assets/img/lamp3.png" alt="" width="400">
 <figcaption>php配置</figcaption>
+</figure>
+
+---
+
+## MacOS 配置 discuz
+
+先贴一个[Discuz!官网][discuz]:
+
+[discuz]: https://www.discuz.vip/download
+
+<figure style="text-align: center;">
+<img src="/assets/img/lamp4.png" alt="" width="400">
+<figcaption>之前不是用brew安装的mysql</figcaption>
+</figure>
+
+### 检查版本
+
+**apache**
+
+系统自带apache默认网站根目录: /Library/WebServer/Documents/
+里面有两个文件: index.html和index.php
+
+系统自带 Apache 的主配置文件: /etc/apache2/httpd.conf
+
+<figure style="text-align: center;">
+<img src="/assets/img/lamp5.png" alt="" width="400">
+<figcaption>查看版本</figcaption>
+</figure>
+
+检查apache是否正常工作: sudo apachectl restart
+
+<figure style="text-align: center;">
+<img src="/assets/img/lamp8.png" alt="" width="400">
+<figcaption>检查apache是否正常工作</figcaption>
+</figure>
+
+**检查php**
+
+php是不需要动的, 配置需要修改apache的conf: /etc/apache2/httpd.conf
+
+前面说过新版本的mac os 删除了自带的配置行
+
+#LoadModule php7_module libexec/apache2/libphp7.so
+
+set nu:
+
+70/71行是php配置.
+
+LoadModule php_module /opt/homebrew/opt/php/lib/httpd/modules/libphp.so
+
+464行添加: AddType application/x-httpd-php .php
+
+如果没有用sudo打开vim, 可以在vim编辑后使用强制命令:w !sudo tee % >/dev/null
+
+**mysql**
+
+我看了一下装的所有mysql:
+
+<figure style="text-align: center;">
+<img src="/assets/img/lamp6.png" alt="" width="400">
+<figcaption>查找mysql</figcaption>
+</figure>
+
+发现一个是anaconda, 一个是刚刚brew装的.
+
+应该是因为这个原因, 所以我修改/Library/WebServer/Documents/index.php配置, 不能正常显示phpinfo页面.
+
+<figure style="text-align: center;">
+<img src="/assets/img/lamp7.png" alt="" width="400">
+<figcaption>index.php</figcaption>
 </figure>
 
