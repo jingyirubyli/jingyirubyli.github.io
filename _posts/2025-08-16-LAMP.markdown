@@ -153,5 +153,17 @@ LoadModule php_module /opt/homebrew/opt/php/lib/httpd/modules/libphp.so
 </figure>
 
 
-### FlyEnv
+### FlyEnv/PhpWebStudy
 
+关闭apache进程: sudo apachectl stop
+
+如果报重复使用错误, 手动关闭:
+
+sudo kill -9 22524 
+
+<figure style="text-align: center;">
+<img src="/assets/img/lamp9.png" alt="" width="400">
+<figcaption>手动关闭apache端口, 在FlyEnv中打开</figcaption>
+</figure>
+
+现在测试网址已经变成了我们设置的 http://mydomain.tld
