@@ -58,6 +58,10 @@ sudo apachectl restart  # 重启
 
 如果是 macOS Monterey (12) 或之后, Apple 已经彻底移除了 PHP, 所以 /etc/apache2/httpd.conf 里面 不会有任何 PHP 配置。
 
+参考[php官方介绍][php-mac]
+
+[php-mac]: https://www.php.net/manual/zh/install.macosx.bundled.php
+
 我查了好久方法, 发现不需要多做操作, 直接在httpd.conf中确认好DocumentIndex路径, 在对应路径中写.php就可以, 比如我写了一个index.php, 浏览器访问http://localhost/index.php:
 
 
@@ -147,4 +151,7 @@ LoadModule php_module /opt/homebrew/opt/php/lib/httpd/modules/libphp.so
 <img src="/assets/img/lamp7.png" alt="" width="400">
 <figcaption>index.php</figcaption>
 </figure>
+
+
+### FlyEnv
 
