@@ -165,3 +165,66 @@ location / {
     proxy_pass 代理网址;
 }
 ```
+
+## MacOS 配置
+
+
+启动
+
+```
+sudo brew services start nginx
+# 访问localhost:8080，若出现欢迎界面，说明成功安装和启动
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/nginx5.png" alt="" width="400">
+<figcaption>启动nginx</figcaption>
+</figure>
+
+localhost:8080已经正常访问, 我们还是检查一下端口号:
+
+/opt/homebrew/etc/nginx/nginx.conf
+
+<figure style="text-align: center;">
+<img src="/assets/img/nginx6.png" alt="" width="400">
+<figcaption>检查nginx端口</figcaption>
+</figure>
+
+找到 Nginx 所在目录, 注意这里不是 nginx.conf 的目录, 而是 Nginx 的安装目录, 执行指令: brew info nginx , 如下图所示:
+
+<figure style="text-align: center;">
+<img src="/assets/img/nginx7.png" alt="" width="400">
+<figcaption>找到安装目录</figcaption>
+</figure>
+
+其中 /opt/homebrew/Cellar/nginx/1.27.5 是安装目录, /opt/homebrew/etc/nginx/nginx.conf 是配置文件目录. 我们用到的是 nginx 的安装目录.
+
+打开此目录: open /opt/homebrew/Cellar/, 将你的前端文件复制到此目录下的 html 文件下, 如下图:
+
+<figure style="text-align: center;">
+<img src="/assets/img/nginx8.png" alt="" width="400">
+<figcaption>自己的前端文件</figcaption>
+</figure>
+
+注意 /opt/homebrew/Cellar/nginx/1.27.5 中的html(alias)文件夹就是/www
+
+<figure style="text-align: center;">
+<img src="/assets/img/nginx9.png" alt="" width="400">
+<figcaption>nginx安装目录</figcaption>
+</figure>
+
+此时再次修改 nginx.conf 文件, 目的是找到你的 前端 文件, nginx.conf 的打开方式上面已经说了, 就是打开修改端口号的那个文件:
+
+指定前端项目所在位置: 我的前端文件就是 html/jingyi , 开启页面我的文件也正好叫做index.html, 按需修改即可, 注意如果有改端口, 这里也要同步修改.
+
+<figure style="text-align: center;">
+<img src="/assets/img/nginx11.png" alt="" width="400">
+<figcaption>按自己的配置修改.conf</figcaption>
+</figure>
+
+部署完要记得重启一下 nginx, 重启指令 sudo nginx -s reload, 刷新一下html, 就可以看到自己的页面了. 我这个是随便拿了两年前写的东西.
+
+<figure style="text-align: center;">
+<img src="/assets/img/nginx12.png" alt="" width="400">
+<figcaption>可以看到自己的页面</figcaption>
+</figure>

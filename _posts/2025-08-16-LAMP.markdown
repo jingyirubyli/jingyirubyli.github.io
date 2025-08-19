@@ -208,8 +208,17 @@ echo $HOMEBREW_BOTTLE_DOMAIN
 
 ```
 unset HOMEBREW_BOTTLE_DOMAIN
+unset HOMEBREW_PIP_INDEX_URL
+source ~/.zshrc
 brew update
 ```
+
+在/Users/jingyili中编辑.zprofile:
+
+<figure style="text-align: center;">
+<img src="/assets/img/lamp10.png" alt="" width="400">
+<figcaption>换官方源</figcaption>
+</figure>
 
 
 总结: 一句话, 服了.
