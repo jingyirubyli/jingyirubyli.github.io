@@ -168,6 +168,7 @@ location / {
 
 ## MacOS 配置
 
+### 使用8080 显示自己的页面
 
 启动
 
@@ -228,3 +229,29 @@ localhost:8080已经正常访问, 我们还是检查一下端口号:
 <img src="/assets/img/nginx12.png" alt="" width="400">
 <figcaption>可以看到自己的页面</figcaption>
 </figure>
+
+### 恢复默认8080, 另外开自己的页面
+
+测试 mac 本机新增一个虚拟主机. 首先将server块内容改为默认, 8080显示回默认页面. 
+
+<figure style="text-align: center;">
+<img src="/assets/img/nginx15.png" alt="" width="400">
+<figcaption>默认设置</figcaption>
+</figure>
+
+在该server块下方新建, 修改为自己的配置:
+
+<figure style="text-align: center;">
+<img src="/assets/img/nginx16.png" alt="" width="400">
+<figcaption>自己的配置</figcaption>
+</figure>
+
+重启nginx:
+
+
+<figure style="text-align: center;">
+<img src="/assets/img/nginx13.png" alt="" width="400"><img src="/assets/img/nginx14.png" alt="" width="400">
+<figcaption>自己的页面端口变成了8081</figcaption>
+</figure>
+
+当然也可以多个虚拟主机使用. 现在我的 server 虚拟主机都是放在当前 nginx.conf 文件中，如果当有很多的虚拟主机的时候，我们可以将这些配置虚拟主机单独放在一个文件里面进行配置，然后 include 到 nginx.conf 文件中即可.
