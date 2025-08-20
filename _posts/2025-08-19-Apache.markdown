@@ -47,6 +47,7 @@ author: # Add name author (optional)
 
 这里总结一点吧: 不要直接运行 sudo apachectl restart, 要加上路径, 否则会造成很多问题....
 
+---
 
 ## 配置 Apache
 
@@ -79,6 +80,8 @@ sudo /opt/homebrew/opt/httpd/bin/httpd -k restart
 访问 http://localhost 就显示 Apache 内容，不受 nginx 文件影响。所以总结: /opt/homebrew/var/www 之前被 nginx 使用过，所以里面是 nginx 页面。Apache 默认也用这个目录，所以你看到 nginx 页面。最安全做法是 为 Apache 设置独立 DocumentRoot，避免和 nginx 冲突。
 
 **注意: 此时apache端口为80, nginx为8080.**
+
+---
 
 ## 配置php
 
@@ -124,3 +127,10 @@ LoadModule php_module /opt/homebrew/opt/php/lib/httpd/modules/libphp.so
 </figure>
 
 此时访问localhost/index.html也可以正常显示 it works!
+
+如果不想要直接访问localhost时自动显示某个页面, 修改DirectoryIndex中内容, 不设置链接先后顺序即可:
+
+<figure style="text-align: center;">
+<img src="/assets/img/apache8.png" alt="" width="400">
+<figcaption>显示目录</figcaption>
+</figure>
