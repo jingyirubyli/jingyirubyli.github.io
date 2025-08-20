@@ -272,6 +272,10 @@ location / {
 }
 ```
 
+保存退出, 仍然可以先检查语法是否正确: /opt/homebrew/etc/nginx/nginx.conf -t.
+
+
+
 ## MacOS 配置
 
 ### 使用8080 显示自己的页面
