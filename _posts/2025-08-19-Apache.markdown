@@ -122,3 +122,5 @@ LoadModule php_module /opt/homebrew/opt/php/lib/httpd/modules/libphp.so
 <img src="/assets/img/apache6.png" alt="" width="400">
 <figcaption>成功访问phpinfo</figcaption>
 </figure>
+
+此时访问localhost/index.html也可以正常显示 it works!
