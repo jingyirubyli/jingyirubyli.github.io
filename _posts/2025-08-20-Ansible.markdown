@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Ansible
+title:  Ansible 自动化运维
 date:   2025-08-20
 description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
 img: ansible.png # Add image post (optional)
@@ -9,3 +9,17 @@ author: # Add name author (optional)
 ---
 # 本讲内容
 
+早期运维人员会结合ssh免密登录以及shell脚本来完成自动化的部署操作。
+系统管理员面临的问题主要是，配置管理系统，远程执行命令，批量安装服务，启停服务等等后来也就诞生了众多的开源自动化运维软件: 如fabric, puppet, saltstack, chef, Ansible. 其中saltstack和ansible都是python开发的.
+
+ansible是一个同时管理多个远程主机的软件，必须是任意可以通过ssh登录的机器，因此ansible可以管理的机器如远程虚拟机, 物理机, 也可以直接管理本机机器.
+ansible通过ssh协议实现了，管理节点（老板，安装了ansible服务的机器），被管理节点（员工，被管理的机器节点）的通信。
+只要是通过ssh协议登录的主机，就可以完成ansible自动化部署操作: 批量文件分发, 批量数据复制, 批量数据修改/删除, 批量自动化安装软件服务, 批量服务启停, 脚本化，自动批量服务部署.
+
+ansible的编排引擎可以出色的完成各种任务配置管理，ansible在流程控制，资源部署等方便很强大，并且ansible无须安装客户端软件，管理简洁，使用yaml配置文件语法，功能强大，便于维护。
+ansible是基于python语言开发的，主要由python的两个ssh处理模块，paramiko，以及PyYAML模块: 安装部署简单; 管理主机便捷，支持多台主机并行管理; 无须安装被管理节点的客户端（no agent），且无须占用客户端的其他端口，仅仅使用ssh服务即可; 不仅仅支持python，还支持其他语言的二次开发; 不用root用户也可执行，降低系统权限.
+
+
+---
+
+## 
