@@ -9,6 +9,26 @@ author: # Add name author (optional)
 ---
 # 本讲内容
 
+- [本讲内容](#本讲内容)
+  - [nginx 安装与简单熟悉](#nginx-安装与简单熟悉)
+    - [Homebrew 安装 nginx](#homebrew-安装-nginx)
+    - [Homebrew 启动 nginx](#homebrew-启动-nginx)
+    - [访问nginx服务页面](#访问nginx服务页面)
+  - [nginx 代理](#nginx-代理)
+    - [正向代理](#正向代理)
+    - [反向代理](#反向代理)
+    - [总结](#总结)
+  - [nginx 使用](#nginx-使用)
+    - [静态网站配置](#静态网站配置)
+    - [基于端口的多虚拟主机](#基于端口的多虚拟主机)
+    - [访问日志](#访问日志)
+    - [代理与中介](#代理与中介)
+  - [MacOS 配置](#macos-配置)
+    - [使用8080 显示自己的页面](#使用8080-显示自己的页面)
+    - [恢复默认8080, 另外开自己的页面](#恢复默认8080-另外开自己的页面)
+    - [多个server](#多个server)
+    - [日志配置和使用](#日志配置和使用)
+
 Web 网络服务是一种被动访问的服务程序，即只有接收到互联网中其他主机发出的 请求后才会响应，最终用于提供服务程序的Web 服务器会通过 HTTP（超文本传输协议））或 HTTPS（安全超文本传输协议）把请求的内容传送给用户。
 目前能够提供 Web 网络服务的程序有 II5、Nginx 和 Apache 等。其中，IIS（Iinternet Information Services，互联网信息服务）是Windows 系统中默认的Web 服务程序. 
 2004年10月4日，为俄罗斯知名门户站点而开发的 Web 服务程序 Nginx 横空出世。Nginx 程序作为一款轻量级的网站服务软件，因其稳定性和丰富的功能而快速占领服务器市 场，但 Nginx 最被认可的还当是系统资源消耗低且并发能力强，因此得到了国内诸如新浪、网易、腾讯等门户站的青睐。
@@ -174,7 +194,7 @@ Nginx的正向代理功能允许局域网中的客户端通过代理服务器访
 
 MacOS路径: /opt/homebrew/Cellar/nginx/1.27.5/html/index.html
 
-没有找到nginx.conf
+nginx.conf 路径: /opt/homebrew/etc/nginx/nginx.conf
 
 ### 基于端口的多虚拟主机
 
@@ -223,6 +243,22 @@ http{
 }
 ```
 
+<figure style="text-align: center;">
+<img src="/assets/img/nginx19.png" alt="" width="400">
+<figcaption>如果是单个虚拟主机, 只需要去掉access_log行注释即可</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+<img src="/assets/img/nginx20.png" alt="" width="400">
+<figcaption>多个虚拟主机要在外层配置</figcaption>
+</figure>
+
+MacOS 日志路径: /opt/homebrew/var/log/nginx/access.log
+
+<figure style="text-align: center;">
+<img src="/assets/img/nginx21.png" alt="" width="400">
+<figcaption>查看日志</figcaption>
+</figure>
 
 ### 代理与中介
 
