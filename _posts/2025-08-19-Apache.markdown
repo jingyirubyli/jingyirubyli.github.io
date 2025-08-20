@@ -79,3 +79,46 @@ sudo /opt/homebrew/opt/httpd/bin/httpd -k restart
 访问 http://localhost 就显示 Apache 内容，不受 nginx 文件影响。所以总结: /opt/homebrew/var/www 之前被 nginx 使用过，所以里面是 nginx 页面。Apache 默认也用这个目录，所以你看到 nginx 页面。最安全做法是 为 Apache 设置独立 DocumentRoot，避免和 nginx 冲突。
 
 **注意: 此时apache端口为80, nginx为8080.**
+
+## 配置php
+
+困扰我好几天的问题: 此时访问http://localhost/index.php只显示文字<?php phpinfo(); ?>, 而不是php默认页面. 刚刚仔细看了一下安装好php后的介绍如下:
+
+```
+==> Caveats
+To enable PHP in Apache add the following to httpd.conf and restart Apache:
+    LoadModule php_module /opt/homebrew/opt/php/lib/httpd/modules/libphp.so
+
+    <FilesMatch \.php$>
+        SetHandler application/x-httpd-php
+    </FilesMatch>
+
+Finally, check DirectoryIndex includes index.php
+    DirectoryIndex index.php index.html
+
+The php.ini and php-fpm.ini file can be found in:
+    /opt/homebrew/etc/php/8.4/
+
+To start php now and restart at login:
+  brew services start php
+Or, if you don't want/need a background service you can just run:
+  /opt/homebrew/opt/php/sbin/php-fpm --nodaemonize
+```
+
+这几行很重要:
+
+```
+# 这一行大家都知道
+LoadModule php_module /opt/homebrew/opt/php/lib/httpd/modules/libphp.so
+# 下面几行容易忽略, 因为网上的教程都没有提到
+<FilesMatch \.php$>
+    SetHandler application/x-httpd-php
+</FilesMatch>
+```
+
+修改好httpd.conf后重启apache即可:
+
+<figure style="text-align: center;">
+<img src="/assets/img/apache6.png" alt="" width="400">
+<figcaption>成功访问phpinfo</figcaption>
+</figure>
