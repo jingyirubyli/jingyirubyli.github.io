@@ -255,3 +255,250 @@ localhost:8080已经正常访问, 我们还是检查一下端口号:
 </figure>
 
 当然也可以多个虚拟主机使用. 现在我的 server 虚拟主机都是放在当前 nginx.conf 文件中，如果当有很多的虚拟主机的时候，我们可以将这些配置虚拟主机单独放在一个文件里面进行配置，然后 include 到 nginx.conf 文件中即可.
+
+
+### 多个server
+
+先熟悉一下httpd.conf内容:
+
+```
+# ------------------------------------- 全局配置
+
+# Nginx worker 进程运行的用户及用户组
+# 语法：user username[groupname]    默认：user nobody nobody
+# user用于设置master进程启动后，fork出的worker进程运行在那个用户和用户组下。当按照"user username;"设置时，用户组名与用户名相同。
+# 若用户在 configure 命令执行时，使用了参数 --user=usergroup 和 --group=groupname ,此时 nginx.conf 将使用参数中指定的用户和用户组。
+#user  nobody;
+
+# Nginx worker 进程个数：其数量直接影响性能。
+# 推荐设置：cpu的个数 * 核心数(几核CPU)
+# 每个 worker 进程都是单线程的进程，他们会调用各个模块以实现多种多样的功能。如果这些模块不会出现阻塞式的调用，那么，有多少CPU内核就应该配置多少个进程，反之，有可能出现阻塞式调用，那么，需要配置稍多一些的worker进程。
+worker_processes  1;
+
+# ssl硬件加速。
+# 用户可以用 OpneSSL 提供的命令来查看是否有ssl硬件加速设备：openssl engine -t
+#ssl_engine device;
+
+# 守护进程(daemon)。是脱离终端在后台允许的进程。它脱离终端是为了避免进程执行过程中的信息在任何终端上显示。这样一来，进程也不会被任何终端所产生的信息所打断。##
+# 关闭守护进程的模式，之所以提供这种模式，是为了放便跟踪调试 nginx，毕竟用gdb调试进程时最繁琐的就是如何继续跟进fork出的子进程了。##
+# 如果用 off 关闭了 master_proccess 方式，就不会fork出 worker 子进程来处理请求，而是用 master 进程自身来处理请求
+#daemon off;   		# 查看是否以守护进程的方式运行 Nginx 默认是 on 
+#master_process off;    # 是否以 master/worker 方式工作 默认是 on
+
+
+# error 日志的设置
+# 语法：error_log path/file level;
+# 默认：error_log logs/error.log error;
+# 当 path/file 的值为 /dev/null 时，这样就不会输出任何日志了，这也是关闭 error 日志的唯一手段；
+# leve 的取值范围是 debug、info、notice、warn、error、crit、alert、emerg 从左至右级别依次增大。
+# 当 level 的级别为 error 时，error、crit、alert、emerg 级别的日志就都会输出。大于等于该级别会输出，小于该级别的不会输出。
+# 如果设定的日志级别是 debug，则会输出所有的日志，这一数据量会很大，需要预先确保 /path/file 所在的磁盘有足够的磁盘空间。级别设定到 debug，必须在 configure 时加入 --with-debug 配置项。
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+# pid文件的路径（master进程ID的pid文件存放路径）
+#pid        logs/nginx.pid;
+
+# ------------------------------------- 事件配置
+
+events {
+		
+    # 仅对指定的客户端输出 debug 级别的日志： 语法：debug_connection [IP || CIDR]
+    # 这个设置项实际上属于事件类配置，因此必须放在 events{……} 中才会生效。它的值可以是 IP 地址或者 CIRD 地址。
+    # 这样，仅仅以下IP地址的请求才会输出 debug 级别的日志，其他请求仍然沿用 error_log 中配置的日志级别
+    # 注意：在使用 debug_connection 前，需确保在执行 configure 时已经加入了 --with-debug 参数，否则不会生效。
+    #debug_connection 10.224.66.14;  # 或是 debug_connection 10.224.57.0/24
+  
+    # 单个 cpu 进程的最大并发连接数(一个进程的并发量)
+    # 根据硬件调整，合前面工作进程配合起来用，尽量大，但是别把 cpu 跑到 100% 就行
+    # 同时要考虑，服务器并不是 100% 为 nginx 服务，还有其他工作要做，因此不能达到理论峰值
+    # max_clients(并发总数) = worker_processes * worker_connections
+    worker_connections  1024;
+}
+
+# 核心转储(coredump): 在 Linux 系统中，当进程发生错误或收到信号而终止时，系统会将进程执行时的内存内容(核心映像)写入一个文件(core文件)，以作为调试只用，这就是所谓的核心转储(coredump)
+
+# ------------------------------------- HTTP配置
+
+http {
+    # 嵌入其他配置文件
+    # 语法：include /path/file 绝对路径，指定目录下的指定文件
+    # 语法：include path/file 相对路径，指定目录下的指定文件
+    # 语法：include path/* 指定目录下的所有文件
+    # 语法：include file 当前 nginx.conf 同文件夹下的指定文件
+    # 参数既可以是绝对路径也可以是相对路径（相对于 nginx 的配置目录，即 nginx.conf 所在的目录
+    include       mime.types;
+    
+    # 响应文件类型
+    default_type  application/octet-stream;
+  	
+    # 日志格式
+    # 语法：log_format 格式名称 格式样式(可以多个)
+    # log_format 与 access_log 既可以配置在 http{ ... }里面，也可以配置在虚拟主机 server{ ... } 里面
+    # 日志格式样式文章尾部有介绍常用的
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+    # 例如在加一个日志配置 
+    # log_format mylog '$remote_addr - $remote_user - $http_user_agent'
+    
+    # 日志文件的存放路径、格式、缓存大小
+    # 语法：access_log 日志存放路径 存放日志的配置格式
+    # log_format 与 access_log 既可以配置在 http{ ... }里面，也可以配置在虚拟主机 server{ ... } 里面
+    #access_log  logs/access.log  main;
+    # 例如在加一个日志配置 
+    # access_log logs/access.log  mylog;
+    
+    # 是否使用 sendfile 系统调用来传输文件
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    # 超时时间
+    keepalive_timeout  65;
+
+    #gzip  on;
+    
+    # 每一个 server 就是一个虚拟主机，虚拟站点
+    server {
+    
+        # 监听的端口
+        listen       8080;
+        
+        # 主机名称：其后可以跟多个主机名称，开始处理一个HTTP请求时，nginx 会取出 header 头中的 Host，与每个 server 中的 server_name 进行匹配，以此决定到底由那一个 server 来处理这个请求。
+        # 有可能一个 Host 与多个 server 块中的 server_name 都匹配，这时会根据匹配优先级来选择实际处理的 server 块。
+        # server_name 与 Host 的匹配优先级见文末。
+        server_name  localhost;
+
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+  	
+        # 当浏览器输入地址访问服务器的时候，就会进入到这个里面来匹配
+        # 语法：location [=|~|~*|^~] patt { ... }
+        # 中括号可以不写任何参数，此时为一般匹配。
+        # 匹配类型按大类型可以分为3种：
+        # 精确匹配: location = patt { ... }
+        # 一般匹配: location patt { ... }
+        # 正则匹配: location ~ patt { ... } 例如：location ~ \.(gif|bmp|jpg)$ { ... }
+        # location 的使用实例见文末。
+        # 注意：location 是有顺序的，当一个请求有可能匹配多个 location 时，实际上这个请求会被第一个 location 处理。
+        location / {
+            # 匹配的根目录，只写文件名默认在 /nginx 文件夹下
+            # 也可以写成绝对路径 root /usr/local/var/dzm;
+            root   html;
+            # 设置默认首页，按先后顺序匹配首页
+            index  index.html index.htm;
+        }
+
+        #error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+
+        # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+        #
+        #location ~ \.php$ {
+        #    proxy_pass   http://127.0.0.1;
+        #}
+
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        #
+        #location ~ \.php$ {
+        #    root           html;
+        #    fastcgi_pass   127.0.0.1:9000;
+        #    fastcgi_index  index.php;
+        #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+        #    include        fastcgi_params;
+        #}
+
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        #location ~ /\.ht {
+        #    deny  all;
+        #}
+    }
+
+    # another virtual host using mix of IP-, name-, and port-based configuration
+    #
+    #server {
+    #    listen       8000;
+    #    listen       somename:8080;
+    #    server_name  somename  alias  another.alias;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+    # HTTPS server
+    #
+    #server {
+    #    listen       443 ssl;
+    #    server_name  localhost;
+
+    #    ssl_certificate      cert.pem;
+    #    ssl_certificate_key  cert.key;
+
+    #    ssl_session_cache    shared:SSL:1m;
+    #    ssl_session_timeout  5m;
+
+    #    ssl_ciphers  HIGH:!aNULL:!MD5;
+    #    ssl_prefer_server_ciphers  on;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+    include servers/*;
+}
+
+
+```
+
+我们可以在nginx.conf所在文件夹内新建一个/server/server.conf, 存放我们的虚拟主机. 在上面配置文件里最尾部我们已经配置了 include servers/*;,也就相当于导入 servers 文件夹内的所有文件。
+
+在server.conf中编辑好server块即可. 如果想要设置别名, 在域名后面以空格隔开即可
+
+```
+server {
+  listen 端口号;
+  server_name 域名 别名1 别名2;
+  location / {
+    root 路径;
+    index index.html;
+  }
+}
+```
+
+记得配置好之后要刷新nginx: nginx -s reload.
+
+
+### 日志配置和使用
+
+在 http{ ... } 里面在配置一个 log_format 与 access_log:
+
+```
+http {
+  ......
+  log_format mylog  '$remote_addr - $request - $status - $http_user_agent';
+  access_log test.access.log mylog;
+  server {
+  ...
+  }
+}
+```
+
+刷新一下当前服务器配置的网页，然后就拿到对应的日志了. 这里是通过 HomeBrew 安装的 Nginx, 所以日志路径都是软链接，在 Linux 里面就不会这样了，其实无论什么系统，只要区分好相对路径跟绝对路径就不会乱，日志路径.
+
+参考log格式:[日志][log]
+
+[log]:https://juejin.cn/post/6883355186790662158
