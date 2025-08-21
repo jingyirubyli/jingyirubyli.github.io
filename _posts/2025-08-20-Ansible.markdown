@@ -108,3 +108,49 @@ ping youruqinggaijiao.local
 <figcaption>成功连接被控机</figcaption>
 </figure>
 
+至此可以使用手动ssh方式登陆被控机: ssh lijingyi@10.0.0.224
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible7.png" alt="" width="400">
+<figcaption>使用ssh密码登陆</figcaption>
+</figure>
+
+但是用 ansible -i /etc/ansible/hosts macs -m ping 却提示 Permission denied (publickey,password,keyboard-interactive)。这通常是因为 Ansible 没有用到你手动 ssh 时用的认证方式。手动 SSH 成功，说明系统知道用哪个私钥或密码；但 Ansible 默认可能没用到它。
+
+注: 我使用该命令一直报错, 查阅一些教程, 发现可能是MacOS没有安装sshpass. 先安装一个看看情况: brew install sshpass. 再次尝试后发现问题解决.
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible11.png" alt="" width="400">
+<figcaption>安装sshpass后解决</figcaption>
+</figure>
+
+### 免密登录
+
+**ansible自带的密码认证参数**
+
+在/etc/ansible/hosts文件中定义密码参数: ansible_ssh_pass=密码. 测试命令: ansible macs -m command -a "hostname" 成功输出:
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible8.png" alt="" width="400">
+<figcaption>使用ansible密码参数</figcaption>
+</figure>
+
+可以将密码参数注释掉, 自行测试, 发现的确不能登入:
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible9.png" alt="" width="400">
+<figcaption>如果删除ansible密码参数就不能登录</figcaption>
+</figure>
+
+此时尝试手动方式: ansible macs -m command -a "hostname" -k -uroot
+
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible10.png" alt="" width="400">
+<figcaption>手动输入密码</figcaption>
+</figure>
+
+现在的问题是这种方法直接把机器的密码暴露了, 很不安全. 介绍另一种方法: 
+
+**ssh密钥方式批量管理主机**
+
