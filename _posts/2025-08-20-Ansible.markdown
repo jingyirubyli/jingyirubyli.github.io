@@ -22,4 +22,59 @@ ansible是基于python语言开发的，主要由python的两个ssh处理模块�
 
 ---
 
-## 
+## 配置 Ansible
+
+### 控制机 (M3 MacOS)
+
+首先安装ansible: brew install ansible
+
+检查: ansible --version
+
+创建Ansible 的 inventory: /etc/ansible/hosts: vim /etc/ansible/hosts
+
+我这里进入/etc后想要创建时使用 % sudo mkdir -p /ansible, 权限问题报错. 因为 macOS（尤其是 Big Sur 以后）对系统分区做了 只读保护 (Signed System Volume, SSV)，所以你不能直接在 / 根目录下随便新建目录。解决方法很简单：不要放在 /ansible，而是放在 可写的系统配置目录 /etc/ansible，这个是允许的。退出/etc 再创建:  sudo mkdir -p /etc/ansible
+
+创建/etc/ansible/hosts: vim hosts
+
+```
+[macs]
+yrqgj ansible_host=10.0.0.224 ansible_user=lijingyi
+# Ansible 的清单文件，告诉 Ansible 有哪些机器、用什么用户名连接。
+# 格式是: 自定义别名 ansible_host=被控机ip ansible_user=登陆被控机的用户名                                                         
+```
+
+在系统的 /etc/hosts中添加被控机主机名映射: 
+
+```
+10.0.0.224 youruqinggaijiao.local yrqgj
+# 系统用来做 IP ↔ 主机名 的解析
+# 格式是: ip 主机名(.local) 自定义别名
+```
+
+至此可以测试所有ping命令, 均可以ping通:
+
+```
+ping yrqgj 
+ping 10.0.0.224
+ping youruqinggaijiao.local
+
+```
+
+测试: ansible -i /etc/ansible/hosts macs -m ping. 红字报错
+
+这说明 Ansible 控制机无法通过 SSH 连接到被控机的 22 端口，不是 inventory 文件的问题。一步步排查：
+
+**确认被控机ssh是否开启**
+
+在 Intel Mac（被控机） 上执行：sudo systemsetup -getremotelogin
+
+提示输入密码, 输入后显示 Remote Login: Off, 说明ssh没开启.
+
+开启 ssh: sudo systemsetup -setremotelogin on
+
+提示 require full disk access provileges. 这个提示是 macOS 的安全策略导致的: 从 macOS Catalina 开始，很多系统命令（包括 systemsetup）要求 Full Disk Access（完全磁盘访问权限） 才能生效，即使你是管理员也会提示权限不足。解决也很简单, 直接通过系统偏好设置开启 Remote Login 即可: 系统设置 → 共享（Sharing） → 勾选远程登录 (Remote Login).
+
+再次尝试, 会出现SSH 首次连接新主机时的安全提示. 原因是控制机第一次连接到被控机（10.0.0.224）, SSH 发现这个主机的 ED25519 公钥 在本地 known_hosts 文件里没有记录, 为了防止 中间人攻击 (MITM)，SSH 提示你确认是否信任这个主机. 
+
+键入yes回车, SSH 会把公钥写入控制机的 ~/.ssh/known_hosts, 再次运行 Ansible 就不会提示了. 可以手动查看一下: cat ~/.ssh/known_hosts.
+
