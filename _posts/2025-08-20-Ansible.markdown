@@ -44,7 +44,7 @@ yrqgj ansible_host=10.0.0.224 ansible_user=lijingyi
 ```
 
 <figure style="text-align: center;">
-<img src="/assets/img/ansible2.png" alt="" width="400">
+<img src="/assets/img/ansible2.png" alt="" width="500">
 <figcaption>/etc/ansible/hosts</figcaption>
 </figure>
 
@@ -57,7 +57,7 @@ yrqgj ansible_host=10.0.0.224 ansible_user=lijingyi
 ```
 
 <figure style="text-align: center;">
-<img src="/assets/img/ansible1.png" alt="" width="400">
+<img src="/assets/img/ansible1.png" alt="" width="500">
 <figcaption>/etc/hosts</figcaption>
 </figure>
 
@@ -71,14 +71,14 @@ ping youruqinggaijiao.local
 ```
 
 <figure style="text-align: center;">
-<img src="/assets/img/ansible4.png" alt="" width="400">
+<img src="/assets/img/ansible4.png" alt="" width="500">
 <figcaption>测试能否ping通</figcaption>
 </figure>
 
 测试: ansible -i /etc/ansible/hosts macs -m ping. 红字报错
 
 <figure style="text-align: center;">
-<img src="/assets/img/ansible3.png" alt="" width="400">
+<img src="/assets/img/ansible3.png" alt="" width="500">
 <figcaption>Ansible 控制机无法通过 SSH 连接到被控机的 22 端口</figcaption>
 </figure>
 
@@ -95,7 +95,7 @@ ping youruqinggaijiao.local
 提示 require full disk access provileges. 这个提示是 macOS 的安全策略导致的: 从 macOS Catalina 开始，很多系统命令（包括 systemsetup）要求 Full Disk Access（完全磁盘访问权限） 才能生效，即使你是管理员也会提示权限不足。解决也很简单, 直接通过系统偏好设置开启 Remote Login 即可: 系统设置 → 共享（Sharing） → 勾选远程登录 (Remote Login).
 
 <figure style="text-align: center;">
-<img src="/assets/img/ansible5.png" alt="" width="400">
+<img src="/assets/img/ansible5.png" alt="" width="500">
 <figcaption>开启被控机ssh服务</figcaption>
 </figure>
 
@@ -104,14 +104,14 @@ ping youruqinggaijiao.local
 键入yes回车, SSH 会把公钥写入控制机的 ~/.ssh/known_hosts, 再次运行 Ansible 就不会提示了. 可以手动查看一下: cat ~/.ssh/known_hosts.
 
 <figure style="text-align: center;">
-<img src="/assets/img/ansible6.png" alt="" width="400">
+<img src="/assets/img/ansible6.png" alt="" width="500">
 <figcaption>成功连接被控机</figcaption>
 </figure>
 
 至此可以使用手动ssh方式登陆被控机: ssh lijingyi@10.0.0.224
 
 <figure style="text-align: center;">
-<img src="/assets/img/ansible7.png" alt="" width="400">
+<img src="/assets/img/ansible7.png" alt="" width="500">
 <figcaption>使用ssh密码登陆</figcaption>
 </figure>
 
@@ -120,7 +120,7 @@ ping youruqinggaijiao.local
 注: 我使用该命令一直报错, 查阅一些教程, 发现可能是MacOS没有安装sshpass. 先安装一个看看情况: brew install sshpass. 再次尝试后发现问题解决.
 
 <figure style="text-align: center;">
-<img src="/assets/img/ansible11.png" alt="" width="400">
+<img src="/assets/img/ansible11.png" alt="" width="500">
 <figcaption>安装sshpass后解决</figcaption>
 </figure>
 
@@ -131,14 +131,14 @@ ping youruqinggaijiao.local
 在/etc/ansible/hosts文件中定义密码参数: ansible_ssh_pass=密码. 测试命令: ansible macs -m command -a "hostname" 成功输出:
 
 <figure style="text-align: center;">
-<img src="/assets/img/ansible8.png" alt="" width="400">
+<img src="/assets/img/ansible8.png" alt="" width="500">
 <figcaption>使用ansible密码参数</figcaption>
 </figure>
 
 可以将密码参数注释掉, 自行测试, 发现的确不能登入:
 
 <figure style="text-align: center;">
-<img src="/assets/img/ansible9.png" alt="" width="400">
+<img src="/assets/img/ansible9.png" alt="" width="500">
 <figcaption>如果删除ansible密码参数就不能登录</figcaption>
 </figure>
 
@@ -146,7 +146,7 @@ ping youruqinggaijiao.local
 
 
 <figure style="text-align: center;">
-<img src="/assets/img/ansible10.png" alt="" width="400">
+<img src="/assets/img/ansible10.png" alt="" width="500">
 <figcaption>手动输入密码</figcaption>
 </figure>
 
