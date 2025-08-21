@@ -43,6 +43,11 @@ yrqgj ansible_host=10.0.0.224 ansible_user=lijingyi
 # 格式是: 自定义别名 ansible_host=被控机ip ansible_user=登陆被控机的用户名                                                         
 ```
 
+<figure style="text-align: center;">
+<img src="/assets/img/ansible2.png" alt="" width="400">
+<figcaption>/etc/ansible/hosts</figcaption>
+</figure>
+
 在系统的 /etc/hosts中添加被控机主机名映射: 
 
 ```
@@ -50,6 +55,11 @@ yrqgj ansible_host=10.0.0.224 ansible_user=lijingyi
 # 系统用来做 IP ↔ 主机名 的解析
 # 格式是: ip 主机名(.local) 自定义别名
 ```
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible1.png" alt="" width="400">
+<figcaption>/etc/hosts</figcaption>
+</figure>
 
 至此可以测试所有ping命令, 均可以ping通:
 
@@ -60,7 +70,17 @@ ping youruqinggaijiao.local
 
 ```
 
+<figure style="text-align: center;">
+<img src="/assets/img/ansible4.png" alt="" width="400">
+<figcaption>测试能否ping通</figcaption>
+</figure>
+
 测试: ansible -i /etc/ansible/hosts macs -m ping. 红字报错
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible3.png" alt="" width="400">
+<figcaption>Ansible 控制机无法通过 SSH 连接到被控机的 22 端口</figcaption>
+</figure>
 
 这说明 Ansible 控制机无法通过 SSH 连接到被控机的 22 端口，不是 inventory 文件的问题。一步步排查：
 
@@ -74,7 +94,17 @@ ping youruqinggaijiao.local
 
 提示 require full disk access provileges. 这个提示是 macOS 的安全策略导致的: 从 macOS Catalina 开始，很多系统命令（包括 systemsetup）要求 Full Disk Access（完全磁盘访问权限） 才能生效，即使你是管理员也会提示权限不足。解决也很简单, 直接通过系统偏好设置开启 Remote Login 即可: 系统设置 → 共享（Sharing） → 勾选远程登录 (Remote Login).
 
+<figure style="text-align: center;">
+<img src="/assets/img/ansible5.png" alt="" width="400">
+<figcaption>开启被控机ssh服务</figcaption>
+</figure>
+
 再次尝试, 会出现SSH 首次连接新主机时的安全提示. 原因是控制机第一次连接到被控机（10.0.0.224）, SSH 发现这个主机的 ED25519 公钥 在本地 known_hosts 文件里没有记录, 为了防止 中间人攻击 (MITM)，SSH 提示你确认是否信任这个主机. 
 
 键入yes回车, SSH 会把公钥写入控制机的 ~/.ssh/known_hosts, 再次运行 Ansible 就不会提示了. 可以手动查看一下: cat ~/.ssh/known_hosts.
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible6.png" alt="" width="400">
+<figcaption>成功连接被控机</figcaption>
+</figure>
 
