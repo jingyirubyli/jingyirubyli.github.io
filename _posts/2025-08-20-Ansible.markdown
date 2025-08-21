@@ -154,3 +154,11 @@ ping youruqinggaijiao.local
 
 **ssh密钥方式批量管理主机**
 
+创建ssh密钥对:
+
+ssh-keygen -f ~/.ssh/id_rsa -P ""  > /dev/null 2>&1
+
+但是这个只适用于单个主机, 要同时控制多个主机, 还是需要更高效的方法.
+
+编写公钥分发脚本.sh:
+
