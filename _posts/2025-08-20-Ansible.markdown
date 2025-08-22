@@ -302,3 +302,13 @@ ansible macs -m shell -a "mkdir -p /test/myscripts/; echo 'hostname' > /test/mys
 
 **script模块案例**
 
+把控制主机上的脚本远程传输到被控机上执行. 比起shell, script更强大, 在控制机上有一份脚本, 就可以在被控机上运行, 而不需要传送后才能执行.
+
+在管理节点上创建脚本 >> 授权 >> 执行.
+
+ansible macs -m script -a "脚本路径"
+
+
+
+
+
