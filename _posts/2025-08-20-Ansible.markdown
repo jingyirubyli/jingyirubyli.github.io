@@ -9,6 +9,14 @@ author: # Add name author (optional)
 ---
 # 本讲内容
 
+- [本讲内容](#本讲内容)
+  - [ansible参考资料: https://ansible-tran.readthedocs.io/en/latest/docs/intro.html](#ansible参考资料-httpsansible-tranreadthedocsioenlatestdocsintrohtml)
+  - [配置 Ansible](#配置-ansible)
+    - [控制机 (M3 MacOS)](#控制机-m3-macos)
+    - [免密登录](#免密登录)
+  - [ansible 模式](#ansible-模式)
+    - [ad-hoc](#ad-hoc)
+
 早期运维人员会结合ssh免密登录以及shell脚本来完成自动化的部署操作。
 系统管理员面临的问题主要是，配置管理系统，远程执行命令，批量安装服务，启停服务等等后来也就诞生了众多的开源自动化运维软件: 如fabric, puppet, saltstack, chef, Ansible. 其中saltstack和ansible都是python开发的.
 
@@ -19,7 +27,9 @@ ansible通过ssh协议实现了，管理节点（老板，安装了ansible服务
 ansible的编排引擎可以出色的完成各种任务配置管理，ansible在流程控制，资源部署等方便很强大，并且ansible无须安装客户端软件，管理简洁，使用yaml配置文件语法，功能强大，便于维护。
 ansible是基于python语言开发的，主要由python的两个ssh处理模块，paramiko，以及PyYAML模块: 安装部署简单; 管理主机便捷，支持多台主机并行管理; 无须安装被管理节点的客户端（no agent），且无须占用客户端的其他端口，仅仅使用ssh服务即可; 不仅仅支持python，还支持其他语言的二次开发; 不用root用户也可执行，降低系统权限.
 
+[ansible参考资料][ansible参考资料]
 
+[ansible参考资料]: https://ansible-tran.readthedocs.io/en/latest/docs/intro.html
 ---
 
 ## 配置 Ansible
