@@ -10,7 +10,6 @@ author: # Add name author (optional)
 # 本讲内容
 
 - [本讲内容](#本讲内容)
-  - [ansible参考资料: https://ansible-tran.readthedocs.io/en/latest/docs/intro.html](#ansible参考资料-httpsansible-tranreadthedocsioenlatestdocsintrohtml)
   - [配置 Ansible](#配置-ansible)
     - [控制机 (M3 MacOS)](#控制机-m3-macos)
     - [免密登录](#免密登录)
@@ -31,6 +30,8 @@ ansible是基于python语言开发的，主要由python的两个ssh处理模块�
 [ansible参考资料][ansible参考资料]
 
 [ansible参考资料]: https://ansible-tran.readthedocs.io/en/latest/docs/intro.html
+
+
 ---
 
 ## 配置 Ansible
