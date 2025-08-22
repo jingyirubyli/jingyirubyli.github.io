@@ -16,6 +16,7 @@ author: # Add name author (optional)
     - [免密登录](#免密登录)
   - [ansible 模式](#ansible-模式)
     - [ad-hoc](#ad-hoc)
+    - [playbook](#playbook)
 
 早期运维人员会结合ssh免密登录以及shell脚本来完成自动化的部署操作。
 系统管理员面临的问题主要是，配置管理系统，远程执行命令，批量安装服务，启停服务等等后来也就诞生了众多的开源自动化运维软件: 如fabric, puppet, saltstack, chef, Ansible. 其中saltstack和ansible都是python开发的.
@@ -319,6 +320,7 @@ ansible macs -m shell -a "mkdir -p /test/myscripts/; echo 'hostname' > /test/mys
 ansible macs -m script -a "脚本路径"
 
 
+### playbook
 
 
 
