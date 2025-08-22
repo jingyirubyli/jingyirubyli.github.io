@@ -152,6 +152,28 @@ ping youruqinggaijiao.local
 
 现在的问题是这种方法直接把机器的密码暴露了, 很不安全. 介绍另一种方法: 
 
+**ssh无密码访问**
+
+我这台机器已经生成密钥:
+
+ssh-copy-id -i ~/.ssh/id_rsa.pub lijingyi@10.0.0.224
+
+把本机的公钥 ~/.ssh/id_rsa.pub 拷贝到远程机器 10.0.0.224 的 ~/.ssh/authorized_keys 文件里，这样下次就能无密码登录。执行 ssh-copy-id 时仍需输入一次远程密码: 因为是第一次拷贝密钥，所以要验证你确实有这个账号的密码权限。输入成功后，公钥就会写入远程机 ~/.ssh/authorized_keys。运行结束后验证是否配置成功, 在本机执行：ssh lijingyi@10.0.0.224, 可以不需要密码直接登录, 至此配置成功.
+
+注意私钥(不带.pub后缀)要保密, 不能分发.
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible12.png" alt="" width="500">
+<figcaption>配置ssh免密登录</figcaption>
+</figure>
+
+使用ansible 命令 ansible -u LinuxUsername LinuxIP -m ping 测试, 可以ping通.
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible13.png" alt="" width="500">
+<figcaption>ansible命令测试通过</figcaption>
+</figure>
+
 **ssh密钥方式批量管理主机**
 
 创建ssh密钥对:
