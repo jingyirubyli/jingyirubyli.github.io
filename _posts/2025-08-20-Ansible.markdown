@@ -278,3 +278,27 @@ warn参数决定是否提供告警信息:
 
 ansible macs -m command -a "chmod 000 /etc/hosts warn=False" 
 
+
+**shell模块案例**
+
+批量查询进程信息:
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible21.png" alt="" width="500">
+<figcaption>批量查询进程信息</figcaption>
+</figure>
+
+批量写入文件:
+
+ansible macs -m shell -a "echo 你知道什么是江湖吗 > /test.txt"
+
+批量执行脚本(该脚本必须在客户端机器上存在, 否则会报错文件不存在. 这是shell的特点. 还有一个专门执行脚本的script模块.)步骤: 创建文件夹/.sh脚本文件 >>  写入脚本内容 >> 赋予脚本可执行权限 >> 执行脚本/处理warning. 所有操作都在控制主机上完成.
+
+```
+ansible macs -m shell -a "mkdir -p /test/myscripts/; echo 'hostname' > /test/myscripts/hostname.sh; chmod +x /test/myscripts/hostname.sh; bash /test/myscripts/hostname.sh  warn=False"
+# 可以cat 检查 
+
+```
+
+**script模块案例**
+
