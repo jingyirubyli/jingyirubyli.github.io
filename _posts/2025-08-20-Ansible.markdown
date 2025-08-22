@@ -174,6 +174,8 @@ ssh-copy-id -i ~/.ssh/id_rsa.pub lijingyi@10.0.0.224
 <figcaption>ansible命令测试通过</figcaption>
 </figure>
 
+注意: 被控机不能sleep, 主机才能成功运行ansible命令.
+
 **ssh密钥方式批量管理主机**
 
 创建ssh密钥对:
@@ -183,4 +185,56 @@ ssh-keygen -f ~/.ssh/id_rsa -P ""  > /dev/null 2>&1
 但是这个只适用于单个主机, 要同时控制多个主机, 还是需要更高效的方法.
 
 编写公钥分发脚本.sh:
+
+
+---
+
+## ansible 模式
+
+ansible实现批量化主机管理的模式主要有两种: 
+- 利用纯命令行: ad-hoc模式
+- 利用playbook剧本: playbook剧本模式
+
+**ad-hoc**
+ansible的命令行形式, 处理临时、简单操作:
+
+- 临时批量查看被管理机器的内存情况、cpu负载情况、网络情况
+- 临时分发配置文件
+
+
+**playbook**
+
+针对比较具体、比较大的任务, 使用写好的playbook剧本比较好
+
+- 一键部署rsync备份服务器
+- 一键部署lnmp环境
+
+### ad-hoc
+
+回顾我们使用过的测试命令: ansible macs -m command -a "hostname"
+
+ansible有许多模块,默认是 ‘command’,也就是命令模块,我们可以通过 -m 选项来指定不同的模块. command 模块不支持 shell 变量,也不支持管道等 shell 相关的东西.如果你想使用 shell相关的这些东西, 请使用’shell’ 模块. 使用 shell 模块的示例如下:
+
+$ ansible raleigh -m shell -a 'echo $TERM'
+
+ansible -h查看所有参数:
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible14.png" alt="" width="500">
+<figcaption>ansible -h 查看所有参数</figcaption>
+</figure>
+
+ansible-doc -l 列出所有支持的模块(可以使用管道符筛选):
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible15.png" alt="" width="500">
+<figcaption>ansible-doc -l 列出所有支持的模块</figcaption>
+</figure>
+
+ansible-doc -s command 列出具体模块用法:
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible16.png" alt="" width="500">
+<figcaption>ansible-doc -s command 列出具体模块用法</figcaption>
+</figure>
 
