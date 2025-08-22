@@ -238,3 +238,43 @@ ansible-doc -s command 列出具体模块用法:
 <figcaption>ansible-doc -s command 列出具体模块用法</figcaption>
 </figure>
 
+注意使用command模块, 不得出现shell变量$name, 也不得出现特殊符号如 > < | ; & 这些. 如果需要用这些特殊符号, 要使用shell模块.
+
+**command模块案例**
+
+获取所有被管理机器的负载信息:
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible17.png" alt="" width="500">
+<figcaption>获取所有被管理机器的负载信息</figcaption>
+</figure>
+
+让客户端机器先切换目录, 然后打印当前工作目录. 在 Ansible 的 command 模块里，chdir 是从目标机器的 根目录 / 开始算路径的，而不是从你的家目录 ~ 开始。
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible18.png" alt="" width="500">
+<figcaption>chdir</figcaption>
+</figure>
+
+使用creates参数判断该文件是否存在, 存在则跳过, 不存在则执行. 如判断/Desktop是否存在, 当前存在, 所以跳过pwd操作.
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible19.png" alt="" width="500">
+<figcaption>creates</figcaption>
+</figure>
+
+使用removes参数, 存在则执行, 不存在则跳过: 如判断/Desktop是否存在, 当前存在, 所以执行pwd操作.
+
+<figure style="text-align: center;">
+<img src="/assets/img/ansible20.png" alt="" width="500">
+<figcaption>removes</figcaption>
+</figure>
+
+如果查找一个不存在的目录, 且不使用creates或removes, 就会报错. 使用的话会直接跳过报错. 
+
+warn参数决定是否提供告警信息:
+
+比如执行 ansible macs -m command -a "chmod 000 /etc/hosts" 修改权限, 默认会有红色警告. 如果warn参数置false就可以取消告警. 这里就不演示了.
+
+ansible macs -m command -a "chmod 000 /etc/hosts warn=False" 
+
