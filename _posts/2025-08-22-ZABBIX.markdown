@@ -17,6 +17,7 @@ author: # Add name author (optional)
   - [Zabbix 安装和配置](#zabbix-安装和配置)
     - [安装](#安装)
     - [配置](#配置)
+    - [导入](#导入)
 
 
 ---
@@ -484,3 +485,8 @@ ps aux | grep php-fpm
 <img src="/assets/img/zabbix18.png" alt="" width="500">
 <figcaption>在phpinfo中检查</figcaption>
 </figure>
+
+总结一下这部分: 只要有残留的 Apache 或 PHP-FPM 旧进程，修改 php.ini 都不会生效。确保先彻底停止，再启动新的服务，这样 Zabbix 前端的 PHP 检查才能通过。
+
+### 导入
+
