@@ -369,3 +369,8 @@ Alias /zabbix "/opt/homebrew/var/apache/zabbix/ui"
 <img src="/assets/img/zabbix10.png" alt="" width="500">
 <figcaption>成功访问zabbix.php</figcaption>
 </figure>
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix11.png" alt="" width="500">
+<figcaption>成功打开zabbix主页</figcaption>
+</figure>
