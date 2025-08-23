@@ -490,3 +490,388 @@ ps aux | grep php-fpm
 
 ### 导入
 
+先查看一下MySQl的用户列表:
+
+```
+# 登录
+mysql -u root -p
+SELECT User, Host FROM mysql.user;
+# 输出
+
+mysql> SELECT User, Host FROM mysql.user;
++------------------+-----------+
+| User             | Host      |
++------------------+-----------+
+| mysql.infoschema | localhost |
+| mysql.session    | localhost |
+| mysql.sys        | localhost |
+| root             | localhost |
++------------------+-----------+
+
+```
+
+发现前 MySQL 中只有默认系统用户和 root，没有 zabbix 用户. 这也是下面前端提示 Access denied for user ‘zabbix’@‘localhost’ 的原因。
+
+下面是Configure DB connection, 这一步 Zabbix 前端尝试用你提供的用户名/密码连接 MySQL，如果没有创建的话, 页面就会报 MySQL 没有这个用户或者权限不足。先创建一个用户:
+
+```
+# 登录 MySQL（用 root 或有权限用户）
+mysql -u root -p
+# 创建 Zabbix 数据库
+CREATE DATABASE zabbix CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+# 创建 Zabbix 数据库用户并授权, 替换 'your_password' 为你想用的密码。
+CREATE USER 'zabbix'@'localhost' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+下面需要导入 Zabbix 前端 .sql 文件, 这里据说是 Zabbix 源码中自带初始化 SQL 文件，我查了下源码路径: /Users/jingyili/Projects/zabbix/database/mysql, 按理说里面应该存在schema.sql, images.sql, data.sql三个文件, 但是现在只有images.sql一个, 直接点下一步的话报错: Cannot connect to the database. Unable to determine current Zabbix database version: the table "dbversion" was not found.
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix19.png" alt="" width="500">
+<figcaption>导入.sql</figcaption>
+</figure>
+
+同样要截图的时候已经解决了 the table "dbversion" was not found 错误, 图片是论坛上找的.
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix20.png" alt="" width="500">
+<figcaption>dbversion报错</figcaption>
+</figure>
+
+此时可以顺手检查一下zabbix.conf.php（一般在 zabbix/ui/conf 或 zabbix/ui 下）：
+
+```
+$DB['TYPE']     = 'MYSQL';
+$DB['SERVER']   = 'localhost';
+$DB['PORT']     = '0';
+$DB['DATABASE'] = 'zabbix';
+$DB['USER']     = 'zabbix';
+$DB['PASSWORD'] = 'your_password';
+```
+
+一般这个应该是自动配置好的吧, 不需要自己写.
+
+说一下报错: Details: Cannot connect to the database. Unable to determine current Zabbix database version: the table "dbversion" was not found. 这个错误说明 Zabbix 前端已经能连接 MySQL 用户和密码了，但是 数据库里没有初始化表，尤其是 dbversion 表，这是 Zabbix 数据库的核心表之一。也就是说没有导入初始化 SQL 文件, 这就是上面缺少的两个文件.
+
+而检查一下tables, 发现数据库 zabbix 已经存在, 用户 zabbix 已经存在，并且可以连接, 但是数据库里没有任何表 → 所以 dbversion 表自然找不到:
+
+```
+mysql> use zabbix;
+Database changed
+mysql> SHOW TABLES;
+Empty set (0.00 sec)
+```
+
+一通分析后, 发现解决方法只能是导入初始化 SQL 文件. 我们一般都会想到重新下载源码, 但是问题是我查了源码, 发现每个branch的该目录下都只有image.sql, 所以重新下载也行不通. 我查了中英文论坛, 没有MacOS的解决方法, 只有旧版的Linux, 而新版linux估计也解决不了. 此时注意到目录下有Makefile文件, 猜测是不是需要手动生成 schema.sql 和 data.sql:
+
+
+``` 
+cd ~/Projects/zabbix/database/mysql
+# 尝试运行. 这条命令会运行 Makefile.am 里定义的生成规则，把模板和生成脚本组合成 schema.sql 和 data.sql
+make schema.sql data.sql
+```
+
+事实证明确实生成了 schema.sql 和 data.sql.
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix21.png" alt="" width="500">
+<figcaption>Makefile生成schema.sql 和 data.sql</figcaption>
+</figure>
+
+```
+# 依次导入 MySQL, 注意顺序
+mysql -u zabbix -p zabbix < schema.sql
+mysql -u zabbix -p zabbix < images.sql
+mysql -u zabbix -p zabbix < data.sql
+```
+
+果不其然又报错了:
+
+ERROR 1419 (HY000) at line 2444: You do not have the SUPER privilege and binary logging is enabled (you *might* want to use the less safe log_bin_trust_function_creators variable)
+
+这个错误是 MySQL 的权限限制导致的：Zabbix 的 SQL 脚本里创建了 存储函数或触发器, MySQL 开启了 binary logging，默认要求创建函数的用户必须有 SUPER 权限. 现在用的 zabbix 用户没有 SUPER 权限 → 导入失败
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix22.png" alt="" width="500">
+<figcaption>导入.sql报错</figcaption>
+</figure>
+
+解决: 给用户临时 SUPER 权限
+
+```
+# 登录 MySQL root
+mysql -u root -p
+# 给 zabbix 用户授予 SUPER 权限
+GRANT SUPER ON *.* TO 'zabbix'@'localhost';
+FLUSH PRIVILEGES;
+# 导入
+mysql -u zabbix -p zabbix < schema.sql
+mysql -u zabbix -p zabbix < images.sql
+mysql -u zabbix -p zabbix < data.sql
+
+# 完成后可以收回权限. 但是自己用就没必要了.
+REVOKE SUPER ON *.* FROM 'zabbix'@'localhost';
+FLUSH PRIVILEGES;
+
+```
+
+你以为现在就解决了么, 哈哈哈不可能的, 继续报错: 
+
+Enter password: 
+ERROR 1050 (42S01) at line 1: Table 'role' already exists
+Enter password: 
+ERROR 1146 (42S02) at line 1: Table 'zabbix.images' doesn't exist
+Enter password: 
+ERROR 1146 (42S02) at line 2: Table 'zabbix.role' doesn't exist
+
+这些错误说明数据库里已经存在部分表了：ERROR 1050 (42S01) at line 1: Table 'role' already exists → 表 role 已经存在, 导致再次导入 schema.sql 失败. 因为我们还没有导入.sql的时候就创建了表, 所以删除重新创建一下:
+
+```
+# 仍然是>mysql环境
+# 删除旧的 zabbix 数据库
+DROP DATABASE zabbix;
+CREATE DATABASE zabbix CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
+然后重新导入：
+mysql -u zabbix -p zabbix < schema.sql
+mysql -u zabbix -p zabbix < images.sql
+mysql -u zabbix -p zabbix < data.sql
+```
+
+输入三次密码, 成功:
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix23.png" alt="" width="500">
+<figcaption>成功导入.sql</figcaption>
+</figure>
+
+此时刷新zabbix页面, 成功:
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix25.png" alt="" width="500">
+<figcaption>成功导入.sql</figcaption>
+</figure>
+
+在mysql环境下检查:
+
+```
+mysql> USE zabbix;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> SHOW TABLES;
++----------------------------+
+| Tables_in_zabbix           |
++----------------------------+
+| acknowledges               |
+| actions                    |
+| alerts                     |
+| auditlog                   |
+| autoreg_host               |
+| changelog                  |
+| conditions                 |
+| config_autoreg_tls         |
+| connector                  |
+| connector_tag              |
+| corr_condition             |
+| corr_condition_group       |
+| corr_condition_tag         |
+| corr_condition_tagpair     |
+| corr_condition_tagvalue    |
+| corr_operation             |
+| correlation                |
+| dashboard                  |
+| dashboard_page             |
+| dashboard_user             |
+| dashboard_usrgrp           |
+| dbversion                  |
+| dchecks                    |
+| dhosts                     |
+| drules                     |
+| dservices                  |
+| escalations                |
+| event_recovery             |
+| event_suppress             |
+| event_symptom              |
+| event_tag                  |
+| events                     |
+| expressions                |
+| functions                  |
+| globalmacro                |
+| globalvars                 |
+| graph_discovery            |
+| graph_theme                |
+| graphs                     |
+| graphs_items               |
+| group_discovery            |
+| group_prototype            |
+| ha_node                    |
+| hgset                      |
+| hgset_group                |
+| history                    |
+| history_bin                |
+| history_log                |
+| history_str                |
+| history_text               |
+| history_uint               |
+| host_discovery             |
+| host_hgset                 |
+| host_inventory             |
+| host_proxy                 |
+| host_rtdata                |
+| host_tag                   |
+| hostmacro                  |
+| hostmacro_config           |
+| hosts                      |
+| hosts_groups               |
+| hosts_templates            |
+| housekeeper                |
+| hstgrp                     |
+| httpstep                   |
+| httpstep_field             |
+| httpstepitem               |
+| httptest                   |
+| httptest_field             |
+| httptest_tag               |
+| httptestitem               |
+| icon_map                   |
+| icon_mapping               |
+| ids                        |
+| images                     |
+| interface                  |
+| interface_discovery        |
+| interface_snmp             |
+| item_condition             |
+| item_discovery             |
+| item_parameter             |
+| item_preproc               |
+| item_rtdata                |
+| item_rtname                |
+| item_tag                   |
+| items                      |
+| lld_macro_export           |
+| lld_macro_path             |
+| lld_override               |
+| lld_override_condition     |
+| lld_override_opdiscover    |
+| lld_override_operation     |
+| lld_override_ophistory     |
+| lld_override_opinventory   |
+| lld_override_opperiod      |
+| lld_override_opseverity    |
+| lld_override_opstatus      |
+| lld_override_optag         |
+| lld_override_optemplate    |
+| lld_override_optrends      |
+| maintenance_tag            |
+| maintenances               |
+| maintenances_groups        |
+| maintenances_hosts         |
+| maintenances_windows       |
+| media                      |
+| media_type                 |
+| media_type_message         |
+| media_type_oauth           |
+| media_type_param           |
+| mfa                        |
+| mfa_totp_secret            |
+| module                     |
+| opcommand                  |
+| opcommand_grp              |
+| opcommand_hst              |
+| opconditions               |
+| operations                 |
+| opgroup                    |
+| opinventory                |
+| opmessage                  |
+| opmessage_grp              |
+| opmessage_usr              |
+| optag                      |
+| optemplate                 |
+| permission                 |
+| problem                    |
+| problem_tag                |
+| profiles                   |
+| proxy                      |
+| proxy_autoreg_host         |
+| proxy_dhistory             |
+| proxy_group                |
+| proxy_group_rtdata         |
+| proxy_history              |
+| proxy_rtdata               |
+| regexps                    |
+| report                     |
+| report_param               |
+| report_user                |
+| report_usrgrp              |
+| rights                     |
+| role                       |
+| role_rule                  |
+| scim_group                 |
+| script_param               |
+| scripts                    |
+| service_alarms             |
+| service_problem            |
+| service_problem_tag        |
+| service_status_rule        |
+| service_tag                |
+| services                   |
+| services_links             |
+| sessions                   |
+| settings                   |
+| sla                        |
+| sla_excluded_downtime      |
+| sla_schedule               |
+| sla_service_tag            |
+| sysmap_element_trigger     |
+| sysmap_element_url         |
+| sysmap_link_threshold      |
+| sysmap_shape               |
+| sysmap_url                 |
+| sysmap_user                |
+| sysmap_usrgrp              |
+| sysmaps                    |
+| sysmaps_element_tag        |
+| sysmaps_elements           |
+| sysmaps_link_triggers      |
+| sysmaps_links              |
+| tag_filter                 |
+| task                       |
+| task_acknowledge           |
+| task_check_now             |
+| task_close_problem         |
+| task_data                  |
+| task_remote_command        |
+| task_remote_command_result |
+| task_result                |
+| timeperiods                |
+| token                      |
+| trends                     |
+| trends_uint                |
+| trigger_depends            |
+| trigger_discovery          |
+| trigger_queue              |
+| trigger_tag                |
+| triggers                   |
+| ugset                      |
+| ugset_group                |
+| user_scim_group            |
+| user_ugset                 |
+| userdirectory              |
+| userdirectory_idpgroup     |
+| userdirectory_ldap         |
+| userdirectory_media        |
+| userdirectory_saml         |
+| userdirectory_usrgrp       |
+| users                      |
+| users_groups               |
+| usrgrp                     |
+| valuemap                   |
+| valuemap_mapping           |
+| widget                     |
+| widget_field               |
++----------------------------+
+207 rows in set (0.01 sec)
+```
+
