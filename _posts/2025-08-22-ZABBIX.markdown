@@ -224,6 +224,8 @@ $ git clone https://github.com/zabbix/zabbix.git
 # 从github下载成功
 ```
 
+clone 过程网络中断 导致的（Zabbix 官方仓库比较大，7k+ 文件，Git HTTP 传输容易中断）。
+
 <figure style="text-align: center;">
 <img src="/assets/img/zabbix6.png" alt="" width="500">
 <figcaption>zabbix.com 下载 Zabbix 源代码</figcaption>
@@ -236,17 +238,24 @@ $ git clone https://github.com/zabbix/zabbix.git
 
 **不使用 TLS 构建 agent：**
 
+解释: agent 在编译的时候没有启用 TLS 支持（没连 OpenSSL / GnuTLS），所以最终的二进制程序 只支持明文传输。特点：和 Zabbix server/proxy 通讯时，数据（监控项、主机名、密钥）全部是 明文。安装简单，不依赖 OpenSSL 等库。功能齐全，但 缺乏加密和认证。适用场景：agent 和 server 部署在 同一台机器，只做本地监控。在一个完全隔离的安全内网，没有数据被窃取的风险。想快速上手测试 Zabbix，先不考虑安全。
+
+
 我使用openssl, 所以这里只贴一下官方文档的代码.
 
 ```
 $ cd zabbix
 $ ./bootstrap.sh
+# --sysconfdir=/usr/local/etc/zabbix 只是 告诉 configure 配置文件的安装位置，和 Zabbix 源码本身的路径没关系。
 $ ./configure --sysconfdir=/usr/local/etc/zabbix --enable-agent --enable-ipv6
 $ make
 $ make install
 ```
 
 **使用 OpenSSL 构建 agent：**
+
+解释: 在编译/安装 agent 时，指定 --with-openssl，启用了 TLS 功能。特点：agent 和 server/proxy 之间通讯可以 加密（防止中间人攻击、窃听）。支持 身份认证（基于 PSK 或 证书）。部署稍微复杂，需要配置证书或密钥。适用场景：server 和 agent 跨公网通讯。内网环境里有 合规要求（如 GDPR、HIPAA）。需要确认 agent 身份，防止伪造数据。
+
 
 ```
 $ cd zabbix
@@ -335,12 +344,14 @@ $ make install
 # 如果报权限错误, 使用 sudo make install. 我就是因为这个权限错误改了几次路径, 发现都不成功, 最终只能使用sudo
 ```
 
-检查:
+确认可执行文件安装位置:
 
 ```
 which zabbix_agentd
 which zabbix_sender
 which zabbix_get
+# 查看man手册是否可用
+man zabbix_agentd
 ```
 
 修改 /usr/local/etc/zabbix/zabbix_agentd.conf 中的 server 地址为本机地址.
