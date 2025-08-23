@@ -9,6 +9,12 @@ author: # Add name author (optional)
 ---
 # 本讲内容
 
+- [本讲内容](#本讲内容)
+  - [Zabbix 介绍](#zabbix-介绍)
+    - [zabbix的构成](#zabbix的构成)
+    - [zabbix的监控对象](#zabbix的监控对象)
+    - [zabbix的常用术语](#zabbix的常用术语)
+  - [Zabbix 安装和配置](#zabbix-安装和配置)
 
 
 ---
@@ -135,7 +141,8 @@ zabbix程序组件
 
 ## Zabbix 安装和配置
 
-仔细读官方文档: [Zabbix官网][中文][英文]
+仔细读官方文档: [Zabbix中文文档][中文]
+[Zabbix英文文档][英文]
 
 [中文]: https://www.zabbix.com/documentation/current/zh/manual/installation/
 [英文]: https://www.zabbix.com/documentation/current/en/manual/installation/
