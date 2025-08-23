@@ -159,7 +159,7 @@ zabbix程序组件
 
 安装 Automake 和 pkg-config：
 
-```
+```zsh
 $ brew install automake
 $ brew install pkg-config
 ```
@@ -177,7 +177,7 @@ $ brew install pkg-config
 
 安装命令:
 
-```
+```zsh
 # 安装 PCRE2 (如果需要的话，在下面的命令中将 pcre2 替换为 pcre )：
 $ brew install pcre2
 # 使用TLS构建时，请安装OpenSSL和/或GnuTLS：
@@ -187,7 +187,7 @@ $ brew install gnutls
 
 检查一下机器上有没有这几个包:
 
-```
+```zsh
 % brew list pcre2
 % brew list openssl
 # openssl 和 gnutls 二选一即可, 我机器上就没有gnutls
@@ -206,7 +206,7 @@ $ brew install gnutls
 
 查看版本:
 
-```
+```zsh
 % pcre2grep --version
 % pcre2-config --version
 % openssl version
@@ -219,7 +219,7 @@ $ brew install gnutls
 
 下载 Zabbix 源代码, 注意不能在根目录(只读权限)安装.
 
-```
+```zsh
 $ git clone https://git.zabbix.com/scm/zbx/zabbix.git
 # 可以看到从官网安装报错
 $ git clone https://github.com/zabbix/zabbix.git
@@ -245,7 +245,7 @@ clone 过程网络中断 导致的（Zabbix 官方仓库比较大，7k+ 文件�
 
 我使用openssl, 所以这里只贴一下官方文档的代码.
 
-```
+```zsh
 $ cd zabbix
 $ ./bootstrap.sh
 # --sysconfdir=/usr/local/etc/zabbix 只是 告诉 configure 配置文件的安装位置，和 Zabbix 源码本身的路径没关系。
@@ -259,7 +259,7 @@ $ make install
 解释: 在编译/安装 agent 时，指定 --with-openssl，启用了 TLS 功能。特点：agent 和 server/proxy 之间通讯可以 加密（防止中间人攻击、窃听）。支持 身份认证（基于 PSK 或 证书）。部署稍微复杂，需要配置证书或密钥。适用场景：server 和 agent 跨公网通讯。内网环境里有 合规要求（如 GDPR、HIPAA）。需要确认 agent 身份，防止伪造数据。
 
 
-```
+```zsh
 $ cd zabbix
 $ ./bootstrap.sh
 # 注意下面这行要按自己的配置写路径
@@ -275,7 +275,7 @@ $ make install
 
 我使用的命令:
 
-```
+```zsh
 # 注意openssl路径, 上面我们查到的是 openssl@3, 这里就使用 openssl@3
 ./configure --sysconfdir=/usr/local/etc/zabbix --enable-agent --enable-ipv6 --with-openssl=/opt/homebrew/opt/openssl@3
 ```
@@ -339,7 +339,7 @@ Configuration:
 
 下一步是 install, 根据指引, 依次运行:
 
-```
+```zsh
 $ make
 # make 一般不会报错
 $ make install
@@ -348,7 +348,7 @@ $ make install
 
 确认可执行文件安装位置:
 
-```
+```zsh
 which zabbix_agentd
 which zabbix_sender
 which zabbix_get
@@ -391,7 +391,7 @@ Alias /zabbix "/opt/homebrew/var/apache/zabbix/ui"
 
 检查zabbix-agent运行状态:
 
-```
+```zsh
 # 前台启动（调试模式） -f 表示 前台运行，可以在终端看到日志
 /usr/local/sbin/zabbix_agentd -c /usr/local/etc/zabbix/zabbix_agentd.conf -f
 # 后台启动（守护进程模式） 在后台启动 agent
@@ -452,7 +452,7 @@ brew services restart httpd
 
 按理说重启后刷新一下就可以生效了, 但是这里httpd重启执行不了, 没有任何提示, php重启是正常的. 所以最好强制重启一次:
 
-```
+```zsh
 # 停止 Homebrew 服务
 brew services stop httpd
 # 强制杀掉残留进程
@@ -566,7 +566,7 @@ Empty set (0.00 sec)
 一通分析后, 发现解决方法只能是导入初始化 SQL 文件. 我们一般都会想到重新下载源码, 但是问题是我查了源码, 发现每个branch的该目录下都只有image.sql, 所以重新下载也行不通. 我查了中英文论坛, 没有MacOS的解决方法, 只有旧版的Linux, 而新版linux估计也解决不了. 此时注意到目录下有Makefile文件, 猜测是不是需要手动生成 schema.sql 和 data.sql:
 
 
-``` 
+```zsh 
 cd ~/Projects/zabbix/database/mysql
 # 尝试运行. 这条命令会运行 Makefile.am 里定义的生成规则，把模板和生成脚本组合成 schema.sql 和 data.sql
 make schema.sql data.sql
