@@ -16,6 +16,7 @@ author: # Add name author (optional)
     - [zabbix的常用术语](#zabbix的常用术语)
   - [Zabbix 安装和配置](#zabbix-安装和配置)
     - [安装](#安装)
+    - [配置](#配置)
 
 
 ---
@@ -384,4 +385,102 @@ Alias /zabbix "/opt/homebrew/var/apache/zabbix/ui"
 <figure style="text-align: center;">
 <img src="/assets/img/zabbix11.png" alt="" width="500">
 <figcaption>成功打开zabbix主页</figcaption>
+</figure>
+
+
+检查zabbix-agent运行状态:
+
+```
+# 前台启动（调试模式） -f 表示 前台运行，可以在终端看到日志
+/usr/local/sbin/zabbix_agentd -c /usr/local/etc/zabbix/zabbix_agentd.conf -f
+# 后台启动（守护进程模式） 在后台启动 agent
+/usr/local/sbin/zabbix_agentd -c /usr/local/etc/zabbix/zabbix_agentd.conf
+# 测试 agent 是否工作返回 1 说明 agent 正常响应, 然后可以在 Zabbix Server 前端添加这台机器作为监控主机
+zabbix_agentd -t agent.ping -c /usr/local/etc/zabbix/zabbix_agentd.conf
+# 检查进程
+ps aux | grep zabbix_agentd
+```
+
+输出 [u|1] 表示 Zabbix Agent 正常运行并响应请求:
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix12.png" alt="" width="500">
+<figcaption>检查zabbix-agent运行状态</figcaption>
+</figure>
+
+
+### 配置
+
+自动访问http://localhost/zabbix/setup.php, 即在出生点点next step, 会进入到pre-requiment check, 如果有不满足的会标红, 我截图的时候已经修好配置了, 所以在官方论坛上找了一张图. 看了一圈国内的教程, 一般也就是这三条会标红.
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix13.png" alt="" width="500">
+<figcaption>pre-requirment要求</figcaption>
+</figure>
+
+好吧, 接下来就要修改php.ini了. 在这里耗了很久, 感觉之前配的apache还是有点未知问题, 导致重启失败也不会报错,没有告警, 所以修改后的php.ini没有生效, 因为这个问题找了很久原因, 最终发现还是要强制重启一下. 接下来详细讲下过程.
+
+首先找到你的php.ini路径: php --ini
+
+会返回如下信息: Loaded Configuration File: /opt/homebrew/etc/php/8.4/php.ini
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix15.png" alt="" width="500">
+<figcaption>php --ini查找php.ini路径</figcaption>
+</figure>
+
+或者在phpinfo网址上查找Loaded Configuration File:
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix14.png" alt="" width="500">
+<figcaption>phpinfo网址上查找php.ini路径</figcaption>
+</figure>
+
+这就是你的apache使用的php配置, 我们需要修改其中标红的几个参数.
+
+```
+# /搜索这几条参数, 按官方要求修改即可. 保存退出.
+# ;注释
+post_max_size = 16M
+max_execution_time = 300
+max_input_time = 300
+# 修改好后重启
+brew services restart php
+brew services restart httpd
+```
+
+按理说重启后刷新一下就可以生效了, 但是这里httpd重启执行不了, 没有任何提示, php重启是正常的. 所以最好强制重启一次:
+
+```
+# 停止 Homebrew 服务
+brew services stop httpd
+# 强制杀掉残留进程
+sudo pkill -9 httpd
+# 确认没有 httpd 进程
+ps aux | grep httpd
+# php也可以强制重启一次, 但是不必要
+brew services stop php
+sudo pkill -9 php-fpm
+ps aux | grep php-fpm
+```
+
+此时再刷新zabbix页面,就可以看到全部通过了:
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix16.png" alt="" width="500">
+<figcaption>pre-requisites全部满足</figcaption>
+</figure>
+
+另外有些教程上会修改www.conf, 在末尾添加类似配置. 我机器上的路径是: /opt/homebrew/etc/php/8.4/php-fpm.d/www.conf. 但是我不清楚这个是不是影响, 因为改了www.conf之后刷新页面还是没有应用, 所以我个人觉得还是重启的问题.
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix17.png" alt="" width="500">
+<figcaption>编辑www.conf</figcaption>
+</figure>
+
+在phpinfo里查找, 发现确实修改成功:
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix18.png" alt="" width="500">
+<figcaption>在phpinfo中检查</figcaption>
 </figure>
