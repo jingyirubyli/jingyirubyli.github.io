@@ -15,6 +15,7 @@ author: # Add name author (optional)
     - [zabbix的监控对象](#zabbix的监控对象)
     - [zabbix的常用术语](#zabbix的常用术语)
   - [Zabbix 安装和配置](#zabbix-安装和配置)
+    - [安装](#安装)
 
 
 ---
@@ -148,9 +149,223 @@ zabbix程序组件
 [英文]: https://www.zabbix.com/documentation/current/en/manual/installation/
 
 
-./configure --sysconfdir=/usr/local/etc/zabbix --enable-agent --enable-ipv6 --with-openssl=/opt/homebrew/opt/openssl@3
+### 安装
+
+**看从源代码安装部分:**
+
+> 需要命令行开发人员工具（不需要Xcode），Automake，pkg-config和PCRE（v8.x）或PCRE2（v10.x）。如果要使用TLS构建 agent 二进制文件，则还需要 OpenSSL 或 GnuTLS。
+
+安装 Automake 和 pkg-config：
+
+```
+$ brew install automake
+$ brew install pkg-config
+```
 
 <figure style="text-align: center;">
-<img src="/assets/img/zabbix1.png" alt="" width="500">
+<img src="/assets/img/zabbix2.png" alt="" width="500">
+<figcaption>检查安装</figcaption>
+</figure>
+
+> 如何准备 PCRE、OpenSSL 和 GnuTLS 库取决于它们如何链接到 agent。 如果您打算在已具有这些库的 macOS 计算机上运行代理二进制文件，则可以使用 Homebrew 提供的预编译库。这些通常是 macOS 机器，它们使用 Homebrew 来构建 Zabbix agent 二进制文件或用于其他目的。如果 agent 的二进制文件将在没有共享版本的库的 macOS 计算机上使用，则应从源代码编译静态库，并将 Zabbix agent与它们链接。
+
+我理解这段话是如果机器上已经存在这几个包, 直接用就行. 如果没有就需要自己安装一下. 
+
+**使用共享库构建 agent 二进制文件**
+
+安装命令:
+
+```
+# 安装 PCRE2 (如果需要的话，在下面的命令中将 pcre2 替换为 pcre )：
+$ brew install pcre2
+# 使用TLS构建时，请安装OpenSSL和/或GnuTLS：
+$ brew install openssl
+$ brew install gnutls
+```
+
+检查一下机器上有没有这几个包:
+
+```
+% brew list pcre2
+% brew list openssl
+# openssl 和 gnutls 二选一即可, 我机器上就没有gnutls
+% brew list gnutls
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix3.png" alt="" width="500">
+<figcaption>检查pcre2</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix4.png" alt="" width="500">
+<figcaption>检查openssl</figcaption>
+</figure>
+
+查看版本:
+
+```
+% pcre2grep --version
+% pcre2-config --version
+% openssl version
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix5.png" alt="" width="500">
+<figcaption>检查pcre2和openssl版本</figcaption>
+</figure>
+
+下载 Zabbix 源代码, 注意不能在根目录(只读权限)安装.
+
+```
+$ git clone https://git.zabbix.com/scm/zbx/zabbix.git
+# 可以看到从官网安装报错
+$ git clone https://github.com/zabbix/zabbix.git
+# 从github下载成功
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix6.png" alt="" width="500">
+<figcaption>zabbix.com 下载 Zabbix 源代码</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix7.png" alt="" width="500">
+<figcaption>github 下载 Zabbix 源代码</figcaption>
+</figure>
+
+**不使用 TLS 构建 agent：**
+
+我使用openssl, 所以这里只贴一下官方文档的代码.
+
+```
+$ cd zabbix
+$ ./bootstrap.sh
+$ ./configure --sysconfdir=/usr/local/etc/zabbix --enable-agent --enable-ipv6
+$ make
+$ make install
+```
+
+**使用 OpenSSL 构建 agent：**
+
+```
+$ cd zabbix
+$ ./bootstrap.sh
+# 注意下面这行要按自己的配置写路径
+$ ./configure --sysconfdir=/usr/local/etc/zabbix --enable-agent --enable-ipv6 --with-openssl=/usr/local/opt/openssl
+$ make
+$ make install
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix8.png" alt="" width="500">
+<figcaption>./bootstrap.sh</figcaption>
+</figure>
+
+我使用的命令:
+
+```
+# 注意openssl路径, 上面我们查到的是 openssl@3, 这里就使用 openssl@3
+./configure --sysconfdir=/usr/local/etc/zabbix --enable-agent --enable-ipv6 --with-openssl=/opt/homebrew/opt/openssl@3
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix9.png" alt="" width="500">
 <figcaption>Thank you for using Zabbix!</figcaption>
+</figure>
+
+其实这里我修改了几次路径, 最后还是用了最初的命令. 按理说只要自己能搞清楚路径分别在哪里就行.
+
+记录一下我最后一次 ./configure 后输出的config:
+
+```
+Configuration:
+
+  Detected OS:           darwin24.6.0
+  Install path:          /usr/local
+  Compilation arch:      osx
+
+  Compiler:              gcc
+  Compiler flags:         -g -O2 -I/opt/homebrew/Cellar/pcre2/10.45/include
+
+  Library-specific flags:
+    libpcre2:              -I/opt/homebrew/Cellar/pcre2/10.45/include
+    TLS:                   -I/opt/homebrew/opt/openssl@3/include
+
+  Enable server:         no
+
+  Enable proxy:          no
+
+  Enable agent:          yes
+  Agent details:
+    TLS:                   OpenSSL
+    Modbus:                no
+    Linker flags:             -L/opt/homebrew/opt/openssl@3/lib   -rdynamic  -L/opt/homebrew/Cellar/pcre2/10.45/lib 
+    Libraries:                -lssl -lcrypto   -lpcre2-8 -lpthread -lm  -lresolv -liconv
+    Configuration file:    /usr/local/etc/zabbix/zabbix_agentd.conf
+    Modules:               /usr/local/lib/modules
+
+  Enable agent 2:        no
+
+  Enable web service:    no
+
+  Enable Java gateway:   no
+
+  LDAP support:          no
+  IPv6 support:          yes
+  cmocka support:        no
+
+  yaml support:          no
+
+***********************************************************
+*            Now run 'make install'                       *
+*                                                         *
+*            Thank you for using Zabbix!                  *
+*              <https://www.zabbix.com>                   *
+***********************************************************
+```
+
+
+下一步是 install, 根据指引, 依次运行:
+
+```
+$ make
+# make 一般不会报错
+$ make install
+# 如果报权限错误, 使用 sudo make install. 我就是因为这个权限错误改了几次路径, 发现都不成功, 最终只能使用sudo
+```
+
+检查:
+
+```
+which zabbix_agentd
+which zabbix_sender
+which zabbix_get
+```
+
+修改 /usr/local/etc/zabbix/zabbix_agentd.conf 中的 server 地址为本机地址.
+
+启动apache, 按官方文档，将zabbix需要的文件复制到指定的web目录下. 我的zabbix目录安装位置在: /Users/jingyili/Projects/zabbix, 要把这个文件放在apache有权限处理的web目录: /opt/homebrew/var/apache/
+
+需要找的zabbix.php路径在: /opt/homebrew/var/apache/zabbix/ui/zabbix.php
+
+所以需要编辑一下apache的.conf文件, 添加该路径: sudo vim /opt/homebrew/etc/httpd/httpd.conf 
+
+添加以下内容:
+
+```
+Alias /zabbix "/opt/homebrew/var/apache/zabbix/ui"
+
+<Directory "/opt/homebrew/var/apache/zabbix/ui">
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
+```
+
+重启apache, 即可访问 http://localhost/zabbix
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix10.png" alt="" width="500">
+<figcaption>成功访问zabbix.php</figcaption>
 </figure>
