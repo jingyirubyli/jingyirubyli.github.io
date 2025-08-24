@@ -18,6 +18,7 @@ author: # Add name author (optional)
     - [安装](#安装)
     - [配置](#配置)
     - [导入](#导入)
+    - [web界面](#web界面)
 
 
 ---
@@ -875,3 +876,28 @@ mysql> SHOW TABLES;
 207 rows in set (0.01 sec)
 ```
 
+### web界面
+
+继续next step, 此时可能会出现红字报错说没有configure文件, 直接点进链接下载, 然后mv到它要求的位置, 刷新. 然后出现用户名密码登陆界面, 输入默认用户名Admin, 密码zabbix, 即可作为 Zabbix超级用户登录(将授予对所有菜单的访问权限)。登入dashboard:
+
+> 若采用从源代码安装 Zabbix，请下载配置文件并将其 Zabbix PHP 文件复制到所在网站服务器 HTML 文件子目录中的 conf/ 下。
+> 注意不要头铁一直输自己的用户名密码. 因为有防止暴力破解: 为了防止暴力破解和词典攻击，如果发生连续五次尝试登录失败，Zabbix界面将暂停30秒。
+
+登录成功后将显示尝试登录失败的IP地址。
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix26.png" alt="" width="500">
+<figcaption>下载配置文件</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix24.png" alt="" width="500">
+<figcaption>成功登录dashboard</figcaption>
+</figure>
+
+成功以默认身份登入, 即可按照官方文档创建自己的新用户. 创建完成后以自己的身份重新登录即可.
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix27.png" alt="" width="500">
+<figcaption>创建自己的用户</figcaption>
+</figure>
