@@ -19,6 +19,7 @@ author: # Add name author (optional)
     - [配置](#配置)
     - [导入](#导入)
     - [web界面](#web界面)
+- [写在最后](#写在最后)
 
 
 ---
@@ -876,11 +877,47 @@ mysql> SHOW TABLES;
 207 rows in set (0.01 sec)
 ```
 
+
 ### web界面
+
+检查zabbix使用的账号权限: 如果用户 zabbix 在 MySQL 中创建时没指定 REQUIRE SSL，客户端可以不使用 SSL 来连。
+
+```sql
+SHOW GRANTS FOR 'zabbix'@'localhost';
+# 如果没有 REQUIRE SSL，说明这个用户可以非加密登录。
+SHOW SESSION STATUS LIKE 'Ssl_version';
+# 如果结果是空的，说明你没有通过 TLS 连接成功。
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix28.png" alt="" width="300">
+<figcaption>没有通过 TLS 连接</figcaption>
+</figure>
+
+```
+# 在shell里连接数据库时加上 --ssl-mode=REQUIRED
+mysql -u zabbix -p --ssl-mode=REQUIRED zabbix
+# 在 MySQL 客户端 (SQL 命令行) 执行 SQL 语句
+SHOW SESSION STATUS LIKE 'Ssl_version';
+# TLS 生效
++---------------+---------------------+
+| Variable_name | Value               |
++---------------+---------------------+
+| Ssl_version   | TLSv1.3             |
++---------------+---------------------+
+
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix29.png" alt="" width="500">
+<figcaption> TLS 生效</figcaption>
+</figure>
+
 
 继续next step, 此时可能会出现红字报错说没有configure文件, 直接点进链接下载, 然后mv到它要求的位置, 刷新. 然后出现用户名密码登陆界面, 输入默认用户名Admin, 密码zabbix, 即可作为 Zabbix超级用户登录(将授予对所有菜单的访问权限)。登入dashboard:
 
 > 若采用从源代码安装 Zabbix，请下载配置文件并将其 Zabbix PHP 文件复制到所在网站服务器 HTML 文件子目录中的 conf/ 下。
+
 > 注意不要头铁一直输自己的用户名密码. 因为有防止暴力破解: 为了防止暴力破解和词典攻击，如果发生连续五次尝试登录失败，Zabbix界面将暂停30秒。
 
 登录成功后将显示尝试登录失败的IP地址。
@@ -901,3 +938,63 @@ mysql> SHOW TABLES;
 <img src="/assets/img/zabbix27.png" alt="" width="500">
 <figcaption>创建自己的用户</figcaption>
 </figure>
+
+
+注意: Zabbix 的 Web 前端页面（PHP 界面）和 Zabbix Server 是两个不同的组件：
+Zabbix Server: 核心进程，负责和数据库、Agent、Proxy 等交互。没有它，就没有“监控逻辑”和“采集数据”。
+
+Zabbix Web (Frontend): 只是一个 PHP 写的管理页面（运行在 Apache/Nginx + PHP 上）。它本身不会采集数据，只是一个 管理 UI。Web 前端需要连接数据库（MySQL/PostgreSQL 等），然后从数据库里读配置、写配置。
+
+现在我没有安装zabbix-server, 但是安装并配置了 Zabbix Web 前端 + 数据库，这两个就能打开页面，甚至能创建用户、配置主机等。
+但是此时页面里的“主机监控”、“触发器”等功能都不会真正生效，因为背后没有 Zabbix Server 进程在跑。Web 只是把你在页面上的操作写进数据库里，等 Zabbix Server 启动后才会真正生效。
+
+所以至此完成/未完成列出:
+- [ ] Zabbix-server 
+- [x] Zabbix-agent
+- [x] Zabbix-frontend (web, php+nginx/apache)
+- [x] MySQL
+
+使用以下的命令检查:
+
+```zsh
+# 检查是否有 zabbix-server
+which zabbix_server
+ps aux | grep zabbix_server
+# 检查是否有 zabbix-agent
+which zabbix_agentd
+which zabbix_agent2
+ps aux | grep zabbix_agent
+# 检查是否有 Zabbix Web 前端 (PHP 页面)
+ls /opt/homebrew/var/apache/zabbix
+```
+
+```sql
+# 检查数据库
+SHOW DATABASES LIKE 'zabbix';
+# 可能会进行重连
+ERROR 2006 (HY000): MySQL server has gone away
+No connection. Trying to reconnect...
+Connection id:    837
+Current database: zabbix
+
++-------------------+
+| Database (zabbix) |
++-------------------+
+| zabbix            |
++-------------------+
+1 row in set (0.18 sec)
+
+USE zabbix;
+SHOW TABLES;
+# 数据库已初始化成功（包含完整表结构和初始数据）。
+```
+
+
+---
+
+# 写在最后
+
+现在的目录对比
+- /usr/local/etc/zabbix/ → 这是 agent 配置目录（zabbix_agentd.conf）。
+- /usr/local/sbin/zabbix_agentd → agent 可执行文件。
+- 缺少 /usr/local/sbin/zabbix_server 和 /usr/local/etc/zabbix/zabbix_server.conf → 说明没有装 server。
