@@ -1006,6 +1006,13 @@ SHOW TABLES;
 <figcaption>server无法启动</figcaption>
 </figure>
 
+不行, 道心破碎了. 不知道哪里有问题, 暂时放弃了.
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix32.png" alt="" width="500"><img src="/assets/img/zabbix33.png" alt="" width="500">
+<figcaption>docker内容</figcaption>
+</figure>
+
+
 ---
 
 # 写在最后
