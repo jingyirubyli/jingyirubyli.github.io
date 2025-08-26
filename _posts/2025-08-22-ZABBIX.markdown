@@ -1045,3 +1045,11 @@ sudo /opt/homebrew/bin/httpd -DFOREGROUND # 这是调试模式, 不能退出
 - /usr/local/etc/zabbix/ → 这是 agent 配置目录（zabbix_agentd.conf）。
 - /usr/local/sbin/zabbix_agentd → agent 可执行文件。
 - 缺少 /usr/local/sbin/zabbix_server 和 /usr/local/etc/zabbix/zabbix_server.conf → 说明没有装 server。
+
+
+ps: 还是不死心, 又查了一下, 发现zabbix没有提供mac的server部分:
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix35.png" alt="" width="500">
+<figcaption>看来还得上虚拟机了</figcaption>
+</figure>
