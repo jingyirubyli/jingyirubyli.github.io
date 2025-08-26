@@ -999,7 +999,7 @@ SHOW TABLES;
 <figcaption>查看config.log</figcaption>
 </figure>
 
-不行, 试了好久, 还是无法连接到web. 道心破碎了.
+不行, docker试了好久, 还是无法连接到web. 道心破碎了.
 
 <figure style="text-align: center;">
 <img src="/assets/img/zabbix31.png" alt="" width="500">
