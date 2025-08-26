@@ -1032,6 +1032,15 @@ sudo /opt/homebrew/bin/httpd -DFOREGROUND
 
 # 写在最后
 
+**重要**
+
+为了避免各种奇怪的错误, 手动启动apache:
+
+```zsh
+sudo /opt/homebrew/bin/httpd -k start
+sudo /opt/homebrew/bin/httpd -DFOREGROUND # 这是调试模式, 不能退出
+```
+
 现在的目录对比
 - /usr/local/etc/zabbix/ → 这是 agent 配置目录（zabbix_agentd.conf）。
 - /usr/local/sbin/zabbix_agentd → agent 可执行文件。
