@@ -1012,6 +1012,19 @@ SHOW TABLES;
 <figcaption>docker内容</figcaption>
 </figure>
 
+记录几条命令:
+
+```zsh
+# 查看端口连接
+nc -zv localhost 10051 
+# 强制启动httpd 
+sudo /opt/homebrew/bin/httpd -DFOREGROUND  
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/zabbix34.png" alt="" width="500">
+<figcaption>sudo /opt/homebrew/bin/httpd -DFOREGROUND 解决以上报错</figcaption>
+</figure>
 
 ---
 
