@@ -1021,6 +1021,8 @@ nc -zv localhost 10051
 sudo /opt/homebrew/bin/httpd -DFOREGROUND  
 ```
 
+命令sudo /opt/homebrew/bin/httpd -DFOREGROUND 运行后不能退出.
+
 <figure style="text-align: center;">
 <img src="/assets/img/zabbix34.png" alt="" width="500">
 <figcaption>sudo /opt/homebrew/bin/httpd -DFOREGROUND 解决以上报错</figcaption>
