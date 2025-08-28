@@ -148,7 +148,9 @@ zabbix程序组件
 ## Zabbix 安装和配置
 
 仔细读官方文档: 
+
 Zabbix中文文档: <https://www.zabbix.com/documentation/current/zh/manual/installation/>
+
 Zabbix英文文档: <https://www.zabbix.com/documentation/current/en/manual/installation/>
 
 
