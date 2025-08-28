@@ -9,6 +9,8 @@ author: # Add name author (optional)
 ---
 # 本讲内容
 
+有手就行:
+
 参考: <https://www.youtube.com/watch?v=kDosGTdwqO0>
 
 iso镜像: <https://ubuntu.com/download/server/arm>
