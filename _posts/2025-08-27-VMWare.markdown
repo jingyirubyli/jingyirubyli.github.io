@@ -1,0 +1,15 @@
+---
+layout: post
+title:  MacOS VMWare 安装 Ubuntu 24.04
+date:   2025-08-27
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: vmware.png # Add image post (optional)
+tags: [Blog, Linux]
+author: # Add name author (optional)
+---
+# 本讲内容
+
+参考: https://www.youtube.com/watch?v=kDosGTdwqO0
+
+iso镜像: https://ubuntu.com/download/server/arm
+
