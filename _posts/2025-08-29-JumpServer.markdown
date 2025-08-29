@@ -9,9 +9,9 @@ author: # Add name author (optional)
 ---
 # 本讲内容
 
-
+终端直接运行: ./[脚本]运行, 需要在脚本头部声明解释器类型. 如果在命令行直接指定, 如 python3 [脚本], 就不用在脚本头部声明解释器.
 
 <figure style="text-align: center;">
-<img src="/assets/img/uz.png" alt="" width="500">
-<figcaption>ubuntu配置非常简单</figcaption>
+<img src="/assets/img/js1.png" alt="" width="500">
+<figcaption></figcaption>
 </figure>
