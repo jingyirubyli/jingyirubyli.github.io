@@ -97,7 +97,7 @@ Jumpserver 管理后台, 是核心组件, 使用 Django Class Based View 风格�
 首先需要安装redis, 当然是要在ubuntu中安装. 我先使用mac试了一下, 非常简单:
 
 <figure style="text-align: center;">
-<img src="/assets/img/js3.png" alt="" width="500">
+<img src="/assets/img/js3.png" alt="" width="500"><img src="/assets/img/js4.png" alt="" width="500">
 <figcaption>redis-cli</figcaption>
 </figure>
 
