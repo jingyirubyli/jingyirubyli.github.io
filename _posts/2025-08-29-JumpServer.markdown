@@ -104,4 +104,5 @@ Jumpserver 管理后台, 是核心组件, 使用 Django Class Based View 风格�
 ubuntu就更简单了. 
 
 - [] 最近太累了就先不配了, 看到还得装docker好麻烦, 好像需要内存也挺大的. 总之先搁置了.
+- 先放一个在线安装步骤链接: <https://docs.jumpserver.org/zh/v3/installation/setup_linux_standalone/online_install/>
 
