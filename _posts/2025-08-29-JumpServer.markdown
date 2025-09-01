@@ -94,5 +94,5 @@ Jumpserver 管理后台, 是核心组件, 使用 Django Class Based View 风格�
 
 读了一下官方文档: <https://docs.jumpserver.org/zh/v3/installation/setup_linux_standalone/online_install/>
 
-ps: 幸好我进去github看了一下, 发现文档里提供的release链接已经没了, 之前踩坑太多已经学精了哈哈哈哈.
+
 
