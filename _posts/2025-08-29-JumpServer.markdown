@@ -11,7 +11,16 @@ author: # Add name author (optional)
 
 终端直接运行: ./[脚本]运行, 需要在脚本头部声明解释器类型. 如果在命令行直接指定, 如 python3 [脚本], 就不用在脚本头部声明解释器.
 
+## Jumpserver 架构
+
+JumpServer 采用分层架构，分别是负载层、接入层、核心层、数据层、存储层。应用架构图如下：
+
 <figure style="text-align: center;">
 <img src="/assets/img/js1.png" alt="" width="500">
-<figcaption></figcaption>
+<figcaption>Jumpserver组成部分</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+<img src="/assets/img/js2.png" alt="" width="500">
+<figcaption>Jumpserver架构图</figcaption>
 </figure>
