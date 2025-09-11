@@ -232,3 +232,52 @@ integer, and returns an integer as result./指向一个函数的指针，该函�
 ## LLVM API
 
 LLVM 提供了 C++ API 来操作 IR（写 Pass 就是用这些 API）。
+
+
+### Module 类
+
+getName(): 获取模块的名字（通常是文件名）。
+
+使用示例:
+
+```cpp
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/Support/raw_ostream.h"
+
+using namespace llvm;
+
+int main() {
+    // 1. 创建一个 LLVM 上下文 (保存类型、常量等全局信息)
+    LLVMContext Context;
+
+    // 2. 创建一个 Module，名字叫 "my_module"
+    Module M("my_module", Context);
+
+    // 3. 打印模块名字
+    outs() << "Module name is " << M.getName() << "\n";
+
+    return 0;
+}
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/llvm11.png" alt="" width="500">
+<figcaption>getName()</figcaption>
+</figure>
+
+functions(): 遍历模块中的所有函数。
+
+
+### Function 类
+
+
+
+
+### Instruction 类
+
+
+
+
+
+### 
