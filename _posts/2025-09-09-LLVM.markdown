@@ -241,6 +241,8 @@ integer, and returns an integer as result./指向一个函数的指针，该函�
 
 LLVM 提供了 C++ API 来操作 IR（写 Pass 就是用这些 API）。
 
+<https://llvm.org/doxygen/classllvm_1_1Instruction.html#ab4e05d690df389b8b1477c90387b575f>
+
 
 ### Module 类
 
@@ -310,6 +312,11 @@ clang++ -std=c++17 module_with_functions.cpp `llvm-config --cxxflags --ldflags -
 <figcaption>functions()</figcaption>
 </figure>
 
+
+getOrInsertFunction():
+
+
+
 ### Function 类
 
 getInstructionCount(): 返回此函数中非调试 IR 指令的数量。相当于函数中包含的所有基本块的大小总和。
@@ -375,8 +382,83 @@ clang++ -std=c++17 count_ir.cpp `llvm-config --cxxflags --ldflags --libs core su
 
 ### Instruction 类
 
+getOpcode():
+
+
+isBinaryOp():
+
+
+instr.getDebugLoc()
+
+### User 类
+
+getOperand(unsigned i)
+
+
+### Value 类
+
+getType():
+
+getContext():
+
+### Type 类
+
+isIntegerTy():
+
+getInt32Ty():
+
+getVoidTy():
+
+
+### CmpInst
+
+
+isTrueWhenEqual():
+
+
+isFalseWhenEqual():
 
 
 
+### StoreInst
 
-### 
+getValueOperand():
+
+getPointerOperand():
+
+
+### LoadInst
+
+getPointerOperand()
+
+### Constant
+
+get(Type* Ty, uint64_t V, bool isSigned = false)
+
+isZeroValue()
+
+
+### PHINode
+
+hasConstantValue():
+
+getNumIncomingValues():
+
+
+### DebugLoc
+
+getLine():
+
+getCol()
+
+
+### FunctionType
+
+FunctionType::get()
+
+
+### CallInst
+
+Create()
+
+
