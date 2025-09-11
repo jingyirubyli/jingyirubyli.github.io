@@ -40,6 +40,8 @@ LLVM 项目最初由伊利诺伊大学香槟分校的 Vikram Adve 和 Chris Latt
 
 参考:
 
+Mapping High Level Constructs to LLVM IR: <https://mapping-high-level-constructs-to-llvm-ir.readthedocs.io/en/latest/>
+ 
 LLVM Programmer’s Manual: <https://releases.llvm.org/8.0.0/docs/ProgrammersManual.html>
 
 LLVM Doxygen Sources: <https://llvm.org/doxygen/>
