@@ -31,6 +31,13 @@ LLVM 项目最初由伊利诺伊大学香槟分校的 Vikram Adve 和 Chris Latt
     - [从 C 程序到 IR](#从-c-程序到-ir)
     - [LLVM 类层次结构](#llvm-类层次结构)
 
+
+参考:
+LLVM Programmer’s Manual: <https://releases.llvm.org/8.0.0/docs/ProgrammersManual.html>
+
+LLVM Doxygen Sources: <https://llvm.org/doxygen/>
+
+
 ---
 
 ## LLVM 概览
@@ -184,7 +191,7 @@ integer, and returns an integer as result./指向一个函数的指针，该函�
 <figcaption>基本块和控制流图（CFG）</figcaption>
 </figure>
 
-### IR 的类与对象
+### IR 的类, 对象, 指令
 
 **LLVM 类层次结构**
 
@@ -198,3 +205,29 @@ integer, and returns an integer as result./指向一个函数的指针，该函�
 在 SSA 下，每条指令都等价于“定义一个变量”: 由于 LLVM IR 使用 SSA 形式，因此每个变量都有一条唯一的赋值指令。
 因此，每条指令都可以看作是被赋值的变量的名称。
 
+- 调试与输出
+
+用 outs(), errs(), dump() 打印 IR, 而不是std::cout , std::cerr, and printf. 此外，LLVM 中没有与 std::endl 等效的函数
+
+- Instruction: AllocaInst → 在栈上分配内存
+- Instruction: StoreInst → 向内存写数据
+- Instruction: LoadInst → 从内存读数据
+- Instruction: BinaryOperator → 二元算术运算
+- Instruction: BinaryOperator operations → 具体的 add/sub/mul/sdiv/udiv
+- Instruction: ReturnInst → 函数返回
+- Instruction: CmpInst → 比较运算（布尔结果）
+- Instruction: CmpInst  → 比较条件（eq/ne/slt/sgt/ule/uge…）
+- Instruction: BranchInst → 条件/无条件跳转
+- Instruction: PHINode → SSA 合流点
+
+- 类型检查与识别: 在写 Pass 时，需要判断某个指令的具体类型。
+
+
+
+
+
+---
+
+## LLVM API
+
+LLVM 提供了 C++ API 来操作 IR（写 Pass 就是用这些 API）。
