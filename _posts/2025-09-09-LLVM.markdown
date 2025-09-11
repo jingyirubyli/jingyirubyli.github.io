@@ -13,3 +13,188 @@ author: # Add name author (optional)
 clang -emit-llvm -S -fno-discard-value-names -target x86_64-unknown-linux-gnu -c test1.c
 clang -emit-llvm -S -fno-discard-value-names -c test1.c
 ```
+
+LLVM 项目最初由伊利诺伊大学香槟分校的 Vikram Adve 和 Chris Lattner 于 2000 年开发。他们最初的目标是为了开发静态和动态编程语言的动态编译技术。 2005 年，Lattner 加入苹果公司，继续开发 LLVM。 2013 年，LLVM 最初代表低级虚拟机 (Low-Level Virtual Machines)，但随着 LLVM 家族的壮大，其原有的含义已不再适用。 如今，LLVM + Clang 总共包含 250 万行 C++ 代码。应用场景:
+
+- 传统 C/C++ 工具链：高通骁龙 LLVM 编译器，适用于 Android
+- 编程语言：Pyston – 基于 LLVM 的高性能 Python 实现
+- 语言运行时系统：LLILC – 基于 LLVM 的 .NET MSIL 编译器
+- GPU：大多数 OpenCL 实现基于 Clang/LLVM
+- Linux/FreeBSD：Debian 正在尝试使用 Clang/LLVM 作为附加编译器
+
+- [本讲内容](#本讲内容)
+  - [LLVM 概览](#llvm-概览)
+  - [LLVM IR 结构](#llvm-ir-结构)
+    - [IR 的三种格式](#ir-的三种格式)
+    - [层级结构与遍历](#层级结构与遍历)
+    - [变量和数据表示](#变量和数据表示)
+    - [从 C 程序到 IR](#从-c-程序到-ir)
+    - [LLVM 类层次结构](#llvm-类层次结构)
+
+---
+
+## LLVM 概览
+
+LLVM 是一个 模块化、可复用的编译器框架, 支持多种前端和后端。它分为：
+- 前端 (Front-End)：处理源代码（C/C++、Rust、Go…），生成 LLVM IR。常见的前端：Clang。
+- 中间层 (Optimizer)：对 IR 做优化（性能优化、安全检查等），主要靠 Passes。
+- 后端 (Back-End)：把 IR 翻译成特定架构的汇编/机器码（x86、ARM、MIPS…）。
+
+
+<figure style="text-align: center;">
+<img src="/assets/img/llvm1.png" alt="" width="500">
+<figcaption>llvm组成部分</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+<img src="/assets/img/llvm2.png" alt="" width="500">
+<figcaption>llvm结构</figcaption>
+</figure>
+
+LLVM 优化器 (opt) 是一系列依次运行的“过程”。两种过程：分析analysis和转换transformation
+- 分析过程分析 LLVM IR 以检查程序属性
+- 转换过程转换 LLVM IR 以监控或优化程序
+=> 分析过程不更改代码；转换过程会更改代码
+LLVM 通常会通过实现新的过程进行扩展，这些过程会在 LLVM IR 编译过程中对其进行检查和更改。
+
+<figure style="text-align: center;">
+<img src="/assets/img/llvm3.png" alt="" width="500">
+<figcaption>llvm优化遍</figcaption>
+</figure>
+
+为什么用 LLVM IR？
+- 独立性：不依赖源语言，也不依赖目标机器。
+- 简化：不同语言的复杂语法（for, while, foreach）在 IR 中可能统一为一种循环结构。例如：源语言可能包含“while”、“for”和“foreach”循环. IR 语言可能只包含“while”循环和序列, 翻译时会消除“for”和“foreach”
+- 适合优化：形式规则、基于 SSA（静态单赋值），方便做数据流分析和优化。
+
+不是处理“((1 + X4) + (3 + (X1 * 5)))”的 AST:
+
+
+```
+Add(Add(Const 1, Var X4),
+    Add(Const 3, Mul(Var X1,
+                    Const 5)))
+```
+
+```
+tmp0 = 1 + X4
+tmp1 = X1 * 5
+tmp2 = 3 + tmp1
+tmp3 = tmp0 + tmp2
+```
+
+注意: 翻译使求值的顺序清晰明确; 命名中间值; 引入的临时变量永远不会被修改。
+
+生成 LLVM IR 命令:
+
+```
+clang factorial.c -S -emit-llvm -o <file>
+# -S: 仅执行预处理和编译步骤，并生成文本汇编
+```
+
+---
+
+## LLVM IR 结构
+
+### IR 的三种格式
+
+- In-Memory (内存中的二进制)：编译时使用。
+- Bitcode (.bc)：磁盘上的二进制，加载快。clang -emit-llvm -c factorial.c -o xxx.bc
+- Assembly (.ll)：人类可读。clang -emit-llvm -S -c factorial.c -o xxx.ll
+
+
+### 层级结构与遍历
+
+Instruction ⊂ Basic Block ⊂ Function ⊂ Module
+
+<figure style="text-align: center;">
+<img src="/assets/img/llvm4.png" alt="" width="500">
+<figcaption>llvm IR 层级</figcaption>
+</figure>
+
+- 模块是 LLVM IR 的顶层容器，对应于前端编译器的每个翻译单元。
+- 函数是编程语言中的一个函数，包含一个函数签名和若干个基本块。函数中的第一个基本块称为入口基本块。
+- 基本块是一组按顺序执行的指令，只有一个入口和一个出口，非头指令和尾指令不会按照执行顺序跳转到其他指令。
+- 指令是 LLVM IR 中最小的可执行单元；每条指令占用一行。
+
+
+<figure style="text-align: center;">
+<img src="/assets/img/llvm5.png" alt="" width="500">
+<figcaption>llvm IR iterators</figcaption>
+</figure>
+
+
+### 变量和数据表示
+
+**变量类型**
+
+LLVM IR 有 局部变量 % 和 全局变量 @，并且强类型化（i32, i8* 等）。
+
+```
+“%” indicates local variables:   %1 = add nsw i32 %a, %tmp
+“@” indicates global variables:  @g = global i32 20, align 4
+```
+
+两种类型：primitive 原始类型（例如integer, floating-point）和 derived 派生类型（例如pointer,
+struct）。
+
+integar 类型用于指定所需位宽的整数：
+i1  single-bit整数
+i32 32-bit整数
+
+pointer 类型用于指定内存位置：
+i32**  A pointer to a pointer to an integer/指向整数指针的指针。
+i32 (i32*) *  A pointer to a function that takes as argument a pointer to an
+integer, and returns an integer as result./指向一个函数的指针，该函数以指向整数的指针作为参数，并返回一个整数作为结果。
+
+
+**SSA(Static Single Assignment) 形式**
+
+每个变量只定义一次，用新的名字表示不同赋值。可以可以调用多次. SSA 在编译器中被广泛使用，因为它简化并改进了各种编译器优化。
+
+<figure style="text-align: center;">
+<img src="/assets/img/llvm9.png" alt="" width="500">
+<figcaption>C-SSA-LLVM IR</figcaption>
+</figure>
+
+
+**Phi 节点**
+
+当同一个变量在多个分支中被修改时，SSA 会出现问题。Phi节点是SSA 的特殊工具：在分支合流时，用 phi 指令选择不同来源的值。
+在示例中，为了返回变量“x”，SSA 形式根据所采用的路径有两个选项“x_2”和“x_3”。Phi 节点通过定义一个新变量“x_4”，并赋予其“x_2”或“x_3”的值，从而抽象化了这种复杂性。
+
+<figure style="text-align: center;">
+<img src="/assets/img/llvm10.png" alt="" width="500">
+<figcaption>phi</figcaption>
+</figure>
+
+### 从 C 程序到 IR
+
+**C 程序及其 LLVM IR 对应程序**
+
+<figure style="text-align: center;">
+<img src="/assets/img/llvm6.png" alt="" width="500">
+<figcaption>C 的阶乘函数如何翻译成 LLVM IR</figcaption>
+</figure>
+
+**基本块(Basic Blocks)和控制流图（CFG,Control Flow Graph）**
+
+<figure style="text-align: center;">
+<img src="/assets/img/llvm7.png" alt="" width="500">
+<figcaption>基本块和控制流图（CFG）</figcaption>
+</figure>
+
+### IR 的类与对象
+
+**LLVM 类层次结构**
+
+<figure style="text-align: center;">
+<img src="/assets/img/llvm8.png" alt="" width="500">
+<figcaption>LLVM Class Hierarchy</figcaption>
+</figure>
+
+**指令和变量**
+
+在 SSA 下，每条指令都等价于“定义一个变量”: 由于 LLVM IR 使用 SSA 形式，因此每个变量都有一条唯一的赋值指令。
+因此，每条指令都可以看作是被赋值的变量的名称。
+
