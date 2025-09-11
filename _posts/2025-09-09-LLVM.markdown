@@ -29,7 +29,13 @@ LLVM 项目最初由伊利诺伊大学香槟分校的 Vikram Adve 和 Chris Latt
     - [层级结构与遍历](#层级结构与遍历)
     - [变量和数据表示](#变量和数据表示)
     - [从 C 程序到 IR](#从-c-程序到-ir)
-    - [LLVM 类层次结构](#llvm-类层次结构)
+    - [IR 的类, 对象, 指令](#ir-的类-对象-指令)
+  - [LLVM API](#llvm-api)
+    - [Module 类](#module-类)
+    - [Function 类](#function-类)
+    - [Instruction 类](#instruction-类)
+    - [](#)
+
 
 
 参考:
