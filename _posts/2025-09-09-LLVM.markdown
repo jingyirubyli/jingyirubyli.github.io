@@ -259,6 +259,10 @@ int main() {
 
     return 0;
 }
+
+// 编译:
+clang++ -std=c++17 my_module.cpp `llvm-config --cxxflags --ldflags --libs core support` -o my_module
+./my_module
 ```
 
 <figure style="text-align: center;">
@@ -266,13 +270,100 @@ int main() {
 <figcaption>getName()</figcaption>
 </figure>
 
-functions(): 遍历模块中的所有函数。
+functions(): 遍历模块中的所有函数。是 llvm::Module 的一个方法。它返回一个 迭代器范围，里面包含了模块中的所有 函数（llvm::Function 对象）。每个函数对应 C/IR 程序里的一个函数，比如 main、foo、bar。
 
+使用示例:
+
+```cpp
+// 4. 手动往模块里添加两个函数：foo 和 bar
+
+    // foo: int foo(int, int)
+    FunctionType *fooType = FunctionType::get(Type::getInt32Ty(Context),
+                                              {Type::getInt32Ty(Context), Type::getInt32Ty(Context)},
+                                              false);
+    Function *fooFunc = Function::Create(fooType, Function::ExternalLinkage, "foo", M);
+
+    // bar: void bar()
+    FunctionType *barType = FunctionType::get(Type::getVoidTy(Context), false);
+    Function *barFunc = Function::Create(barType, Function::ExternalLinkage, "bar", M);
+
+    // 5. 遍历 Module 里的所有函数，并打印函数名
+    for (auto &F : M.functions()) {
+        outs() << "Function name: " << F.getName() << "\n";
+    }
+
+// 编译:
+clang++ -std=c++17 module_with_functions.cpp `llvm-config --cxxflags --ldflags --libs core support` -o module_with_functions
+./module_with_functions
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/llvm12.png" alt="" width="500">
+<figcaption>functions()</figcaption>
+</figure>
 
 ### Function 类
 
+getInstructionCount(): 返回此函数中非调试 IR 指令的数量。相当于函数中包含的所有基本块的大小总和。
 
+```cpp
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/Support/SourceMgr.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/AsmParser/Parser.h"
 
+using namespace llvm;
+
+int main(int argc, char **argv) {
+    if (argc < 2) {
+        errs() << "Usage: " << argv[0] << " <IR file>\n";
+        return 1;
+    }
+
+    // 1. 创建 LLVM 上下文
+    LLVMContext Context;
+
+    // 2. 从输入文件读取 Module（.ll 文件）
+    SMDiagnostic Err;
+    std::unique_ptr<Module> M = parseAssemblyFile(argv[1], Err, Context);
+
+    if (!M) {
+        Err.print(argv[0], errs());
+        return 1;
+    }
+
+    // 3. 初始化计数器
+    int NumOfFunctions = 0;
+    int NumOfInstructions = 0;
+
+    // 4. 遍历所有函数并统计
+    for (auto &F : M->functions()) {
+        if (F.isDeclaration()) continue; // 跳过声明（例如外部函数 printf）
+        NumOfFunctions += 1;
+        NumOfInstructions += F.getInstructionCount();
+    }
+
+    // 5. 输出结果
+    outs() << "Module name: " << M->getName() << "\n";
+    outs() << "Number of functions: " << NumOfFunctions << "\n";
+    outs() << "Number of instructions: " << NumOfInstructions << "\n";
+
+    return 0;
+}
+
+// 编译
+clang++ -std=c++17 count_ir.cpp `llvm-config --cxxflags --ldflags --libs core support asmparser` -o count_ir
+./count_ir test.ll
+```
+
+<figure style="text-align: center;">
+<img src="/assets/img/llvm13.png" alt="" width="500">
+<figcaption>getInstructionCount( )</figcaption>
+</figure>
 
 ### Instruction 类
 
