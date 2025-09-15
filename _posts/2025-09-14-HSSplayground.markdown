@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  抽象域
+title:  HSS Playground/Assignment 笔记
 date:   2025-09-14
 description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
 img: static-analyzer.png # Add image post (optional)
