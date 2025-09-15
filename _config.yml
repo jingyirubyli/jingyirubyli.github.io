@@ -9,8 +9,7 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://jingyirubyli.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 
 # Author settings
-author: Jingyi Li # add your name
-# author-pic: neo.png
+author: 学习笔记 S # add your name
 author-pic: zhang2.png
 
 about-author: 以今夜北斗为证，淮深愿与君刀山共闯。
