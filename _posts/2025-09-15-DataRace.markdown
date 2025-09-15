@@ -1,0 +1,12 @@
+---
+layout: post
+title:  Data Race 数据争用
+date:   2025-09-15
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: datarace.png # Add image post (optional)
+tags: [Blog, Holistic Software Security]
+author: # Add name author (optional)
+---
+# 本讲内容
+
+9-15 lecture提到的: 如何监测是否有data race
