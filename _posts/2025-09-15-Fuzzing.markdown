@@ -81,6 +81,10 @@ AFL++ 作为改进版的 AFL（American Fuzzy Lop），提供了更强大的功�
 ## AFL++
 
 
+<figure style="text-align: center;">
+<img src="/assets/img/fuzz3.png" alt="" width="500">
+<figcaption>AFLPlusPlus(A++)</figcaption>
+</figure>
 
 
 
