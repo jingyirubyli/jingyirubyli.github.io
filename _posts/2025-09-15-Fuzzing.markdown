@@ -9,9 +9,88 @@ author: # Add name author (optional)
 ---
 # 本讲内容
 
-在软件安全测试领域，模糊测试（Fuzzing）是一种高效的缺陷发现技术。AFL++ 作为改进版的 AFL（American Fuzzy Lop），提供了更强大的功能和更高的测试效率。然而，当面对仅有二进制文件而没有源代码的情况时，传统的模糊测试方法往往效果不佳。本文将深入探讨如何使用 AFL++ 对二进制目标进行高效的模糊测试。
+在软件安全测试领域，模糊测试（Fuzzing）是一种高效的缺陷发现技术。Fuzzing的核心是通过一定的方式自动地生成大量的测试用例，并使用这些测试用例测试目标程序，以期待能够检测到目标程序的非预期行为、软件缺陷或漏洞。
+
+OSS-Fuzz 是 Google 搭建的一个开源软件模糊测试平台。包含常用工具：AFL (American Fuzzy Lop) → 知名的 coverage-guided fuzzer。LibFuzzer → 与 LLVM/Clang 深度集成的 fuzzer。借助 Google Cloud，可以同时在成千上万个实例上并行跑 fuzzing，极大提高漏洞发现效率。2016–2019 期间：OSS-Fuzz 帮助发现了 超过 17,400 个漏洞。涉及很多关键的开源项目：openssl（加密库）, llvm（编译器框架）, postgresql（数据库）, git（版本控制）, firefox（浏览器）. 这些都是影响范围非常大的项目，说明 fuzzing 的实用价值和影响力。
+
+AFL++ 作为改进版的 AFL（American Fuzzy Lop），提供了更强大的功能和更高的测试效率。然而，当面对仅有二进制文件而没有源代码的情况时，传统的模糊测试方法往往效果不佳。本文将深入探讨如何使用 AFL++ 对二进制目标进行高效的模糊测试。
 
 
 
-## 
+## Fuzzing 介绍
+
+### 发展历程
+
+模糊测试：第一代
+- 由威斯康星大学的 Barton Miller 进行。
+- 1990 年：命令行模糊测试器，用于测试 UNIX 程序的可靠性。
+  - 用随机数据轰炸实用程序
+- 1995 年：扩展到基于 GUI 的程序（X Windows）、网络协议和系统库 API。
+- 之后：扩展到基于命令行和 GUI 的 Windows 和 OS X 应用程序。
+
+导致 25-33% 的 UNIX 实用程序崩溃（转储状态）或挂起（无限循环）, 难以生成格式正确的数据：例如，PNG 文件。
+
+模糊测试：第二代a（基于变异）
+- 非常有效地生成半结构化输入。
+- 仍然不太有效地生成高度结构化的输入： 例如，C 文件。
+
+
+模糊测试：第二代b（基于生成）
+- 非常有效地生成复杂输入：
+  -  Csmith：生成语法有效但随机的 C 程序。
+- 商业工具： Peach。
+- 需要手动编写以下输入语法：
+  - 领域特定语言。
+  - 大型：约 200 行
+
+模糊测试：第三代（基于反馈引导的变异）
+- 能够快速高效地生成格式正确的输入。
+- 非常成功的商业级工具：
+  - AFL（AFLPlusPlus）
+- 需要一种捕捉反馈的方法：影响性能。
+
+---
+
+### 实现思路
+
+1. Input Generation (输入生成)
+- Fuzzing 的第一步是自动生成测试输入。
+- 这些输入可以是随机的（random fuzzing）、基于语法的（grammar-based fuzzing）、或基于已有输入不断变异的（mutation-based fuzzing）。随机源/变异现有输入/基于给定的输入语法。
+- 目标是覆盖更多代码路径，发现潜在的错误。
+
+
+2. Execution Control (执行控制)
+- 输入被送到目标程序里运行。常规命令行程序：execve 和 stdin/操作系统：系统调用/网络程序：通过网络发送/输入文件：将数据保存到文件中并提供文件
+- 这里的模块负责控制程序执行过程，比如监控程序是否正常运行、是否崩溃、或者是否触发了异常。
+
+3. Detection Oracle (检测判定/预言机)
+- 程序执行的结果需要经过 Oracle 判断是否出现异常或漏洞。程序崩溃/竞争条件/执行时间过长
+- 图中给了三种可能的输出结果：
+  - 美元符号 ($)：表示一些与经济价值相关的漏洞，比如安全漏洞、可利用的错误。
+  - 爆炸图标：表示程序崩溃 (crash)，常见于内存越界、段错误等。
+  - 转盘/骰子图标：表示不确定性或非预期行为，可能代表逻辑漏洞、非确定性 bug 或者性能问题。
+
+<figure style="text-align: center;">
+<img src="/assets/img/fuzz1.png" alt="" width="500">
+<figcaption>Fuzzing: high level idea</figcaption>
+</figure>
+
+
+---
+
+## AFL++
+
+
+
+
+
+
+---
+
+## Fuzzing Trends
+
+<figure style="text-align: center;">
+<img src="/assets/img/fuzz2.png" alt="" width="500">
+<figcaption>Fuzzing: Trends</figcaption>
+</figure>
 
