@@ -11,6 +11,14 @@ author: # Add name author (optional)
 
 C/C++ 提供了直接操作内存的强大能力，然而使用不当也会招致许多问题，下面是 Google chromium 团队的一组统计数据: "Around 70% of our high severity security bugs are memory unsafety problems (that is, mistakes with C/C++ pointers). Half of those are use-after-free bugs." 与内存相关的问题往往排查难度较大，耗时较多。Sanitizers 是由 Google 研发团队提出的用于检测 C/C++ 程序常见内存错误的工具集，Google 工程师公开了它们的源代码和算法, 并在 LLVM clang 上实现，它们已经被用于多个工程中, 比如 Chromium、Firefox 等知名项目中。Sanitizers 除了能够检测内存错误外，还能够检测一些其它常见的错误。
 
+- [本讲内容](#本讲内容)
+  - [Sanitizers 工作原理](#sanitizers-工作原理)
+    - [AddressSanitizer (ASan)](#addresssanitizer-asan)
+    - [MemorySanitizer (MSan)](#memorysanitizer-msan)
+    - [ThreadSanitizer (TSan)](#threadsanitizer-tsan)
+    - [UndefinedBehaviorSanitizer (UBSan)](#undefinedbehaviorsanitizer-ubsan)
+    - [DataFlowSanitizer / 其它：](#dataflowsanitizer--其它)
+
 
 ---
 
@@ -89,3 +97,8 @@ ASan是最常用的安全防护机制之一：广泛用于模糊测试。会增�
 ### UndefinedBehaviorSanitizer (UBSan)
 
 检测未定义行为（例如有符号整型溢出、错误的类型转换等），通常开销较低。
+
+
+### DataFlowSanitizer / 其它：
+
+用于更通用的数据流检查或特定用途的检测。
