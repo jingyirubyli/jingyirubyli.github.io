@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  LogoFail 和。UEFI
+title:  LogoFail 和 UEFI
 date:   2025-09-19
 description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
 img: logofail.png # Add image post (optional)
