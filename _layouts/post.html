@@ -11,12 +11,12 @@ layout: default
       <div class="page-content">
         <div class="header-page">
           <h1 class="page-title">{{page.title}}</h1>
-              <p class="post-meta">
-                发布于：{{ page.date | date: "%Y-%m-%d" }}  
-                <br>
-                最后修改：{{ page.last_modified_at | date: "%Y-%m-%d %H:%M" }}
-              </p>
-          <div class="page-date"><time datetime="{{page.date}}">{{page.date | date: '%Y, %b %d'}}</time></div>
+          <div class="page-date">
+            发布于：<time datetime="{{ page.date }}">{{ page.date | date: "%Y-%m-%d" }}</time>
+            ·
+            最后修改：<time datetime="{{ page.last_modified_at }}">{{ page.last_modified_at | date: "%Y-%m-%d" }}</time>
+            <!-- <time datetime="{{page.date}}">{{page.date | date: '%Y, %b %d'}}</time></div> -->
+          </div>  
         </div>
         {{page.content | markdownify}}
         <div class="page-footer">
