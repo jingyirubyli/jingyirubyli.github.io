@@ -25,7 +25,12 @@ author: # Add name author (optional)
     - [Step 3: Memory abstraction -- 了解内存抽象](#step-3-memory-abstraction----了解内存抽象)
     - [Step 4: 实现 DivZeroAnalysis::transfer 函数](#step-4-实现-divzeroanalysistransfer-函数)
     - [Step 5: 实现 DivZeroAnalysis::check 函数](#step-5-实现-divzeroanalysischeck-函数)
-  - [Part 2:](#part-2)
+  - [Part 2: 综合内容——完成数据流分析](#part-2-综合内容完成数据流分析)
+    - [Step 1: 实现 flowIn 操作](#step-1-实现-flowin-操作)
+    - [Step 2: 调用 transfer 函数](#step-2-调用-transfer-函数)
+    - [Step 3: 实现 flowOut 操作](#step-3-实现-flowout-操作)
+    - [Step 4: 编写 doAnalysis 函数](#step-4-编写-doanalysis-函数)
+- [编译实践](#编译实践)
 
 
 ---
@@ -53,9 +58,16 @@ author: # Add name author (optional)
 
 ## Part 1: Transfer Functions
 
+- [] 根据 Domain.h 编写 Domain.cpp
+- [] 填充 InMap 和 OutMap
+- [] 编写 transfer 函数
+
 ### Step 1: Abstract domain -- 了解抽象域
 
 阅读《A Menagerie of Program Abstractions》, 了解 Domain class: 文件 *DivZero/include/Domain.h 和 DivZero/src/Domain.cpp* 包含抽象值及其操作。这些操作将在不运行程序的情况下执行抽象求值。我们定义了加法、减法、乘法和除法的抽象运算符。
+
+实际上, 是根据Domain.h写自己的Domain.cpp:
+
 
 ### Step 2: DataflowAnalysis::runOnFunction -- 了解编译器优化阶段是如何从高层次上执行数据流分析的。
 
@@ -204,4 +216,49 @@ DivZeroAnalysis::check 函数用于检查特定指令是否可能导致除零错
 
 ---
 
-## Part 2: 
+## Part 2: 综合内容——完成数据流分析
+
+现在您已经编写了填充输入输出映射表以及使用这些映射表检测除零错误的代码，下一步是在doAnalysis函数中实现混沌迭代算法。首先，请复习数据流分析的课程内容，特别是要重点学习可达定义分析和混沌迭代算法。简而言之，数据流分析为程序控制流图中的每个节点创建并填充一个输入集（IN）和一个输出集（OUT）。重复执行输入流和输出流操作，直到算法达到稳定状态。更正式地说，doAnalysis函数应该维护一个工作集（WorkSet），其中包含需要进一步处理的节点。当工作集为空时，算法达到稳定状态。对于工作集中的每个指令，您的函数应该执行以下操作：
+
+- [] 执行 flowIn 操作，将所有前驱指令的OUT集合合并，并将结果保存到当前指令的IN集合中。这里，您需要使用Part 1中填充的InMap和OutMap中的数据作为IN和OUT集合。
+- [] 使用Part 1中实现的transfer函数，计算当前指令的OUT集合。
+- [] 执行 flowOut 操作，并相应地更新 WorkSet。只有当tranfer函数修改了OUT集合时，才将当前指令的后继指令添加到workset中。
+
+我们已经为您预先编写了该流程的起始部分，即使用输入C程序中的每条指令初始化WorkSet：
+
+```c
+void DivZeroAnalysis::doAnalysis(Function &F) {
+    SetVector<Instruction *> WorkSet;
+    for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
+    WorkSet.insert(&(*I));
+}
+// ...
+}
+```
+
+在本实验中，我们无需手动维护控制流图；LLVM内部已经实现了控制流图。为了让您专注于数据流分析部分，我们提供了两个辅助函数getSuccessors和getPredecessors（定义在*DivZero/include/DataflowAnalysis.h*中），它们可以查找并返回给定LLVM指令的后继指令和前驱指令。
+首先，请取消PART 2部分中标记的函数注释，包括doAnalysis、flowIn、flowOut、join和equal。之后，按照以下步骤实现上述算法的各个部分：
+
+### Step 1: 实现 flowIn 操作
+
+
+
+
+### Step 2: 调用 transfer 函数
+
+
+
+### Step 3: 实现 flowOut 操作
+
+
+
+
+### Step 4: 编写 doAnalysis 函数
+
+
+
+
+---
+
+# 编译实践
+
