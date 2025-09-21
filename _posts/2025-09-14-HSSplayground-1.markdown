@@ -3,7 +3,7 @@ layout: post
 title:  HSS Playground/Assignment 1 笔记
 date:   2025-09-14
 description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
-img: static-analyzer.png # Add image post (optional)
+img: hss1.png # Add image post (optional)
 tags: [Blog, Holistic Software Security]
 author: # Add name author (optional)
 ---
