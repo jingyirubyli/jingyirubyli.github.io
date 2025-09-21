@@ -44,11 +44,6 @@ author: # Add name author (optional)
 文件 DivZero/include/Domain.h 和 DivZero/src/Domain.cpp 包含抽象值及其操作。这些操作将在不运行程序的情况下执行抽象求值。我们定义了加法、减法、乘法和除法的抽象运算符。
 
 
-<figure style="text-align: center;">
-<img src="/assets/img/uz.png" alt="" width="500">
-<figcaption>ubuntu配置非常简单</figcaption>
-</figure>
-
 ```cpp
 bool DataflowAnalysis::runOnFunction(Function &F) {
     outs() << "Running " << getAnalysisName() << " on " << F.getName() << "\n";
