@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  HSS Playground/Assignment 笔记
+title:  HSS Playground/Assignment 1 笔记
 date:   2025-09-14
 description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
 img: static-analyzer.png # Add image post (optional)
@@ -36,16 +36,15 @@ author: # Add name author (optional)
 
 ---
 
-# Assignment 1
 
 
-## 学习目标
+# 学习目标
 
 理解不同的LLVM IR指令以及它们是如何从C代码生成的。
 
-## 实践
+# 实践
 
-### 必会命令
+## 必会命令
 
 
 **从 .c 生成 .bc**
@@ -70,7 +69,7 @@ llvm-dis <path_to_bitcode_file>
 clang -emit-llvm -S -fno-discard-value-names -c <your_c_file> -o <your_ll_file>
 ```
 
-### 理解 LLVM IR
+## 理解 LLVM IR
 
 **Part 1**
 
