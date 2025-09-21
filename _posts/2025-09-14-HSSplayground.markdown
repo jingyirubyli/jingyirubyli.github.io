@@ -15,6 +15,18 @@ author: # Add name author (optional)
 - 项目代码包: <https://github.com/HolisticSoftwareSecurity/LLVMPlayground> -->
 - 开发环境：CLion（<https://www.jetbrains.com/clion/>）。
 
+
+- [HSS Playground](#hss-playground)
+- [Assignment 1](#assignment-1)
+  - [学习目标](#学习目标)
+  - [实践](#实践)
+    - [必会命令](#必会命令)
+    - [理解 LLVM IR](#理解-llvm-ir)
+- [Assignment 2](#assignment-2)
+  - [Part 3](#part-3)
+  - [Part 4](#part-4)
+
+
 一个成熟的静态分析器包含三个组件：
 1. 抽象域
 2. 各条指令的抽象传递函数，以及
@@ -126,17 +138,18 @@ attributes #1 = { "disable-tail-calls"="false" "frame-pointer"="all" "less-preci
 
 ```
 
-
-1. %retval = alloca i32, align 4
+1. define dso_local i32 @main() #0 {}
+    define表示这是一个函数定义（有函数体），而不是仅仅声明。dso_local: DSO = Dynamic Shared Object, 表示这个符号在当前模块内（local）可以直接引用，不需要通过动态链接器的全局查找。在现代 clang/LLVM 中，dso_local 是默认的优化标志，用来减少动态链接时的开销。@main 函数名是 main。在 LLVM IR 中，函数名都要以 @ 开头。() 中是函数参数列表，这里是空的（main() 没有参数）。#0 引用了函数属性组 #0。在文件末尾会有 attributes #0 = { ... } 来定义具体属性。在这个例子里，#0 就是 { noinline nounwind optnone uwtable ... }。上一行的注释; Function Attrs: noinline nounwind optnone uwtable表示: 函数 int main()，不能内联(noinline)、不抛异常(nounwind)、不优化(optnone)、会生成 unwind table(uwtable).
+2. %retval = alloca i32, align 4
     返回值 %retval 的类型是 i32*（指向这块内存的指针）。
     alloca: 在函数的栈帧上分配一块内存，类型是 i32（32 位整数）, 
     align 4 表示这块内存按 4 字节对齐（即地址是 4 的倍数），这是常见的 int 对齐要求。
 > 为什么有 %retval？编译器（Clang/LLVM）常常为“返回值”或为了简化代码生成，在函数入口分配一个专门的返回值槽（stack slot）叫做 retval。它并不是必须的（编译器也可以直接 ret 一个寄存器的值），但这是一个常见的函数栈帧布局习惯：先分配所有局部变量和返回槽。在等价的 C 源里通常你不会写 retval 这个变量；它是编译器生成的实现细节，用来保存最终要返回的值或用于调试/栈布局。
 
-2. %a = alloca i32, align 4 / %b = alloca i32, align 4 / %c = alloca i32, align 4 / %d = alloca i32, align 4
+1. %a = alloca i32, align 4 / %b = alloca i32, align 4 / %c = alloca i32, align 4 / %d = alloca i32, align 4
     为局部变量 a, b, c, d 在栈上分配空间，返回的都是 i32* 指针（分别是 %a, %b, %c, %d）。在 C 源中这就对应于在函数开始处声明的 int a, b, c, d;（编译器把这些局部变量实现为栈上的 alloca）。注意：LLVM 要求 alloca 通常出现在函数的入口块（entry），以便后面各处引用该内存。
 
-3. store i32 0, i32* %retval, align 4
+2. store i32 0, i32* %retval, align 4
     store 是把一个值写入内存：把 i32 0 写到指针 %retval 指向的位置。语义上等同 C 语句：retval = 0;（即把返回值槽初始化为 0）。align 4 表示这次内存写也按 4 字节对齐（告诉后端内存访问对齐信息，可能影响生成的机器指令）。
 
 > 内存与临时值的关系: alloca 分配的是内存（stack slot），你要通过 store 把值放进去，load 才能读出来。与之不同，LLVM 还有 SSA 临时值（像 %0, %1, %cmp），这些是寄存器式的、并非内存。代码里会交替用 load 得到临时值、用 store 更新内存槽。
@@ -174,7 +187,7 @@ attributes #1 = { "disable-tail-calls"="false" "frame-pointer"="all" "less-preci
 
 
 
-    
+
 ---
 
 # Assignment 2
