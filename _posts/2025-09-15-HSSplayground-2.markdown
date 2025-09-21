@@ -21,7 +21,7 @@ author: # Add name author (optional)
 - [概念理解](#概念理解)
   - [Part 1: Transfer Functions](#part-1-transfer-functions)
     - [Step 1: Abstract domain -- 了解抽象域](#step-1-abstract-domain----了解抽象域)
-    - [Step 2: DataflowAnalysis::runOnFunction -- 了解编译器优化阶段是如何从高层次上执行数据流分析的。](#step-2-dataflowanalysisrunonfunction----了解编译器优化阶段是如何从高层次上执行数据流分析的)
+    - [Step 2: DataflowAnalysis::runOnFunction -- 了解编译器优化阶段是如何从高层次上执行数据流分析](#step-2-dataflowanalysisrunonfunction----了解编译器优化阶段是如何从高层次上执行数据流分析)
     - [Step 3: Memory abstraction -- 了解内存抽象](#step-3-memory-abstraction----了解内存抽象)
     - [Step 4: 实现 DivZeroAnalysis::transfer 函数](#step-4-实现-divzeroanalysistransfer-函数)
     - [Step 5: 实现 DivZeroAnalysis::check 函数](#step-5-实现-divzeroanalysischeck-函数)
@@ -72,7 +72,7 @@ author: # Add name author (optional)
 实际上, 是根据Domain.h写自己的Domain.cpp:
 
 
-### Step 2: DataflowAnalysis::runOnFunction -- 了解编译器优化阶段是如何从高层次上执行数据流分析的。
+### Step 2: DataflowAnalysis::runOnFunction -- 了解编译器优化阶段是如何从高层次上执行数据流分析
 
 ```c
 bool DataflowAnalysis::runOnFunction(Function &F) {
@@ -325,6 +325,6 @@ Potential Instructions by DivZero:
 ```
 
 <figure style="text-align: center;">
-<img src="/assets/img/hss2-2.png" alt="" width="500">
+<img src="/assets/img/hss2-2.png" alt="" width="700">
 <figcaption></figcaption>
 </figure>
