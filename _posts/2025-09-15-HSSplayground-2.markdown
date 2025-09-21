@@ -267,6 +267,19 @@ void DivZeroAnalysis::doAnalysis(Function &F) {
 
 # 编译实践
 
+一切就绪后, 需要依次运行的命令速查:
+
+```bash
+## cd ~/LLVMPlayground/part2_basic_data_flow_analysis
+## mkdir build && cd build
+## cmake ..
+## make
+DivZero/test# clang -emit-llvm -S -fno-discard-value-names -Xclang -disable-O0-optnone -c simple1.c
+DivZero/test# opt -mem2reg -S simple1.ll -o simple1.opt.ll
+DivZero/test# opt -load ../../build/DivZero/libDataflowPass.so -DivZero -disable-output simple1.opt.ll
+```
+
+
 ## Step 1: 生成 .so
 
 使用以下所示的CMakeLists.txt文件构建pass：在生成的文件夹build/DivZero目录下找到DataflowPass.so文件。
@@ -311,3 +324,7 @@ Potential Instructions by DivZero:
     %div1 = sdiv i32 %div, %div
 ```
 
+<figure style="text-align: center;">
+<img src="/assets/img/hss2-2.png" alt="" width="500">
+<figcaption></figcaption>
+</figure>
