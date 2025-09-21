@@ -29,8 +29,11 @@ author: # Add name author (optional)
     - [Step 1: 实现 flowIn 操作](#step-1-实现-flowin-操作)
     - [Step 2: 调用 transfer 函数](#step-2-调用-transfer-函数)
     - [Step 3: 实现 flowOut 操作](#step-3-实现-flowout-操作)
-    - [Step 4: 编写 doAnalysis 函数](#step-4-编写-doanalysis-函数)
+    - [Step 4: 编写 doAnalysis 函数, 实现混沌迭代算法](#step-4-编写-doanalysis-函数-实现混沌迭代算法)
 - [编译实践](#编译实践)
+  - [Step 1: 生成 .so](#step-1-生成-so)
+  - [Step 2: 生成 .ll](#step-2-生成-ll)
+  - [Step 3: 应用自定义工具](#step-3-应用自定义工具)
 
 
 ---
@@ -132,7 +135,7 @@ runOnFunction 为函数中的每条指令分配输入/输出抽象状态（InMap
 Instruction类是所有指令类型的基类。Instruction有许多子类。为了正确填充outMap，需要对每种类型的指令进行不同的处理。
 
 本次实验中，您需要处理以下类型的指令：
-- BinaryOperators (add, mul, sub, etc.): 二元运算符（加、乘、减等）
+- BinaryOperators (add, mul, sub, etc.): 算术算符（+、-、*、/）
 - CastInst: 类型转换指令
 - CmpInst (icmp eq, ne, slt, sgt, sge, etc.): 比较指令（icmp eq、ne、slt、sgt、sge等）
 - BranchInst: 分支指令
@@ -253,7 +256,9 @@ void DivZeroAnalysis::doAnalysis(Function &F) {
 
 
 
-### Step 4: 编写 doAnalysis 函数
+### Step 4: 编写 doAnalysis 函数, 实现混沌迭代算法
+
+
 
 
 
@@ -261,4 +266,48 @@ void DivZeroAnalysis::doAnalysis(Function &F) {
 ---
 
 # 编译实践
+
+## Step 1: 生成 .so
+
+使用以下所示的CMakeLists.txt文件构建pass：在生成的文件夹build/DivZero目录下找到DataflowPass.so文件。
+
+```bash
+$ cd ~/LLVMPlayground/part2_basic_data_flow_analysis
+$ mkdir build && cd build
+$ cmake ..
+## $ cmake -DUSE_REFERENCE=ON ..  
+## DUSE_REFERENCE=ON标志：本实验分为两个部分，该标志允许您专注于第一部分所需的功能，而无需考虑第二部分。
+$ make
+```
+
+## Step 2: 生成 .ll
+
+在运行优化器之前，必须先生成LLVM IR代码：
+
+```bash
+$ cd ~/LLVMPlayground/part2_basic_data_flow_analysis/DivZero/test
+$ clang -emit-llvm -S -fno-discard-value-names -Xclang -disable-O0-optnone -c simple1.c
+$ opt -mem2reg -S simple1.ll -o simple1.opt.ll
+```
+
+第二行（clang）将输入C程序simple1.c转换成标准的LLVM IR代码。
+最后一行（opt）对生成的LLVM IR代码进行优化，生成一个等价的LLVM IR程序，
+这样可以简化您在本实验中将要编写的分析器的工作；特别是，-mem2reg指令会将所有AllocaInst指令转换为寄存器操作，
+从而使您的分析器在本次实验中无需处理指针。在后续部分，您将扩展分析器以支持指针处理。
+
+## Step 3: 应用自定义工具
+
+您将以LLVM插件（名为DataflowPass）的形式实现您的分析器。使用opt命令在优化后的LLVM IR程序上运行此插件，命令如下：
+
+```bash
+DivZero/test $ opt -load ../../build/DivZero/libDataflowPass.so -DivZero -disable-output simple1.opt.ll
+```
+
+如果实验成功，输出应如下所示：
+
+```
+Running DivZero on main
+Potential Instructions by DivZero:
+    %div1 = sdiv i32 %div, %div
+```
 
