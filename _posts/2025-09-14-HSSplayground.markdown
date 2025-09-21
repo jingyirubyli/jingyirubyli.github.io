@@ -145,45 +145,45 @@ attributes #1 = { "disable-tail-calls"="false" "frame-pointer"="all" "less-preci
     alloca: 在函数的栈帧上分配一块内存，类型是 i32（32 位整数）, 
     align 4 表示这块内存按 4 字节对齐（即地址是 4 的倍数），这是常见的 int 对齐要求。
 > 为什么有 %retval？编译器（Clang/LLVM）常常为“返回值”或为了简化代码生成，在函数入口分配一个专门的返回值槽（stack slot）叫做 retval。它并不是必须的（编译器也可以直接 ret 一个寄存器的值），但这是一个常见的函数栈帧布局习惯：先分配所有局部变量和返回槽。在等价的 C 源里通常你不会写 retval 这个变量；它是编译器生成的实现细节，用来保存最终要返回的值或用于调试/栈布局。
-
-1. %a = alloca i32, align 4 / %b = alloca i32, align 4 / %c = alloca i32, align 4 / %d = alloca i32, align 4
+3. %a = alloca i32, align 4 / %b = alloca i32, align 4 / %c = alloca i32, align 4 / %d = alloca i32, align 4
     为局部变量 a, b, c, d 在栈上分配空间，返回的都是 i32* 指针（分别是 %a, %b, %c, %d）。在 C 源中这就对应于在函数开始处声明的 int a, b, c, d;（编译器把这些局部变量实现为栈上的 alloca）。注意：LLVM 要求 alloca 通常出现在函数的入口块（entry），以便后面各处引用该内存。
 
-2. store i32 0, i32* %retval, align 4
+4. store i32 0, i32* %retval, align 4
     store 是把一个值写入内存：把 i32 0 写到指针 %retval 指向的位置。语义上等同 C 语句：retval = 0;（即把返回值槽初始化为 0）。align 4 表示这次内存写也按 4 字节对齐（告诉后端内存访问对齐信息，可能影响生成的机器指令）。
 
 > 内存与临时值的关系: alloca 分配的是内存（stack slot），你要通过 store 把值放进去，load 才能读出来。与之不同，LLVM 还有 SSA 临时值（像 %0, %1, %cmp），这些是寄存器式的、并非内存。代码里会交替用 load 得到临时值、用 store 更新内存槽。
 
-4. %call = call i32 @getchar()
+5. %call = call i32 @getchar()
     call 指令：调用一个函数。@getchar 是一个外部声明的函数（在文件尾部 declare dso_local i32 @getchar()），返回类型是 i32（整型）。执行时，它会调用 C 标准库的 getchar()，从输入里读一个字符，返回一个 int。返回值直接存放在 SSA 临时变量 %call 里，这不是内存槽，而是一次调用的结果。对应 C 代码片段：int tmp = getchar();
-5. store i32 %call, i32* %a, align 4
+6. store i32 %call, i32* %a, align 4
     把刚才 getchar() 返回的值 %call 写进内存槽 %a 对应的位置。%a 是之前 alloca i32 分配的变量槽，存放 int a;。align 4 同样告诉 LLVM 后端，这块内存按 4 字节对齐。对应 C 代码片段：a = tmp;
-6. store i32 0, i32* %b, align 4
+7. store i32 0, i32* %b, align 4
     把字面量常数 0（类型是 i32）写到内存槽 %b 里面。%b 是前面 alloca i32, align 4 分配的局部变量存储空间，对应 C 语言里的 int b;。这里直接初始化为 0。对应 C 代码片段：b = 0;
-7. %0 = load i32, i32* %a, align 4
+8. %0 = load i32, i32* %a, align 4
     把局部变量 a 中的值读出来，存到一个 SSA 临时变量 %0 里: 
     load：从内存里读一个值。
     i32* %a：指向局部变量 %a 的地址。前面 %a = alloca i32 分配了一个整型槽。
 	%0：这是一个新的 SSA 临时变量，用来保存读出来的结果。
 	align 4：告诉 LLVM，这次读操作的地址对齐是 4 字节（因为是 32 位整数）。
     int tmp0 = a;
-8. %1 = load i32, i32* %b, align 4
+9. %1 = load i32, i32* %b, align 4
     读变量 b 的值，并存到 %1 里。
-9. %cmp = icmp ne i32 %0, %1
+10. %cmp = icmp ne i32 %0, %1
     icmp 是整数比较（integer compare）。ne 意味着 “not equal”（不等于）。比较两个 i32 值 %0 和 %1（它们之前是通过 load 从内存读出的 a 与 b 的当前值）。返回一个 i1（1 位布尔型），%cmp = true 当且仅当 %0 != %1，否则 false。
-10. %conv = zext i1 %cmp to i32
+11.  %conv = zext i1 %cmp to i32
     zext = zero-extend，把较窄的整数扩展成较宽的整数，并在高位填 0。%cmp 是 i1（只有 0 或 1），而后面要把它存到 i32 类型的内存槽（变量 c 是 i32）。必须把 i1 扩成 i32。zext 会把 false → 0，true → 1，这正是 C 语义（布尔值到整型的转换）。结果：%conv 是一个 i32，值为 0 或 1。
-11. store i32 %conv, i32* %c, align 4
+12.  store i32 %conv, i32* %c, align 4
     把 i32 值 %conv 写入内存槽 %c（对应 C 里的局部变量 c）。
-12. %2 = load i32, i32* %b, align 4
+13.  %2 = load i32, i32* %b, align 4
     %3 = load i32, i32* %c, align 4
     从内存槽 %b 读出 i32，放入 SSA 临时 %2。从内存槽 %c 读出 i32，放入 SSA 临时 %3。
-13. %div = sdiv i32 %2, %3
+14. %div = sdiv i32 %2, %3
     带符号整数除法（sdiv），对 %2（被除数）除以 %3（除数），结果存到 %div。sdiv 是有符号除法（与 udiv 相对）。当除数为 0 时，这是 未定义行为（undefined behavior）——在实际运行上可能导致硬件异常（如“Floating point exception”/SIGFPE）或其它不可预测后果。LLVM IR 不自动插入除零检查，除非你用 pass 插装。
-14. store i32 %div, i32* %d, align 4
+15. store i32 %div, i32* %d, align 4
     ret i32 0
     把除法结果 %div 存回内存槽 %d（局部变量 d）。函数返回整数 0，结束 main。
-
+16. declare dso_local i32 @getchar() #1
+    有一个外部函数 int getchar(void)，它返回一个 i32，没有参数，但函数体不在当前模块中（需要链接 libc）。
 
 
 
