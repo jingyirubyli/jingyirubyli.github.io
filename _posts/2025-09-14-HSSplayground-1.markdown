@@ -17,14 +17,11 @@ author: # Add name author (optional)
 
 
 - [HSS Playground](#hss-playground)
-- [Assignment 1](#assignment-1)
-  - [学习目标](#学习目标)
-  - [实践](#实践)
-    - [必会命令](#必会命令)
-    - [理解 LLVM IR](#理解-llvm-ir)
-- [Assignment 2](#assignment-2)
-  - [Part 3](#part-3)
-  - [Part 4](#part-4)
+- [学习目标](#学习目标)
+- [实践](#实践)
+  - [必会命令](#必会命令)
+  - [理解 LLVM IR](#理解-llvm-ir)
+
 
 
 一个成熟的静态分析器包含三个组件：
