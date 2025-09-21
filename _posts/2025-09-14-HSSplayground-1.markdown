@@ -11,25 +11,17 @@ author: # Add name author (optional)
 
 注意事项：
 - LLVM入门：阅读LLVM PRIMER; 阅读LLVM doc: <https://mapping-high-level-constructs-to-llvm-ir.readthedocs.io/en/latest/index.html>，了解C语言到LLVM IR的映射关系。
-<!-- - 项目环境搭建：课程提供资源库，其中包含安装LLVM、Z3以及编写LLVM插件所需的所有脚本和示例代码。资源库地址：<https://github.com/HolisticSoftwareSecurity/hssllvmsetup>。该资源库包含分析（即不修改IR的插件）和插桩（即修改IR的插件）的示例。
-- 项目代码包: <https://github.com/HolisticSoftwareSecurity/LLVMPlayground> -->
+- 项目环境搭建：课程提供资源库，其中包含安装LLVM、Z3以及编写LLVM插件所需的所有脚本和示例代码。资源库地址：<https://github.com/HolisticSoftwareSecurity/hssllvmsetup>。该资源库包含分析（即不修改IR的插件）和插桩（即修改IR的插件）的示例。
+- 项目代码包: <https://github.com/HolisticSoftwareSecurity/LLVMPlayground>
 - 开发环境：CLion（<https://www.jetbrains.com/clion/>）。
 
-
+目录:
 - [HSS Playground](#hss-playground)
 - [学习目标](#学习目标)
 - [实践](#实践)
   - [必会命令](#必会命令)
   - [理解 LLVM IR](#理解-llvm-ir)
 
-
-
-一个成熟的静态分析器包含三个组件：
-1. 抽象域
-2. 各条指令的抽象传递函数，以及
-3. 合并各条指令的分析结果，以获得整个函数或程序的分析结果。
-
-在本实验中，我们将仅关注 (ii) 的实现，并且仅针对上述有限的指令子集。更具体地说，您的任务是实现分析如何评估来自给定抽象域的不同 LLVM IR 指令的抽象值。
 
 ---
 

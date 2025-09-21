@@ -15,7 +15,7 @@ author: # Add name author (optional)
 - 项目代码包: <https://github.com/HolisticSoftwareSecurity/LLVMPlayground> -->
 - 开发环境：CLion（<https://www.jetbrains.com/clion/>）。
 
-
+目录:
 - [HSS Playground](#hss-playground)
 - [学习目标](#学习目标)
 - [实践](#实践)
@@ -23,6 +23,10 @@ author: # Add name author (optional)
   - [Part 4](#part-4)
 
 
+---
+
+
+# 学习目标
 
 一个成熟的静态分析器包含三个组件：
 1. 抽象域
@@ -30,13 +34,6 @@ author: # Add name author (optional)
 3. 合并各条指令的分析结果，以获得整个函数或程序的分析结果。
 
 在本实验中，我们将仅关注 (ii) 的实现，并且仅针对上述有限的指令子集。更具体地说，您的任务是实现分析如何评估来自给定抽象域的不同 LLVM IR 指令的抽象值。
-
----
-
-
-# 学习目标
-
-理解不同的LLVM IR指令以及它们是如何从C代码生成的。
 
 # 实践
 
