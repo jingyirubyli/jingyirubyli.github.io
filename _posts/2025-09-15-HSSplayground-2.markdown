@@ -30,6 +30,7 @@ author: # Add name author (optional)
     - [Step 2: 调用 transfer 函数](#step-2-调用-transfer-函数)
     - [Step 3: 实现 flowOut 操作](#step-3-实现-flowout-操作)
     - [Step 4: 编写 doAnalysis 函数, 实现混沌迭代算法](#step-4-编写-doanalysis-函数-实现混沌迭代算法)
+    - [Step 5: 全剧辅助函数 join、equal](#step-5-全剧辅助函数-joinequal)
 - [编译实践](#编译实践)
   - [Step 1: 生成 .so](#step-1-生成-so)
   - [Step 2: 生成 .ll](#step-2-生成-ll)
@@ -244,6 +245,11 @@ void DivZeroAnalysis::doAnalysis(Function &F) {
 
 ### Step 1: 实现 flowIn 操作
 
+```cpp
+void DivZeroAnalysis::flowIn(Instruction *I, Memory *In) {
+
+}
+```
 
 
 
@@ -261,7 +267,7 @@ void DivZeroAnalysis::doAnalysis(Function &F) {
 
 
 
-
+### Step 5: 全剧辅助函数 join、equal
 
 ---
 

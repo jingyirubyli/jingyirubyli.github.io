@@ -1,0 +1,33 @@
+---
+layout: post
+title:  kubernetes/K8s 配置和使用
+date:   2025-09-22
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: k8s.png # Add image post (optional)
+tags: [Blog, Web]
+author: # Add name author (optional)
+---
+# 本讲内容
+
+kubernetes: <https://kubernetes.io/docs/tasks/tools/install-kubectl-macos/#install-with-homebrew-on-macos>
+
+minikube: <https://minikube.sigs.k8s.io/docs/start/?arch=%2Fmacos%2Fx86-64%2Fstable%2Fbinary+download>
+
+
+```bash
+# brew 安装 kubernetes
+brew install kubectl
+# 查看版本
+kubectl version --client
+# brew 安装 minikube
+brew install minikube
+# 检查是否安装成功
+which minikube
+# 开启
+minikube start
+# 检查k8s cluster 配置, 看到链接是正确的, 可能无法访问, 
+kubectl cluster-info
+kubectl get po -A
+# 打开minikube dashboard
+minikube dashboard
+```
