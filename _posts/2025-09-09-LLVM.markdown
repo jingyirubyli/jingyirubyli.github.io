@@ -4,7 +4,7 @@ title:  LLVM
 date:   2025-09-09
 description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
 img: llvm-2.png # Add image post (optional)
-tags: [Blog, LLVM, Holistic Software Security]
+tags: [Blog, C/C++, LLVM, Holistic Software Security]
 author: # Add name author (optional)
 ---
 # 本讲内容
