@@ -21,3 +21,5 @@ C++: <https://www.runoob.com/cplusplus/cpp-overloading.html>
 
 定义一个函数为纯虚函数，才代表函数没有被实现。
 定义纯虚函数是为了实现一个接口，起到一个规范的作用，规范继承这个类的程序员必须实现这个函数。
+
+抽象基类(Abstract Base Class, ABC)
