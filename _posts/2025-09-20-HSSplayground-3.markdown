@@ -60,10 +60,15 @@ author: # Add name author (optional)
 在之前的实验中，分析器只能处理没有参数的简单基本函数：
 
 ```cpp
+// 以前的测试程序是：
 void f() {  // 没有参数
     int x = 0;
     int y = 2;
     int z = y / x;  // 除零错误
+}
+// 现在处理类似情况：
+int f(int a, int b) {
+  return b / a;
 }
 ```
 
@@ -71,7 +76,7 @@ void f() {  // 没有参数
 
 ### Step 2: 处理函数参数-回顾 doAnalysis()函数
 
-熟悉doAnalysis()函数，它是您编写的LLVM除零检测插件的入口函数。在之前的章节中，您修改了这个函数来实现了完整的混沌迭代算法：
+熟悉doAnalysis(Function &F)函数，它是您编写的LLVM除零检测插件的入口函数。在之前的章节中，您修改了这个函数来实现了完整的混沌迭代算法：
 
 *void DivZeroAnalysis::doAnalysis(Function &F, PointerAnalysis *PA)*
 
@@ -80,10 +85,10 @@ void f() {  // 没有参数
 
 ### Step 3: 处理函数参数-
 
-给定一个任意函数F作为doAnalysis()方法的参数，查找该函数调用的所有参数，并为每个参数创建抽象域值。请注意，这里的对象F是Function类型，可以用来获取所有参数信息。此外，在初始化这些参数的初始抽象值后，将这些值传递给现有的除零检测算法，以便在整个可达定义分析过程中跟踪这些变量的状态。
+LLVM 里，Function 类型提供了 F.args()，可以直接遍历函数的参数。给定一个任意函数F作为doAnalysis()方法的参数，查找该函数调用的所有参数，并为每个参数创建抽象域值。请注意，这里的对象F是Function类型，可以用来获取所有参数信息。此外，在初始化这些参数的初始抽象值后，将这些值传递给现有的除零检测算法，以便在整个可达定义分析过程中跟踪这些变量的状态。
 
 
-### Step 4: 处理函数调用
+### Step 4: 处理函数调用-CallInst
 
 
 除了处理被分析函数F的参数外，还需要处理程序中其他函数调用。之前已经遇到过类似的情况，例如下面的函数：
@@ -106,7 +111,7 @@ return 0;
 
 ## Part 2: Store / Load Instructions-处理Store/Load指令
 
-### Step 1: 新的函数签名
+### Step 1: 新的函数签名 - doAnalysis 初始化
 
 如上所述，我们对之前的doAnalysis()函数进行了修改：
 
@@ -144,7 +149,7 @@ transfer(I, In, NOut, PA, PointerSet);
 再次强调，传输函数现在需要PointerAnalysis和PointerSet作为输入参数。请记住这一点，尤其是在复用之前实验代码时。
 
 
-### Step 2: 理解LLVM内存模型
+### Step 2: 理解LLVM内存模型 - transfer()
 
 修改*DivZeroAnalysis.cpp*中的transfer()函数，通过跟踪指针来执行更精细的除零分析。
 
@@ -167,7 +172,7 @@ PointerAnalysis类的基本代码位于*DivZero/src/PointerAnalysis.cpp*中，�
 
 
 
-### Step 3: 实现Store/Load处理
+### Step 3: 实现Store/Load处理 - transfer()
 
 使用 PointerAnalysis 对象，修改 DivZeroAnalysis.cpp 中的 transfer() 函数，使其在分析过程中能够考虑指针别名问题。为此，需要添加对 StoreInst 和 LoadInst 指令的处理。
 
