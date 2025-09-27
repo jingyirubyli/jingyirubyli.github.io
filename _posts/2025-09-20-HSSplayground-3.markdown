@@ -106,7 +106,7 @@ return 0;
 
 ## Part 2: Store / Load Instructions-处理Store/Load指令
 
-### Step 1: 
+### Step 1: 新的函数签名
 
 如上所述，我们对之前的doAnalysis()函数进行了修改：
 
@@ -144,7 +144,7 @@ transfer(I, In, NOut, PA, PointerSet);
 再次强调，传输函数现在需要PointerAnalysis和PointerSet作为输入参数。请记住这一点，尤其是在复用之前实验代码时。
 
 
-### Step 2: 
+### Step 2: 理解LLVM内存模型
 
 修改*DivZeroAnalysis.cpp*中的transfer()函数，通过跟踪指针来执行更精细的除零分析。
 
@@ -167,7 +167,7 @@ PointerAnalysis类的基本代码位于*DivZero/src/PointerAnalysis.cpp*中，�
 
 
 
-### Step 3: 
+### Step 3: 实现Store/Load处理
 
 使用 PointerAnalysis 对象，修改 DivZeroAnalysis.cpp 中的 transfer() 函数，使其在分析过程中能够考虑指针别名问题。为此，需要添加对 StoreInst 和 LoadInst 指令的处理。
 
