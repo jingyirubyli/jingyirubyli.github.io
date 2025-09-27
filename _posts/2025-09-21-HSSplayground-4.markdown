@@ -50,7 +50,7 @@ root@809bedcd4077:~/Downloads/LLVMPlayground-main/part4_instrumentation/DivZeroI
 
 理解本实验涉及的技术, 完成下面的任务:
 
-1. 实现 instrumentSanitize 函数，为给定的指令插入 \_\_sanitize__ 检测代码。
+1. 实现 instrumentSanitize 函数，为给定的指令插入 \_sanitize__ 检测代码。
 2. 修改 runOnFunction 函数，为给定代码块中的所有除法指令添加除零检测功能。
 3. 实现 instrumentCoverage 函数，为所有调试位置插入 \__coverage__ 代码覆盖率统计代码。
 4. 修改 runOnFunction 函数，为所有指令添加代码覆盖率统计功能。
@@ -85,7 +85,7 @@ int main() {
 ```
 
 
-当然，我们完全可以把这个重复的检查逻辑封装到一个名为“__sanitize__”的函数中，以便重复使用。 
+当然，我们完全可以把这个重复的检查逻辑封装到一个名为“\__sanitize__”的函数中，以便重复使用。 
 
 ```c
 void __sanitize__(int divisor) {
@@ -115,7 +115,7 @@ int main() {
 
 ### Step 3: 调试位置(Debug Location)
 
-当使用 -g 选项编译 C 程序时，LLVM 会在生成的 LLVM IR 指令中包含调试信息。利用上述代码插桩技术， LLVM Pass 可以获取指令的调试信息，并将其传递给 __sanitize__ 函数，以报告发生除零错误的位置。我们将在后续章节详细介绍该接口的使用方法。
+当使用 -g 选项编译 C 程序时，LLVM 会在生成的 LLVM IR 指令中包含调试信息。利用上述代码插桩技术， LLVM Pass 可以获取指令的调试信息，并将其传递给 \__sanitize__ 函数，以报告发生除零错误的位置。我们将在后续章节详细介绍该接口的使用方法。
 
 
 ### Step 4: 代码分析插件(Instrumentation Pass)
