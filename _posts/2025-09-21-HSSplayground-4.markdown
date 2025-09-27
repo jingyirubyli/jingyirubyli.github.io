@@ -50,7 +50,7 @@ root@809bedcd4077:~/Downloads/LLVMPlayground-main/part4_instrumentation/DivZeroI
 
 理解本实验涉及的技术, 完成下面的任务:
 
-1. 实现 instrumentSanitize 函数，为给定的指令插入 __sanitize__ 检测代码。
+1. 实现 instrumentSanitize 函数，为给定的指令插入 \_\_sanitize__ 检测代码。
 2. 修改 runOnFunction 函数，为给定代码块中的所有除法指令添加除零检测功能。
 3. 实现 instrumentCoverage 函数，为所有调试位置插入 __coverage__ 代码覆盖率统计代码。
 4. 修改 runOnFunction 函数，为所有指令添加代码覆盖率统计功能。
