@@ -246,16 +246,135 @@ void DivZeroAnalysis::doAnalysis(Function &F) {
 ### Step 1: 实现 flowIn 操作
 
 ```cpp
+/* 函数签名解析 
+输入参数：
+- Instruction *I: 当前要分析的指令
+- Memory *In: 输出参数，用于存储计算出的输入状态
+作用：计算指令I执行前的程序状态 */
 void DivZeroAnalysis::flowIn(Instruction *I, Memory *In) {
-
+  /* 获取前驱指令
+  作用：获取控制流图中指向当前指令I的所有前驱指令
+  */
+  std::vector<Instruction *> preds = getPredecessors(I);
+  /* 初始化合并容器
+  - joined: 用于累积合并结果的内存状态
+  - first: 标志位，区分第一个前驱的处理方式
+  */
+  Memory *joined = new Memory();
+  bool first = true;
+  /* 核心合并循环
+  */
+  for (auto *P : preds) {
+    if (first) {
+      *joined = *OutMap[P];
+      first = false;
+    } else {
+      Memory *tmp = join(joined, OutMap[P]);
+      joined = tmp;
+    }
+  }
+  *In = *joined;
 }
 ```
-
 
 
 ### Step 2: 调用 transfer 函数
 
 
+```cpp
+/* 函数签名与总体结构
+参数：
+I: 当前要分析的指令
+In: 指令执行前的输入状态（只读）
+NOut: 指令执行后的输出状态（输出参数）
+作用：根据指令类型和输入状态，计算执行该指令后的新状态
+*/
+void DivZeroAnalysis::transfer(Instruction *I, const Memory *In, Memory NOut) {
+  // 初始化输出状态
+  *NOut = *In;
+  // 输入指令处理
+  if (isInput(I)) {
+    std::string var = variable(I);
+    (*NOut)[var] = new Domain(Domain::MaybeZero);
+    return;
+  }
+  // 操作数值提取
+  if (BinaryOperator *BI = dyn_cast<BinaryOperator>(I)) {
+    Domain *lhs = nullptr, *rhs = nullptr;
+    Value *op0 = BI->getOperand(0);
+    Value *op1 = BI->getOperand(1);
+    /* 左操作数分析
+    情况1：常量操作数 if
+    情况2：变量操作数 else
+    */
+    if (ConstantInt C0 = dyn_cast<ConstantInt>(op0)) {
+      lhs = new Domain(C0->isZero() ? Domain::Zero : Domain::NonZero);
+    } else {
+      lhs = In->count(variable(op0)) ? (In).at(variable(op0)) : new Domain(Domain::MaybeZero);
+    }
+    /* 右操作数分析
+    
+    
+    */
+    if (ConstantInt C1 = dyn_cast<ConstantInt>(op1)) {
+      rhs = new Domain(C1->isZero() ? Domain::Zero : Domain::NonZero);
+    } else {
+      rhs = In->count(variable(op1)) ? (In).at(variable(op1)) : new Domain(Domain::MaybeZero);
+    }
+
+    Domain *res = nullptr;
+    switch (BI->getOpcode()) {
+      case Instruction::Add: res = Domain::add(lhs, rhs); break;
+      case Instruction::Sub: res = Domain::sub(lhs, rhs); break;
+      case Instruction::Mul: res = Domain::mul(lhs, rhs); break;
+      case Instruction::SDiv:
+      case Instruction::UDiv: res = Domain::div(lhs, rhs); break;
+      default: res = new Domain(Domain::MaybeZero); break;
+    }
+
+    std::string var = variable(I);
+    (*NOut)[var] = res;
+    return;
+  }
+
+  /* 内存分配指令
+  alloca在栈上分配内存，但不初始化
+  抽象值：Uninit（未初始化状态）
+  */
+  if (AllocaInst AI = dyn_cast<AllocaInst>(I)) {
+    std::string var = variable(I);
+    (NOut)[var] = new Domain(Domain::Uninit);
+    return;
+  }
+  /* 内存读取指令
+  从内存地址读取值
+  保守估计：内存中的值无法静态确定
+  */
+  if (LoadInst LI = dyn_cast<LoadInst>(I)) {
+    std::string var = variable(I);
+    (NOut)[var] = new Domain(Domain::MaybeZero);
+    return;
+  }
+  /* 内存写入指令
+  将值写入内存地址
+  不影响我们跟踪的变量：我们只跟踪SSA形式的局部变量
+  */
+  if (StoreInst *SI = dyn_cast<StoreInst>(I)) {
+    return;
+  }
+  /* 比较指令
+  整数比较操作(eq, ne, lt, gt等)
+  结果是布尔值(0或1)
+  抽象为MaybeZero因为结果可能是0或1
+  */
+  if (ICmpInst CI = dyn_cast<ICmpInst>(I)) {
+    std::string var = variable(I);
+    (NOut)[var] = new Domain(Domain::MaybeZero);
+    return;
+  }
+}
+
+```
 
 ### Step 3: 实现 flowOut 操作
 
