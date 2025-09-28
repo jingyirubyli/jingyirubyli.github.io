@@ -30,7 +30,7 @@ author: # Add name author (optional)
     - [Step 2: 调用 transfer 函数](#step-2-调用-transfer-函数)
     - [Step 3: 实现 flowOut 操作](#step-3-实现-flowout-操作)
     - [Step 4: 编写 doAnalysis 函数, 实现混沌迭代算法](#step-4-编写-doanalysis-函数-实现混沌迭代算法)
-    - [Step 5: 全剧辅助函数 join、equal](#step-5-全剧辅助函数-joinequal)
+    - [Step 5: 全局辅助函数 join、equal](#step-5-全局辅助函数-joinequal)
 - [编译实践](#编译实践)
   - [Step 1: 生成 .so](#step-1-生成-so)
   - [Step 2: 生成 .ll](#step-2-生成-ll)
@@ -72,6 +72,86 @@ author: # Add name author (optional)
 
 实际上, 是根据Domain.h写自己的Domain.cpp:
 
+```cpp
+#include "Domain.h"
+
+//===----------------------------------------------------------------------===//
+// Abstract Domain Implementation
+//===----------------------------------------------------------------------===//
+
+/* Add your code here */
+
+namespace dataflow {
+
+Domain::Domain() : Value(Uninit) {}
+Domain::Domain(Element V) : Value(V) {}
+
+void Domain::print(llvm::raw_ostream &O) {
+  switch(Value) {
+    case Uninit: O << "Uninit"; break;
+    case NonZero: O << "NonZero"; break;
+    case Zero: O << "Zero"; break;
+    case MaybeZero: O << "MaybeZero"; break;
+  }
+}
+
+// +
+Domain* Domain::add(Domain *E1, Domain *E2) {
+  if (!E1 || !E2) return new Domain(MaybeZero);
+  if (E1->Value == Zero && E2->Value == Zero) return new Domain(Zero);
+  if (E1->Value == NonZero && E2->Value == NonZero) return new Domain(NonZero);
+  return new Domain(MaybeZero);
+}
+
+// -
+Domain* Domain::sub(Domain *E1, Domain *E2) {
+  if (!E1 || !E2) return new Domain(MaybeZero);
+  if (E1->Value == Zero && E2->Value == Zero) return new Domain(Zero);
+  if (E1->Value == NonZero && E2->Value == NonZero) return new Domain(MaybeZero);
+  return new Domain(MaybeZero);
+}
+
+// *
+Domain* Domain::mul(Domain *E1, Domain *E2) {
+  if (!E1 || !E2) return new Domain(MaybeZero);
+  if (E1->Value == Zero || E2->Value == Zero) return new Domain(Zero);
+  if (E1->Value == NonZero && E2->Value == NonZero) return new Domain(NonZero);
+  return new Domain(MaybeZero);
+}
+
+// /
+Domain* Domain::div(Domain *E1, Domain *E2) {
+  if (!E1 || !E2) return new Domain(MaybeZero);
+  if (E2->Value == Zero) return new Domain(MaybeZero);
+  if (E1->Value == Zero) return new Domain(Zero);
+  if (E1->Value == NonZero && E2->Value == NonZero) return new Domain(NonZero);
+  return new Domain(MaybeZero);
+}
+
+// join
+Domain* Domain::join(Domain *E1, Domain *E2) {
+  if (!E1) return E2;
+  if (!E2) return E1;
+  if (E1->Value == E2->Value) return new Domain(E1->Value);
+  return new Domain(MaybeZero);
+}
+
+// order
+bool Domain::order(Domain E1, Domain E2) {
+  if (E1.Value == E2.Value) return true;
+  if (E1.Value == Uninit) return true;
+  if (E2.Value == MaybeZero) return true;
+  return false;
+}
+
+// operator<<
+llvm::raw_ostream &operator<<(llvm::raw_ostream &O, Domain V) {
+  V.print(O);
+  return O;
+}
+
+}
+```
 
 ### Step 2: DataflowAnalysis::runOnFunction -- 了解编译器优化阶段如何执行数据流分析
 
@@ -87,6 +167,8 @@ bool DataflowAnalysis::runOnFunction(Function &F) {
     ...
 }
 ```
+
+DataflowAnalysis.cpp实现了一个通用的数据流分析基础框架，为具体的分析（如除零分析）提供基础设施和通用接口。
 
 runOnFunction 为函数中的每条指令分配输入/输出抽象状态（InMap / OutMap），运行数据流固定点算法（chaotic iteration），最后用得到的 InMap 去检测每个除法指令的潜在“除零”风险。主要步骤分析:
 
@@ -218,6 +300,32 @@ Domain *evalPhiNode(PHINode *PHI, const Memory *Mem) {
 DivZeroAnalysis::check 函数用于检查特定指令是否可能导致除零错误。您应该使用 DivZeroAnalysis::InMap 来判断是否存在错误。
 
 
+```cpp
+bool DivZeroAnalysis::check(Instruction *I) {
+  /* Add your code here */
+  if (BinaryOperator *BI = dyn_cast<BinaryOperator>(I)) {
+    if (BI->getOpcode() == Instruction::SDiv ||
+        BI->getOpcode() == Instruction::UDiv) {
+      Value *divisor = BI->getOperand(1);
+
+      if (ConstantInt *C = dyn_cast<ConstantInt>(divisor)) {
+        return C->isZero();
+      }
+
+      std::string var = variable(divisor);
+      Memory *In = InMap[I];
+      if (In->find(var) != In->end()) {
+        Domain *d = (*In)[var];
+        return (d->Value == Domain::Zero);
+      }
+    }
+  }
+  return false;
+}
+```
+
+
+
 ---
 
 ## Part 2: 综合内容——完成数据流分析
@@ -244,6 +352,8 @@ void DivZeroAnalysis::doAnalysis(Function &F) {
 首先，请取消PART 2部分中标记的函数注释，包括doAnalysis、flowIn、flowOut、join和equal。之后，按照以下步骤实现上述算法的各个部分：
 
 ### Step 1: 实现 flowIn 操作
+
+flowIn 在控制流汇合点合并来自不同路径的状态
 
 ```cpp
 /* 函数签名解析 
@@ -378,15 +488,89 @@ void DivZeroAnalysis::transfer(Instruction *I, const Memory *In, Memory NOut) {
 
 ### Step 3: 实现 flowOut 操作
 
+flowOut 检查状态是否变化，如有变化则传播给后继指令
 
-
+```cpp
+void DivZeroAnalysis::flowOut(Instruction *I, Memory *Pre, Memory *Post,
+                              SetVector<Instruction *> &WorkSet) {
+    if (!equal(OutMap[I], Post)) {
+        OutMap[I] = new Memory(*Post);  // 更新输出状态
+    
+        // 将所有后继指令加入工作列表
+        std::vector<Instruction *> succs = getSuccessors(I);
+        for (Instruction *S : succs) {
+            WorkSet.insert(S);
+        }
+    }
+}
+```
 
 ### Step 4: 编写 doAnalysis 函数, 实现混沌迭代算法
 
 
+```cpp
+void DivZeroAnalysis::doAnalysis(Function &F) {
+    SetVector<Instruction *> WorkSet;
+    
+    // 1. 初始化：所有指令加入工作列表
+    for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
+        WorkSet.insert(&(*I));
+    }
+    
+    // 2. 迭代直到不动点
+    while (!WorkSet.empty()) {
+        Instruction *I = WorkSet.pop_back_val();
+        
+        // 2.1 计算输入状态
+        Memory *In = new Memory();
+        flowIn(I, In);
+        InMap[I] = In;
+        
+        // 2.2 应用传递函数
+        Memory *Post = new Memory();
+        transfer(I, In, Post);
+        
+        // 2.3 检查是否需要传播
+        flowOut(I, In, Post, WorkSet);
+    }
+}
+```
 
 
-### Step 5: 全剧辅助函数 join、equal
+### Step 5: 全局辅助函数 join、equal
+
+工具函数
+
+```cpp
+// 内存状态操作
+// 合并两个内存状态
+Memory* join(Memory *M1, Memory *M2) {
+    Memory* Result = new Memory(*M1);
+    for (auto &kv : *M2) {
+        auto it = Result->find(kv.first);
+        if (it == Result->end()) {
+            (*Result)[kv.first] = new Domain(kv.second->Value);
+        } else {
+            (*Result)[kv.first] = Domain::join(it->second, kv.second);
+        }
+    }
+    return Result;
+}
+
+// 比较两个内存状态是否相等
+bool equal(Memory *M1, Memory *M2) {
+    if (M1->size() != M2->size()) return false;
+    for (auto &kv : *M1) {
+        auto it = M2->find(kv.first);
+        if (it == M2->end()) return false;
+        if (kv.second->Value != it->second->Value) return false;
+    }
+    return true;
+}
+```
+
+
+
 
 ---
 
