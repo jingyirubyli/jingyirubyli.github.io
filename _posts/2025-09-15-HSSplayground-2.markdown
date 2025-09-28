@@ -25,7 +25,7 @@ author: # Add name author (optional)
     - [Step 3: Memory abstraction -- 了解内存抽象](#step-3-memory-abstraction----了解内存抽象)
     - [Step 4: 实现 DivZeroAnalysis::transfer 函数](#step-4-实现-divzeroanalysistransfer-函数)
     - [Step 5: 实现 DivZeroAnalysis::check 函数](#step-5-实现-divzeroanalysischeck-函数)
-  - [Part 2: 综合内容——完成数据流分析](#part-2-综合内容完成数据流分析)
+  - [Part 2: 综合内容——完成数据流分析: 编写doAnalysis()函数](#part-2-综合内容完成数据流分析-编写doanalysis函数)
     - [Step 1: 实现 flowIn 操作](#step-1-实现-flowin-操作)
     - [Step 2: 调用 transfer 函数](#step-2-调用-transfer-函数)
     - [Step 3: 实现 flowOut 操作](#step-3-实现-flowout-操作)
@@ -329,7 +329,7 @@ bool DivZeroAnalysis::check(Instruction *I) {
 
 ---
 
-## Part 2: 综合内容——完成数据流分析
+## Part 2: 综合内容——完成数据流分析: 编写doAnalysis()函数
 
 现在您已经编写了填充输入输出映射表以及使用这些映射表检测除零错误的代码，下一步是在doAnalysis函数中实现混沌迭代算法。首先，请复习数据流分析的课程内容，特别是要重点学习可达定义分析和混沌迭代算法。简而言之，数据流分析为程序控制流图中的每个节点创建并填充一个输入集（IN）和一个输出集（OUT）。重复执行输入流和输出流操作，直到算法达到稳定状态。更正式地说，doAnalysis函数应该维护一个工作集（WorkSet），其中包含需要进一步处理的节点。当工作集为空时，算法达到稳定状态。对于工作集中的每个指令，您的函数应该执行以下操作：
 
@@ -339,7 +339,7 @@ bool DivZeroAnalysis::check(Instruction *I) {
 
 我们已经为您预先编写了该流程的起始部分，即使用输入C程序中的每条指令初始化WorkSet：
 
-```c
+```cpp
 void DivZeroAnalysis::doAnalysis(Function &F) {
     SetVector<Instruction *> WorkSet;
     for (inst_iterator I = inst_begin(F), E = inst_end(F); I != E; ++I) {
@@ -576,6 +576,41 @@ bool equal(Memory *M1, Memory *M2) {
 ---
 
 # 编译实践
+
+**总结调用链分析**
+
+主分析流程:
+
+LLVM Pass Manager
+    ↓
+DataflowAnalysis::runOnFunction()
+    ↓
+DivZeroAnalysis::doAnalysis()
+    ↓
+工作列表算法循环
+    ├── DivZeroAnalysis::flowIn()
+    │   ├── getPredecessors()
+    │   └── join()
+    ├── DivZeroAnalysis::transfer()
+    │   ├── variable()
+    │   ├── Domain::add/sub/mul/div()
+    │   └── dyn_cast<>() [LLVM函数]
+    └── DivZeroAnalysis::flowOut()
+        ├── equal()
+        └── getSuccessors()
+
+错误检测流程:
+
+DataflowAnalysis::collectErrorInsts()
+    ↓
+遍历所有指令
+    ↓
+DivZeroAnalysis::check()
+    ├── dyn_cast<BinaryOperator>()
+    ├── variable()
+    └── Domain值检查  
+
+**编译命令速查**
 
 一切就绪后, 需要依次运行的命令速查:
 
