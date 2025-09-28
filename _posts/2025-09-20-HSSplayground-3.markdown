@@ -226,9 +226,9 @@ int f() {
 一切就绪后, 需要依次运行的命令速查:
 
 ```bash
-#
-
-
+# cd ~/LLVMPlayground/part3_pointer_aware_data_flow_analysis/DivZero/test
+clang -emit-llvm -S -fno-discard-value-names -Xclang -disable-O0-optnone -c pointer0.c -o pointer0.opt.ll
+opt -load ../../build/DivZero/libDataflowPass.so -DivZero pointer0.opt.ll
 ```
 
 
