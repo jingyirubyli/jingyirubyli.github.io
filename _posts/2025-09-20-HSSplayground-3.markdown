@@ -23,14 +23,15 @@ author: # Add name author (optional)
     - [Step 1: 处理函数参数-理解函数参数](#step-1-处理函数参数-理解函数参数)
     - [Step 2: 处理函数参数-回顾 doAnalysis()函数](#step-2-处理函数参数-回顾-doanalysis函数)
     - [Step 3: 处理函数参数-](#step-3-处理函数参数-)
-    - [Step 4: 处理函数调用](#step-4-处理函数调用)
+    - [Step 4: 处理函数调用-CallInst](#step-4-处理函数调用-callinst)
   - [Part 2: Store / Load Instructions-处理Store/Load指令](#part-2-store--load-instructions-处理storeload指令)
-    - [Step 1:](#step-1)
-    - [Step 2:](#step-2)
-    - [Step 3:](#step-3)
+    - [Step 1: 新的函数签名 - doAnalysis 初始化](#step-1-新的函数签名---doanalysis-初始化)
+    - [Step 2: 理解LLVM内存模型 - transfer()](#step-2-理解llvm内存模型---transfer)
+    - [Step 3: 实现Store/Load处理 - transfer()](#step-3-实现storeload处理---transfer)
 - [编译实践](#编译实践)
   - [Step 1: 生成 .so](#step-1-生成-so)
   - [Step 2: 生成 .ll](#step-2-生成-ll)
+
 
 
 ---

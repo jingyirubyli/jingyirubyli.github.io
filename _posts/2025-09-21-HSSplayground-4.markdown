@@ -28,6 +28,24 @@ root@809bedcd4077:~/Downloads/LLVMPlayground-main/part4_instrumentation/DivZeroI
 4,13
 ```
 
+- [本讲内容](#本讲内容)
+- [学习目标](#学习目标)
+- [概念理解](#概念理解)
+  - [Part 1: 关键技术](#part-1-关键技术)
+    - [Step1: 插桩（Instrumentation）](#step1-插桩instrumentation)
+    - [Step 2: 代码覆盖率(Code Coverage)机制](#step-2-代码覆盖率code-coverage机制)
+    - [Step 3: 调试位置(Debug Location)](#step-3-调试位置debug-location)
+    - [Step 4: 代码分析插件(Instrumentation Pass)](#step-4-代码分析插件instrumentation-pass)
+  - [Part 2: 代码实现](#part-2-代码实现)
+    - [Step 1: 在LLVM代码中插入指令](#step-1-在llvm代码中插入指令)
+    - [Step 3: 将C函数加载到LLVM代码中](#step-3-将c函数加载到llvm代码中)
+    - [Step 3: 调试信息](#step-3-调试信息)
+- [编译实践](#编译实践)
+  - [Step 1: 生成 .so](#step-1-生成-so)
+  - [Step 2: 生成 .ll](#step-2-生成-ll)
+  - [Step 3: 应用优化器](#step-3-应用优化器)
+  - [Step 4: 生成独立可执行文件](#step-4-生成独立可执行文件)
+
 
 ---
 
