@@ -192,9 +192,12 @@ printf(\Line No: %d\n", Debug.getLine());
 一切就绪后, 需要依次运行的命令速查:
 
 ```bash
-#
-
-
+# root@809bedcd4077:~/Downloads/LLVMPlayground-main/part4_instrumentation/DivZeroInstrument/test #
+clang -emit-llvm -S -fno-discard-value-names -c -o simple0.ll simple0.c -g
+opt -load ../../build/DivZeroInstrument/libInstrumentPass.so -Instrument -S simple0.ll -o simple0.instrumented.ll
+clang -o simple0 -L../../build/DivZeroInstrument -lruntime simple0.instrumented.ll
+LD_LIBRARY_PATH=../../build/DivZeroInstrument ./simple0
+cat simple0.cov
 ```
 
 

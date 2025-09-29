@@ -111,6 +111,16 @@ return 0;
 
 ## Part 2: Store / Load Instructions-处理Store/Load指令
 
+
+需要做的:
+
+- [] 编写 doAnalysis()
+- [] 编写 transfer()--LoadInst和StoreInst
+- [] 
+
+
+
+
 ### Step 1: 新的函数签名 - doAnalysis 初始化
 
 如上所述，我们对之前的doAnalysis()函数进行了修改：
