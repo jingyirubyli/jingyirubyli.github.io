@@ -3,7 +3,7 @@ layout: post
 title:  HSS SymbolicExecutionPlayground 笔记
 date:   2025-10-18
 description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
-img: hss1.png # Add image post (optional)
+img: hss5.png # Add image post (optional)
 tags: [Blog, C/C++, Holistic Software Security]
 author: # Add name author (optional)
 ---
@@ -27,7 +27,7 @@ author: # Add name author (optional)
 
 
 
-# 实践
+# 理解
 
 ## Part 1: LLVM Instrumentation
 
@@ -81,3 +81,33 @@ Address 类的一个实例表示一个符号内存地址。符号地址根据 LL
 
 **路径公式和搜索策略。**
 每次执行已检测的程序后，路径公式将被编码并存储在 formula.smt2 中。所有已执行分支指令的 ID 将按执行顺序存储在 branch.txt 中，这可能有助于生成下一个输入。给定当前可满足的路径公式，searchStrategy 函数将提出一个公式来推导新的输入，从而探索更多路径。DSE.cpp 中的主函数将迭代生成新的输入，直到找到崩溃的输入或发生超时。
+
+
+# 实践
+
+## 输入程序的格式
+
+本实验中的输入程序假设仅包含以下 C 语言子特性：
+- 所有值均为整数（即​​不含浮点数、指针、结构体、枚举、数组等）。其他类型的值可以忽略。
+- 假设用户输入仅通过 DSE_Input 函数传入，且不存在其他函数的调用指令。
+
+
+## 示例输入和输出
+
+您的 DSE 引擎应该在给定的已插桩程序上运行。例如：
+
+```bash
+$ cd DSE/test
+$ make
+$ ../../build/DSE/dse ./simple0 5
+```
+
+它将在 1 次迭代后找到崩溃的输入，并将该输入存储在 input.txt 中：
+
+```bash
+Floating point exception
+Crashing input found (1 iters)
+$ cat input.txt
+X0,1024
+```
+
