@@ -1,0 +1,74 @@
+---
+layout: post
+title:  HSS CodeQL Playground and Real World Bug Finding
+date:   2025-10-27
+description: You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. # Add post description (optional)
+img: codeql.png # Add image post (optional)
+tags: [Blog, C/C++, Holistic Software Security]
+author: # Add name author (optional)
+---
+# HSS Playground
+
+注意事项：
+- LLVM入门：阅读LLVM PRIMER; 阅读LLVM doc: <https://mapping-high-level-constructs-to-llvm-ir.readthedocs.io/en/latest/index.html>，了解C语言到LLVM IR的映射关系。
+- 项目环境搭建：课程提供资源库，其中包含安装LLVM、Z3以及编写LLVM插件所需的所有脚本和示例代码。资源库地址：<https://github.com/HolisticSoftwareSecurity/hssllvmsetup>。该资源库包含分析（即不修改IR的插件）和插桩（即修改IR的插件）的示例。
+- 项目代码包: <https://github.com/HolisticSoftwareSecurity/LLVMPlayground>
+- 开发环境：CLion（<https://www.jetbrains.com/clion/>）。
+
+目录:
+
+
+
+---
+
+
+
+# 学习目标
+
+本次作业包含两个模块。在第一个模块中，你将编写 CodeQL 查询来搜索某些潜在的错误模式。在第二个模块中，你将通过在开源代码库上运行 CodeQL 套件来体验实际的错误查找。
+
+# 理解
+
+## Part 1: LLVM Instrumentation
+
+
+
+
+## Part 2: Runtime Symbolic Interpretation
+
+
+
+
+
+
+## Part 3: Backtracking Strategy
+
+
+
+
+# 实践
+
+## 输入程序的格式
+
+
+
+
+## 示例输入和输出
+
+您的 DSE 引擎应该在给定的已插桩程序上运行。例如：
+
+```bash
+$ cd DSE/test
+$ make
+$ ../../build/DSE/dse ./simple0 5
+```
+
+它将在 1 次迭代后找到崩溃的输入，并将该输入存储在 input.txt 中：
+
+```bash
+Floating point exception
+Crashing input found (1 iters)
+$ cat input.txt
+X0,1024
+```
+

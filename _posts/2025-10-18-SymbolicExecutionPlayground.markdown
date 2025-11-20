@@ -25,6 +25,27 @@ author: # Add name author (optional)
 
 # 学习目标
 
+**实验说明**
+
+动态符号执行 (DSE) 使用随机测试和符号执行技术，来搜索程序的所有执行路径以查找错误。DSE 同时跟踪运行时值和符号约束，并在程序计算树的回溯搜索过程中，使用前者来简化后者的求解。我们已使用 Z3 构建了一个符号解释器的主干。您需要将一个 C 程序编码到这个符号解释器 API 中，并编写驱动动态符号执行的代码。我们将在以下章节中提供一些关于如何执行此操作的详细信息。本实验假设输入程序仅包含整型变量（没有指针或其他类型的变量），并且没有函数（没有 CallInstr）。
+
+**理解 Z3。**
+
+Z3 是微软开发的定理证明器。它是一个庞大而复杂的工具，因此本文将作为其功能和用途的粗略指南。考虑一个如下简单的通用方程组，其中 X 和 Y 为整数：
+
+X < Y
+X > 2
+
+虽然这个例子很简单，但请思考一下如何使用您选择的任何编程语言来解决这个问题。您可以使用循环来检查数字，或者找到一个处理矩阵乘法的库。这是因为大多数编程语言都是命令式的，这意味着解决问题需要一系列命令。另一方面，Z3 有一个声明式接口，在这种情况下，您只需要提供约束列表（在本例中为 X < Y 和 X > 2）。将以下内容插入在线 Z3 求解器即可查看结果：
+
+(declare-const x Int)
+(declare-const y Int)
+(assert (< x y))
+(assert (> x 2))
+(check-sat)
+(get-model)
+
+Z3 可能无法提供所有符合约束条件的可能结果，但重要的是，它验证了可满足性，这是该 DSE 引擎将利用的关键因素。
 
 
 # 理解
@@ -32,6 +53,19 @@ author: # Add name author (optional)
 ## Part 1: LLVM Instrumentation
 
 此动态符号执行实现的第一个组件是对输入程序进行插桩，该操作在 src/Instrument.cpp 中完成。这遵循了之前实验中常见的格式和模式，只是这次 LLVM 传递将注入 src/Runtime.cpp 中定义的各种函数，并附带来自每个有效 LLVM 指令的相应元数据。这将使 DSE 能够在运行时与 Z3 交互。具体来说，以下是需要插桩的函数（来自 include/Instrument.h）：
+
+```cpp
+static const char *DSEInitFunctionName = "__DSE_Init__";
+static const char *DSEAllocaFunctionName = "__DSE_Alloca__";
+static const char *DSEStoreFunctionName = "__DSE_Store__";
+static const char *DSELoadFunctionName = "__DSE_Load__";
+static const char *DSEConstFunctionName = "__DSE_Const__";
+static const char *DSERegisterFunctionName = "__DSE_Register__";
+static const char *DSEICmpFunctionName = "__DSE_ICmp__";
+static const char *DSEBranchFunctionName = "__DSE_Branch__";
+static const char *DSEBinOpFunctionName = "__DSE_BinOp__";
+```
+
 
 **符号输入。**框架代码提供了一个名为 DSE_Input 的辅助函数，供用户指定符号输入。在目标程序中，您应该首先包含头文件 include/Runtime.h 才能使用该函数。在下面的示例代码中，动态符号执行引擎将变量 x 和 y 视为符号输入，并将 z 视为具体值 0：
 
